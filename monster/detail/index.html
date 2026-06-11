@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>モンスター詳細｜凡庸な イルルカSP（再現版）</title>
+  <meta name="description" content="モンスターのスキル、特性、耐性、ステータスを掲載しています。">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <script>window.SITE_ROOT = "../../";</script>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main role="main">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-9 order-lg-2">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="../../">ホーム</a></li>
+              <li class="breadcrumb-item"><a href="../">モンスター</a></li>
+              <li class="breadcrumb-item active" aria-current="page" id="bc-name">詳細</li>
+            </ol>
+          </nav>
+          <div id="detail-body"></div>
+        </div>
+        <div class="col-lg-3 order-lg-1"><div id="site-nav"></div></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+  <script src="../../assets/js/common.js"></script>
+  <script>
+  (function () {
+    var B = window.Bonyou;
+    var id = new URLSearchParams(location.search).get('id') || '';
+    var box = document.getElementById('detail-body');
+
+    function row(label, value) {
+      return '<tr><th class="w-25">' + B.esc(label) + '</th><td>' + value + '</td></tr>';
+    }
+
+    function resGrid(m) {
+      return B.buildResGrid(function (el) {
+        var v = m[el];
+        return { cls: B.resClass(v), html: B.esc(B.resDisplay(v)) };
+      });
+    }
+
+    var monsterSkills = [];  // このモンスターが持つスキル
+
+    function render(m) {
+      document.title = m['名前'] + '｜凡庸な イルルカSP（再現版）';
+      document.getElementById('bc-name').textContent = m['名前'];
+      var info = B.lineageInfo(m['系統']);
+
+      // 特性
+      var sizeTrait = m['サイズ特性'];
+      var traits = B.traitsOf(m);
+      var traitRows =
+        row('サイズ特性', B.esc(sizeTrait)) +
+        row('新生前特性', [m['新生前特性1'], m['新生前特性2']].filter(Boolean).map(B.esc).join('、')) +
+        row('特性(Lv25)', B.esc(m['特性25'] || '-')) +
+        row('特性(Lv50)', B.esc(m['特性50'] || '-')) +
+        row('特性(Lv100)', B.esc(m['特性100'] || '-')) +
+        row('メガ特性', B.esc(m['メガ特性'] || '-')) +
+        row('ギガ特性', B.esc(m['ギガ特性'] || '-')) +
+        row('超ギガ特性', B.esc(m['超ギガ特性'] || '-'));
+
+      // ステータス
+      var statRows =
+        row('ＨＰ', m['HP']) + row('ＭＰ', m['MP']) +
+        row('攻撃力', m['攻撃力']) + row('守備力', m['守備力']) +
+        row('素早さ', m['素早さ']) + row('かしこさ', m['賢さ']);
+
+      var weapons = B.weaponsOf(m);
+
+      // スキル（種族→スキルの逆引き）
+      var skillHtml = monsterSkills.length
+        ? monsterSkills.map(function (s) { return '<a class="badge badge-light border p-2 mr-1 mb-1" href="../../skill/detail/?id=' + B.esc(s.id) + '">' + B.esc(s.name) + '</a>'; }).join('')
+        : '<span class="text-muted">データなし</span>';
+
+      box.innerHTML =
+        '<div class="card mb-3"><div class="card-body">' +
+          '<div class="d-flex align-items-center">' +
+            '<span class="mon-icon ' + info.cls + '" style="width:48px;height:48px;font-size:16px;">' + B.esc(m.no) + '</span>' +
+            '<div class="ml-3">' +
+              '<h1 class="h4 mb-1 detail-title"><a href="' + B.buildUrl(m) + '" title="ビルドシミュレーターを開く">' + B.esc(m['名前']) + '</a></h1>' +
+              '<div><span class="badge badge-secondary mr-1">No.' + B.esc(m.no) + '</span>' +
+              '<span class="badge badge-info mr-1">ランク' + B.esc(m['ランク']) + '</span>' +
+              '<span class="badge badge-light mr-1">' + B.esc(info.label) + '</span>' +
+              '<span class="badge badge-light">' + B.esc(sizeTrait) + '</span></div>' +
+            '</div>' +
+          '</div>' +
+        '</div></div>' +
+
+        '<h2 class="h5">スキル</h2>' +
+        '<div class="mb-2">' + skillHtml + '</div>' +
+
+        '<h2 class="h5 mt-4">特性</h2>' +
+        '<table class="table table-sm table-bordered"><tbody>' + traitRows + '</tbody></table>' +
+
+        '<h2 class="h5 mt-4">耐性（新生配合時）</h2>' + resGrid(m) +
+
+        '<h2 class="h5 mt-4">ステータス</h2>' +
+        '<table class="table table-sm table-bordered"><tbody>' + statRows + '</tbody></table>' +
+
+        '<h2 class="h5 mt-4">装備</h2>' +
+        '<p>' + (weapons.length ? B.esc(weapons.join('、')) : 'なし') + '</p>' +
+
+        '<p class="mt-4"><a href="../../search-monster/">耐性・特性からモンスターを検索する</a></p>';
+    }
+
+    Promise.all([B.loadMonsters(), B.loadSkills().catch(function () { return []; })]).then(function (arr) {
+      var data = arr[0], skills = arr[1];
+      var m = data.filter(function (x) { return x.id === id; })[0];
+      if (!m) { box.innerHTML = '<div class="alert alert-warning">モンスターが見つかりませんでした（id=' + B.esc(id) + '）。<a href="../">一覧へ戻る</a></div>'; return; }
+      // このモンスター(種族)を持つスキルを逆引き（スキル側のidは No.(位階) または 完全id）
+      monsterSkills = skills.filter(function (s) {
+        return s.monsters.some(function (mo) { return mo.id === m.no || mo.id === m.id; });
+      });
+      render(m);
+    }).catch(function (e) {
+      box.innerHTML = '<div class="alert alert-danger">読み込みに失敗しました: ' + B.esc(e.message) + '</div>';
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:web.archive.org)",
+      "Bash(curl -sL -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://web.archive.org/web/20250519152957/https://bonyou.info/dqm2sp/\" -o /tmp/dqm2sp.html)",
+      "Read(//tmp/**)",
+      "Bash(python3 -)",
+      "Bash(sed 's/<[^>]*>//g')",
+      "Bash(awk 'BEGIN{p=0} /<body/{p=1} p{print} /<\\\\/body>/{p=0}' dqm2sp.html)",
+      "Bash(grep -vE '^$')",
+      "Bash(perl -0777 -ne 'print $1 if /<body[^>]*>\\(.*\\)<\\\\/body>/s' dqm2sp.html)",
+      "Bash(perl -0777 -pe 's/<script.*?<\\\\/script>//gs; s/<style.*?<\\\\/style>//gs; s/<[^>]+>/ /gs; s/[ \\\\t\\\\r\\\\n]+/ /g' body.html)",
+      "Bash(curl -s -o page___TRACKED_VAR__.html -w '%{http_code} %{size_download}' -A Mozilla/5.0 https://web.archive.org/web/20250519152957/https://bonyou.info/dqm2sp/__TRACKED_VAR__/)",
+      "Bash(curl -sL -A Mozilla/5.0 -o page___TRACKED_VAR__.html -w 'final=%{url_effective}\\\\nhttp=%{http_code} size=%{size_download}\\\\n' https://web.archive.org/web/2025/https://bonyou.info/dqm2sp/__TRACKED_VAR__/)",
+      "Bash(grep -oiE 'url *: *.{0,60}' page_monster.html)",
+      "Bash(perl -0777 -ne 'while\\(/<tr>\\(.*?\\)<\\\\/tr>/gs\\){print \"$1\\\\n---\\\\n\"; $i++; last if $i>=3}' page_monster.html)",
+      "Bash(curl -s \"http://web.archive.org/cdx/search/cdx?url=bonyou.info/dqm2sp*&output=text&fl=original&collapse=urlkey&limit=20000\")",
+      "Bash(sed -E 's#https?://bonyou.info/dqm2sp/##' cdx.txt)",
+      "Bash(awk -F/ '{print $1}')",
+      "Bash(curl -s \"http://web.archive.org/cdx/search/cdx?url=bonyou.info/dqm2sp/monster/detail*&output=text&fl=original&filter=original:.*id=.*&limit=100000\")",
+      "Bash(curl -s \"http://web.archive.org/cdx/search/cdx?url=bonyou.info/dqm2sp/monster/detail*&output=text&fl=original&limit=100000\")",
+      "Bash([ -f \"$f\" ])",
+      "Read(//mnt/d/Downloads/**)",
+      "Read(//mnt/d/**)",
+      "PowerShell($f=\"D:\\\\Downloads\\\\MonsterData \\(1\\).json\"; \\(Get-Item $f\\).Length; \"----HEAD----\"; Get-Content $f -TotalCount 60)",
+      "Bash(perl -0777 -ne 'print length\\($1\\),\"\\\\n\" while /<style[^>]*>\\(.*?\\)<\\\\/style>/gs' dqm2sp.html)"
+    ]
+  }
+}
