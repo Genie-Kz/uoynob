@@ -1,0 +1,128 @@
+@import 'tailwindcss';
+
+/* Tailwind v4: テーマ拡張（カスタムカラー）。
+   ここで定義した色は bg-resistance-half / bg-lineage-slime などのユーティリティとして使える。 */
+@theme {
+  /* 耐性の段階ごとの背景色（元サイト準拠） */
+  --color-resistance-weak: #ffcccc; /* 弱点 */
+  --color-resistance-little: #f4ffff; /* 軽減 */
+  --color-resistance-half: #e5ffff; /* 半減 */
+  --color-resistance-large: #b2ffff; /* 激減 */
+  --color-resistance-invalid: #00ffff; /* 無効 */
+  --color-resistance-recover: #00ff00; /* 回復 */
+  --color-resistance-reflect: #ff33ff; /* 反射 */
+
+  /* 系統ごとのアイコン色 */
+  --color-lineage-slime: #1e9bd7;
+  --color-lineage-dragon: #2e8b57;
+  --color-lineage-beast: #c97f2e;
+  --color-lineage-nature: #7cb342;
+  --color-lineage-devil: #8e44ad;
+  --color-lineage-zombie: #5d6d7e;
+  --color-lineage-material: #7f8c8d;
+  --color-lineage-special: #d4af37;
+}
+
+@layer base {
+  /* Tailwind v4 は border の既定色が currentColor。v3 同様の薄いグレーに揃える。 */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, #e5e7eb);
+  }
+
+  body {
+    @apply bg-white text-gray-800;
+  }
+
+  /* 操作要素はホバー時にふわっと色が変わるように */
+  a,
+  button,
+  select,
+  summary {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .app-link {
+    @apply text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline;
+  }
+}
+
+/* ---- 画面遷移のフェード（router-view） ---- */
+.route-fade-enter-active,
+.route-fade-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.route-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.route-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ---- モーダルのフェード＋せり上がり ---- */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.18s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-active .modal-panel,
+.modal-leave-active .modal-panel {
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease;
+}
+.modal-enter-from .modal-panel,
+.modal-leave-to .modal-panel {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+}
+
+/* ---- アコーディオン（高さをなめらかに開閉） ---- */
+.collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+.collapsible.is-open {
+  grid-template-rows: 1fr;
+}
+.collapsible > .collapsible-inner {
+  overflow: hidden;
+}
+
+/* ---- ふわっと現れるユーティリティ ---- */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.25s ease both;
+}
+
+/* ---- 動きを抑える設定の尊重 ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

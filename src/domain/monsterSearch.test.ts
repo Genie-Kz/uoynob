@@ -1,0 +1,32 @@
+import { describe, expect, it } from 'vitest';
+import { isEmptyCriteria, searchMonsters } from './monsterSearch';
+import { createMonster } from '@/test/fixtures';
+
+describe('searchMonsters', () => {
+  const fireImmune = createMonster({ 名前: 'A', 炎: '無効', 新生前特性1: 'メタルボディ' });
+  const fireHalf = createMonster({ 名前: 'B', 炎: '半減' });
+  const fireWeak = createMonster({ 名前: 'C', 炎: '弱点', 新生前特性1: 'メタルボディ' });
+
+  const all = [fireImmune, fireHalf, fireWeak];
+
+  it('耐性の閾値以上のモンスターだけ返す（半減↑）', () => {
+    const result = searchMonsters(all, {
+      thresholds: [{ element: '炎', minLevel: 3 }], // 半減=3 以上
+      requiredTraits: [],
+    });
+    expect(result.map((m) => m.名前)).toEqual(['A', 'B']);
+  });
+
+  it('特性条件でも絞り込む（AND条件）', () => {
+    const result = searchMonsters(all, {
+      thresholds: [{ element: '炎', minLevel: 3 }],
+      requiredTraits: ['メタルボディ'],
+    });
+    expect(result.map((m) => m.名前)).toEqual(['A']);
+  });
+
+  it('条件が空かどうかを判定できる', () => {
+    expect(isEmptyCriteria({ thresholds: [], requiredTraits: [] })).toBe(true);
+    expect(isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] })).toBe(false);
+  });
+});

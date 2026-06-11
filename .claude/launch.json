@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dqm2sp",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["serve.js", "8124"],
-      "port": 8124
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "4178", "--strictPort"],
+      "port": 4178
     }
   ]
 }

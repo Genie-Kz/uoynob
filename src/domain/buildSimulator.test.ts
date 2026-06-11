@@ -1,0 +1,136 @@
+import { describe, expect, it } from 'vitest';
+import { computeBuildResistances, type BuildConfiguration } from './buildSimulator';
+import type { ResistanceOutcome } from './buildSimulator';
+import { createGuardSkill, createMonster } from '@/test/fixtures';
+import type { BodySize, Monster } from '@/types/monster';
+
+function buildConfig(monster: Monster, overrides: Partial<BuildConfiguration> = {}): BuildConfiguration {
+  return {
+    monster,
+    bodySize: monster.サイズ特性,
+    traits: [],
+    skills: [],
+    forgeElements: [],
+    ...overrides,
+  };
+}
+
+function outcomeOf(results: ResistanceOutcome[], element: string): ResistanceOutcome {
+  const found = results.find((result) => result.element === element);
+  if (!found) throw new Error(`要素が見つかりません: ${element}`);
+  return found;
+}
+
+describe('computeBuildResistances - 基本', () => {
+  it('何も設定しなければ元の耐性のまま', () => {
+    const monster = createMonster({ メラ: '半減', ねむり: '弱点' });
+    const results = computeBuildResistances(buildConfig(monster));
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('半減');
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('弱点');
+    expect(outcomeOf(results, 'メラ').changed).toBe(false);
+  });
+
+  it('全ガード＋ですべての耐性が1段階上がる', () => {
+    const monster = createMonster({ メラ: '普通', イオ: '弱点' });
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'] }));
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('軽減');
+    expect(outcomeOf(results, 'イオ').finalValue).toBe('普通');
+    expect(outcomeOf(results, 'メラ').raised).toBe(true);
+  });
+});
+
+describe('computeBuildResistances - 上限ルール', () => {
+  it('属性耐性はスキル等で「回復」まで上がる', () => {
+    const monster = createMonster({ メラ: '無効' });
+    const skill = createGuardSkill('001', 'メラ強化', ['メラガード＋']);
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }));
+    // 無効(5) + 全ガード(1) + メラガード＋(2) = 8 → 属性なので回復(6)止まり（反射にはならない）
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('回復');
+  });
+
+  it('属性以外の耐性は上昇上限が「無効」', () => {
+    const monster = createMonster({ ねむり: '激減' });
+    const skill = createGuardSkill('001', 'ねむり強化', ['ねむりガード＋']);
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }));
+    // 激減(4) + 全ガード(1) + ねむりガード＋(2) = 7 → 属性以外なので無効(5)止まり（回復にならない）
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('無効');
+  });
+
+  it('元々反射の耐性は下がらず常に反射のまま（例: JOKERのねむり）', () => {
+    const monster = createMonster({ ねむり: '反射' });
+    // こうどうはやい は ねむり を -2 するが、反射は不変
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['こうどうはやい'] }));
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('反射');
+    expect(outcomeOf(results, 'ねむり').changed).toBe(false);
+  });
+
+  it('元の耐性が上限より高い場合（非属性で元々回復）はその段階を維持', () => {
+    const monster = createMonster({ ねむり: '回復' });
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'] }));
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('回復');
+  });
+});
+
+describe('computeBuildResistances - 下限・負の蓄積', () => {
+  it('弱点を下回ると蓄積され、上回るまで弱点のまま', () => {
+    const monster = createMonster({ マインド: '弱点' });
+    // こうどうはやい(-2) のみ → 弱点-2 → 弱点表示
+    const onlyHayai = computeBuildResistances(buildConfig(monster, { traits: ['こうどうはやい'] }));
+    expect(outcomeOf(onlyHayai, 'マインド').finalValue).toBe('弱点');
+
+    // こうどうはやい(-2) + マインドガード＋×2(+4) → -2+4=2 → 軽減
+    const nebuta = createGuardSkill('001', 'ねぶた魂', ['マインドガード＋', 'マインドガード＋']);
+    const withSkill = computeBuildResistances(
+      buildConfig(monster, { traits: ['こうどうはやい'], skills: [nebuta] }),
+    );
+    expect(outcomeOf(withSkill, 'マインド').finalValue).toBe('軽減');
+  });
+});
+
+describe('computeBuildResistances - 各補正', () => {
+  it('ボディサイズ補正は元サイズからの差分で適用', () => {
+    const standard = createMonster({ サイズ特性: 'スタンダードボディ', ザキ: '普通' });
+    const asMega = computeBuildResistances(buildConfig(standard, { bodySize: 'メガボディ' as BodySize }));
+    // ザキは状態異常系。メガ(+2) → 普通(1)+2=3=半減
+    expect(outcomeOf(asMega, 'ザキ').finalValue).toBe('半減');
+
+    // 元々メガのモンスターをメガのまま → 差分0で変化なし
+    const naturalMega = createMonster({ サイズ特性: 'メガボディ', ザキ: '普通' });
+    const keepMega = computeBuildResistances(buildConfig(naturalMega));
+    expect(outcomeOf(keepMega, 'ザキ').finalValue).toBe('普通');
+  });
+
+  it('スキルのガード＋は重複で+4になる', () => {
+    const monster = createMonster({ 炎: '普通' });
+    const dosanko = createGuardSkill('001', 'どさんこソウル', ['炎ブレスガード＋', '炎ブレスガード＋']);
+    const results = computeBuildResistances(buildConfig(monster, { skills: [dosanko] }));
+    // 炎は属性。普通(1)+4=5=無効
+    expect(outcomeOf(results, '炎').finalValue).toBe('無効');
+  });
+
+  it('武器鍛冶は別々の耐性に+1（重複は1回扱い）', () => {
+    const monster = createMonster({ メラ: '普通', ギラ: '半減' });
+    const results = computeBuildResistances(
+      buildConfig(monster, { forgeElements: ['メラ', 'メラ', 'ギラ'] }),
+    );
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('軽減'); // 重複しても+1のみ
+    expect(outcomeOf(results, 'ギラ').finalValue).toBe('激減');
+  });
+
+  it('メタル系ボディは複数持っても効果は1回のみ', () => {
+    const monster = createMonster({ どく: '普通' });
+    const results = computeBuildResistances(
+      buildConfig(monster, { traits: ['メタルボディ', 'ハードメタルボディ'] }),
+    );
+    // どくは +1 のみ → 軽減
+    expect(outcomeOf(results, 'どく').finalValue).toBe('軽減');
+  });
+
+  it('こうどうおそいは状態異常系を+2する', () => {
+    const monster = createMonster({ どく: '普通', マインド: '普通', メラ: '普通' });
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['こうどうおそい'] }));
+    expect(outcomeOf(results, 'どく').finalValue).toBe('半減'); // +2
+    expect(outcomeOf(results, 'マインド').finalValue).toBe('半減'); // +2
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('普通'); // 対象外
+  });
+});
