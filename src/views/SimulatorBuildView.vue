@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import type { BodySize } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { useMonsters } from '@/composables/useMonsters';
@@ -11,7 +12,6 @@ import {
 } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE, TRAIT_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
-import { collectAllTraitNames } from '@/domain/monster';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
@@ -23,28 +23,54 @@ import type { PickerItem } from '@/types/picker';
 
 const props = defineProps<{ id: string }>();
 
+const route = useRoute();
+const router = useRouter();
+
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+
+// マウント時点のクエリを控え、URL共有パラメータからの復元に使う
+const initialQuery = { ...route.query };
 
 const {
   bodySize,
   traitSlots,
   skillSlots,
   forgeSlots,
+  traitMaster,
+  skillById,
   resistanceOutcomes,
+  shareQuery,
   changeBodySize,
   setTrait,
   setSkill,
   setForgeElement,
-} = useBuildSimulator(monster);
+  resetTraits,
+  resetSkills,
+  resetForge,
+} = useBuildSimulator(monster, monsters, skills, initialQuery);
 
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
 const resistanceCells = computed(() => buildResistanceCells(resistanceOutcomes.value));
 
-const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
-const skillById = computed(() => new Map((skills.value ?? []).map((skill) => [skill.id, skill])));
+// 入力が変わるたびに URL を更新（履歴は汚さず replace）。これがそのまま共有リンクになる。
+watch(shareQuery, (query) => {
+  router.replace({ name: 'simulator-build', params: { id: props.id }, query });
+});
+
+// 共有用：現在のURLをクリップボードへコピー
+const copied = ref(false);
+async function copyShareUrl(): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    copied.value = true;
+    setTimeout(() => (copied.value = false), 1500);
+  } catch {
+    /* クリップボード不可の環境では何もしない */
+  }
+}
 
 const statRows = computed(() => {
   const target = monster.value;
@@ -84,7 +110,7 @@ function openTraitPicker(index: number): void {
     mode: 'trait',
     index,
     title: '特性を選択',
-    items: [{ label: '（空きにする）', value: '' }, ...allTraitNames.value.map((name) => ({ label: name, value: name }))],
+    items: [{ label: '（空きにする）', value: '' }, ...traitMaster.value.map((name) => ({ label: name, value: name }))],
   };
 }
 
@@ -153,17 +179,33 @@ function handlePick(value: string): void {
           </div>
         </div>
 
+        <!-- 共有 -->
+        <div class="mb-4">
+          <button
+            type="button"
+            class="text-sm border rounded px-3 py-1 hover:bg-gray-50"
+            @click="copyShareUrl"
+          >
+            {{ copied ? 'コピーしました！' : 'この構成を共有（URLをコピー）' }}
+          </button>
+        </div>
+
         <!-- 最終耐性 -->
         <h3 class="text-lg font-bold mb-2">最終耐性</h3>
         <ResistanceGrid :cells="resistanceCells" class="mb-5" />
 
         <!-- 特性 -->
-        <h3 class="text-lg font-bold mb-2">
-          特性
-          <span class="text-sm text-gray-500 font-normal">
-            {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
-          </span>
-        </h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-bold">
+            特性
+            <span class="text-sm text-gray-500 font-normal">
+              {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
+            </span>
+          </h3>
+          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetTraits">
+            リセット
+          </button>
+        </div>
         <div class="mb-2">
           <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
           <select
@@ -188,9 +230,14 @@ function handlePick(value: string): void {
         </ul>
 
         <!-- スキル -->
-        <h3 class="text-lg font-bold mb-2">
-          スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
-        </h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-bold">
+            スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
+          </h3>
+          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetSkills">
+            リセット
+          </button>
+        </div>
         <ul class="border rounded divide-y mb-5">
           <li v-for="(skill, index) in skillSlots" :key="index" class="flex items-center justify-between px-3 py-2">
             <span v-if="skill">
@@ -210,9 +257,14 @@ function handlePick(value: string): void {
         </ul>
 
         <!-- 武器鍛冶 -->
-        <h3 class="text-lg font-bold mb-2">
-          武器鍛冶 <span class="text-sm text-gray-500 font-normal">別々の耐性を3つまで・各+1</span>
-        </h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-bold">
+            武器鍛冶 <span class="text-sm text-gray-500 font-normal">別々の耐性を3つまで・各+1</span>
+          </h3>
+          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetForge">
+            リセット
+          </button>
+        </div>
         <ul class="border rounded divide-y mb-5">
           <li v-for="(element, index) in forgeSlots" :key="index" class="flex items-center justify-between px-3 py-2">
             <span>
