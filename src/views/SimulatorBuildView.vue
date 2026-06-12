@@ -96,12 +96,20 @@ function skillGuardSummary(skill: Skill): string {
 /* ---- 入れ替えモーダル ---- */
 type PickerMode = 'trait' | 'skill' | 'forge';
 
-const picker = ref<{ open: boolean; mode: PickerMode; index: number; title: string; items: PickerItem[] }>({
+const picker = ref<{
+  open: boolean;
+  mode: PickerMode;
+  index: number;
+  title: string;
+  items: PickerItem[];
+  current: string;
+}>({
   open: false,
   mode: 'trait',
   index: 0,
   title: '',
   items: [],
+  current: '',
 });
 
 function openTraitPicker(index: number): void {
@@ -111,6 +119,7 @@ function openTraitPicker(index: number): void {
     index,
     title: '特性を選択',
     items: [{ label: '（空きにする）', value: '' }, ...traitMaster.value.map((name) => ({ label: name, value: name }))],
+    current: traitSlots.value[index] ?? '',
   };
 }
 
@@ -124,6 +133,7 @@ function openSkillPicker(index: number): void {
       { label: '（空きにする）', value: '' },
       ...(skills.value ?? []).map((skill) => ({ label: `${skill.name}〔${skill.category}〕`, value: skill.id })),
     ],
+    current: skillSlots.value[index]?.id ?? '',
   };
 }
 
@@ -134,6 +144,7 @@ function openForgePicker(index: number): void {
     index,
     title: '武器鍛冶を選択',
     items: [{ label: '（なし）', value: '' }, ...RESISTANCE_ELEMENTS.map((element) => ({ label: element, value: element }))],
+    current: forgeSlots.value[index] ?? '',
   };
 }
 
@@ -200,7 +211,7 @@ function handlePick(value: string): void {
             {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
           </span>
         </h3>
-        <div class="flex items-end justify-between mb-2 pr-[13px]">
+        <div class="flex items-end justify-between mb-2 pr-2">
           <div>
             <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
             <select
@@ -211,7 +222,11 @@ function handlePick(value: string): void {
               <option v-for="size in BODY_SIZES" :key="size" :value="size">{{ bodySizeLabel(size) }}</option>
             </select>
           </div>
-          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetTraits">
+          <button
+            type="button"
+            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            @click="resetTraits"
+          >
             リセット
           </button>
         </div>
@@ -223,17 +238,21 @@ function handlePick(value: string): void {
               class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
               @click="openTraitPicker(index)"
             >
-              編集
+              選択
             </button>
           </li>
         </ul>
 
         <!-- スキル -->
-        <div class="flex items-center justify-between mb-2 pr-[13px]">
+        <div class="flex items-center justify-between mb-2 pr-2">
           <h3 class="text-lg font-bold">
             スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
           </h3>
-          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetSkills">
+          <button
+            type="button"
+            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            @click="resetSkills"
+          >
             リセット
           </button>
         </div>
@@ -250,17 +269,21 @@ function handlePick(value: string): void {
               class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
               @click="openSkillPicker(index)"
             >
-              編集
+              選択
             </button>
           </li>
         </ul>
 
         <!-- 武器鍛冶 -->
-        <div class="flex items-center justify-between mb-2 pr-[13px]">
+        <div class="flex items-center justify-between mb-2 pr-2">
           <h3 class="text-lg font-bold">
             武器鍛冶 <span class="text-sm text-gray-500 font-normal">別々の耐性を3つまで・各+1</span>
           </h3>
-          <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetForge">
+          <button
+            type="button"
+            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            @click="resetForge"
+          >
             リセット
           </button>
         </div>
@@ -278,7 +301,7 @@ function handlePick(value: string): void {
               class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
               @click="openForgePicker(index)"
             >
-              編集
+              選択
             </button>
           </li>
         </ul>
@@ -300,6 +323,7 @@ function handlePick(value: string): void {
       :open="picker.open"
       :title="picker.title"
       :items="picker.items"
+      :current="picker.current"
       @select="handlePick"
       @close="picker.open = false"
     />

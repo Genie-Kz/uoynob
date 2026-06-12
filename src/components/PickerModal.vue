@@ -6,6 +6,8 @@ const props = defineProps<{
   open: boolean;
   title: string;
   items: PickerItem[];
+  /** 現在選択中の値（開いたときに反転表示する） */
+  current?: string;
 }>();
 
 const emit = defineEmits<{
@@ -14,12 +16,17 @@ const emit = defineEmits<{
 }>();
 
 const keyword = ref('');
+/** 反転表示中の値。null は未選択。 */
+const selectedValue = ref<string | null>(null);
 
-// 開くたびに検索欄をリセット
+// 開くたびに検索をリセットし、現在値を選択状態にする
 watch(
   () => props.open,
   (isOpen) => {
-    if (isOpen) keyword.value = '';
+    if (isOpen) {
+      keyword.value = '';
+      selectedValue.value = props.current ?? null;
+    }
   },
 );
 
@@ -28,6 +35,15 @@ const filteredItems = computed(() => {
   if (!query) return props.items;
   return props.items.filter((item) => item.label.includes(query));
 });
+
+function selectItem(value: string): void {
+  selectedValue.value = value;
+}
+
+function confirm(): void {
+  if (selectedValue.value === null) return;
+  emit('select', selectedValue.value);
+}
 </script>
 
 <template>
@@ -38,32 +54,51 @@ const filteredItems = computed(() => {
       @click.self="emit('close')"
     >
       <div class="modal-panel bg-white rounded shadow-lg w-full max-w-2xl mt-10 max-h-[80vh] flex flex-col">
-      <div class="flex items-center justify-between border-b px-4 py-2">
-        <h3 class="font-bold">{{ title }}</h3>
-        <button class="text-gray-500 text-2xl leading-none" aria-label="閉じる" @click="emit('close')">
-          &times;
-        </button>
-      </div>
-      <div class="p-3 overflow-y-auto">
-        <input
-          v-model="keyword"
-          type="text"
-          class="border rounded w-full px-2 py-1 mb-3"
-          placeholder="入力して絞り込み（未入力なら一覧から選択）"
-        />
-        <div class="flex flex-wrap gap-2">
-          <!-- 青枠・青字・白背景の選択ボタン -->
-          <button
-            v-for="item in filteredItems"
-            :key="item.value"
-            type="button"
-            class="border border-blue-500 text-blue-600 bg-white rounded px-3 py-1 text-sm hover:bg-blue-50"
-            @click="emit('select', item.value)"
-          >
-            {{ item.label }}
-          </button>
+        <!-- ヘッダー -->
+        <div class="border-b px-4 py-2 font-bold">{{ title }}</div>
+
+        <!-- 選択肢（スクロール）。選択中は文字色・背景色を反転表示。 -->
+        <div class="p-3 overflow-y-auto flex-1">
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="item in filteredItems"
+              :key="item.value"
+              type="button"
+              class="border border-blue-500 rounded px-3 py-1 text-sm"
+              :class="
+                selectedValue === item.value
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-blue-600 hover:bg-blue-50'
+              "
+              @click="selectItem(item.value)"
+            >
+              {{ item.label }}
+            </button>
+          </div>
         </div>
-      </div>
+
+        <!-- 検索欄＋操作ボタン（下部。検索欄は閉じる/選択ボタンの上） -->
+        <div class="border-t p-3">
+          <input
+            v-model="keyword"
+            type="text"
+            class="border rounded w-full px-2 py-1 mb-3"
+            placeholder="入力して絞り込み"
+          />
+          <div class="flex justify-end gap-2">
+            <button type="button" class="border rounded px-4 py-1 text-sm hover:bg-gray-50" @click="emit('close')">
+              閉じる
+            </button>
+            <button
+              type="button"
+              class="border border-blue-500 bg-blue-600 text-white rounded px-4 py-1 text-sm disabled:opacity-50"
+              :disabled="selectedValue === null"
+              @click="confirm"
+            >
+              選択
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </Transition>
