@@ -17,7 +17,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "data:monsters": "node scripts/build-data.js",
-    "data:skills": "node scripts/scrape-skills.js"
+    "data:skills": "node scripts/scrape-skills.js",
+    "data:traits-abilities": "node scripts/scrape-traits-abilities.js",
+    "data:pickups": "node scripts/scrape-pickups.js"
   },
   "dependencies": {
     "vue": "^3.5.38",

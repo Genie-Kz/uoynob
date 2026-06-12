@@ -44,14 +44,24 @@ export const NAV_CARDS: NavCard[] = [
   {
     id: 'attribute',
     title: '特性',
-    items: [{ label: 'すべて' }, { label: '特性効果系' }, { label: 'パラメータ系' }, { label: '耐性系' }],
+    items: [
+      { label: 'すべて', to: { name: 'attribute-list' } },
+      { label: '特性効果系', to: { name: 'attribute-list', query: { cat: 'effect' } } },
+      { label: 'パラメータ系', to: { name: 'attribute-list', query: { cat: 'parameter' } } },
+      { label: '耐性系', to: { name: 'attribute-list', query: { cat: 'resistance' } } },
+    ],
   },
   {
     id: 'ability',
     title: '特技',
     items: [
-      { label: 'すべて' }, { label: '呪文' }, { label: '斬撃' }, { label: '体技' },
-      { label: '踊り' }, { label: 'ブレス・ふえ' }, { label: 'その他' },
+      { label: 'すべて', to: { name: 'ability-list' } },
+      { label: '呪文', to: { name: 'ability-list', query: { cat: 'spell' } } },
+      { label: '斬撃', to: { name: 'ability-list', query: { cat: 'slash' } } },
+      { label: '体技', to: { name: 'ability-list', query: { cat: 'physical' } } },
+      { label: '踊り', to: { name: 'ability-list', query: { cat: 'dance' } } },
+      { label: 'ブレス・ふえ', to: { name: 'ability-list', query: { cat: 'breath' } } },
+      { label: 'その他', to: { name: 'ability-list', query: { cat: 'other' } } },
     ],
   },
   {
@@ -67,9 +77,16 @@ export const NAV_CARDS: NavCard[] = [
     id: 'pickup',
     title: 'ピックアップ',
     items: [
-      { label: '転生モンスター' }, { label: 'ご当地スキル' }, { label: 'キラー系スキル' },
-      { label: '呪文耐性スキル' }, { label: 'ブレス耐性スキル' }, { label: '状態耐性スキル' },
-      { label: '封じ耐性スキル' }, { label: '弱体耐性スキル' }, { label: 'パラメータ上昇スキル' }, { label: 'れんぞく回数' },
+      { label: '転生モンスター', to: { name: 'pickup', params: { pickupKey: 'monster-reincarnation' } } },
+      { label: 'ご当地スキル', to: { name: 'pickup', params: { pickupKey: 'skill-local' } } },
+      { label: 'キラー系スキル', to: { name: 'pickup', params: { pickupKey: 'skill-killer' } } },
+      { label: '呪文耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-spell' } } },
+      { label: 'ブレス耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-breath' } } },
+      { label: '状態耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-condition' } } },
+      { label: '封じ耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-seal' } } },
+      { label: '弱体耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-weaken' } } },
+      { label: 'パラメータ上昇スキル', to: { name: 'pickup', params: { pickupKey: 'skill-parameter-up' } } },
+      { label: 'れんぞく回数', to: { name: 'pickup', params: { pickupKey: 'number-of-consecutive-times' } } },
     ],
   },
   {

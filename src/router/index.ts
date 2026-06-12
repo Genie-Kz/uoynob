@@ -27,6 +27,28 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/SearchMonsterView.vue'),
   },
   {
+    path: '/attributes',
+    name: 'attribute-list',
+    component: () => import('@/views/AttributeListView.vue'),
+  },
+  {
+    path: '/attributes/:id',
+    name: 'attribute-detail',
+    component: () => import('@/views/AttributeDetailView.vue'),
+    props: true,
+  },
+  {
+    path: '/abilities',
+    name: 'ability-list',
+    component: () => import('@/views/AbilityListView.vue'),
+  },
+  {
+    path: '/abilities/:id',
+    name: 'ability-detail',
+    component: () => import('@/views/AbilityDetailView.vue'),
+    props: true,
+  },
+  {
     path: '/skills',
     name: 'skill-list',
     component: () => import('@/views/SkillListView.vue'),
@@ -35,6 +57,12 @@ const routes: RouteRecordRaw[] = [
     path: '/skills/:id',
     name: 'skill-detail',
     component: () => import('@/views/SkillDetailView.vue'),
+    props: true,
+  },
+  {
+    path: '/pickup/:pickupKey',
+    name: 'pickup',
+    component: () => import('@/views/PickupView.vue'),
     props: true,
   },
   {

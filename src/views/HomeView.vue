@@ -21,7 +21,6 @@ function toggleCard(cardId: string): void {
 <template>
   <div class="max-w-xl mx-auto">
     <div class="text-center my-4">
-      <h2 class="text-xl font-bold">凡庸な イルルカSP</h2>
       <p class="text-sm text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
     </div>
 
@@ -41,11 +40,11 @@ function toggleCard(cardId: string): void {
     <div v-for="card in NAV_CARDS" :key="card.id" class="border rounded mb-2 overflow-hidden">
       <button
         type="button"
-        class="w-full flex items-center justify-between px-3 py-2 font-semibold bg-gray-50 hover:bg-gray-100"
+        class="group w-full flex items-center justify-between px-3 py-2 font-semibold bg-gray-50 hover:bg-gray-100"
         :aria-expanded="!!openCardIds[card.id]"
         @click="toggleCard(card.id)"
       >
-        <span>{{ card.title }}</span>
+        <span class="group-hover:underline">{{ card.title }}</span>
         <span
           class="text-xs text-gray-500 transition-transform duration-200"
           :class="{ 'rotate-180': openCardIds[card.id] }"
@@ -57,9 +56,13 @@ function toggleCard(cardId: string): void {
       <div class="collapsible" :class="{ 'is-open': openCardIds[card.id] }">
         <div class="collapsible-inner">
           <ul class="divide-y border-t">
-            <li v-for="item in card.items" :key="item.label" class="px-3 py-2">
+            <li v-for="item in card.items" :key="item.label" class="px-3 py-2 hover:bg-gray-50">
               <router-link v-if="item.to" :to="item.to" class="app-link block">{{ item.label }}</router-link>
-              <span v-else class="text-gray-400" title="このデータは未提供です（本サイトはモンスターデータを収録）">
+              <span
+                v-else
+                class="text-gray-400 hover:underline"
+                title="このデータは未提供です（本サイトはモンスターデータを収録）"
+              >
                 {{ item.label }}
               </span>
             </li>

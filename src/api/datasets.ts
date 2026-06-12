@@ -5,11 +5,17 @@
  */
 import type { Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
+import type { Attribute } from '@/types/attribute';
+import type { Ability } from '@/types/ability';
+import type { PickupData } from '@/types/pickup';
 
 const baseUrl = import.meta.env.BASE_URL;
 
 let monstersPromise: Promise<Monster[]> | null = null;
 let skillsPromise: Promise<Skill[]> | null = null;
+let attributesPromise: Promise<Attribute[]> | null = null;
+let abilitiesPromise: Promise<Ability[]> | null = null;
+let pickupsPromise: Promise<PickupData> | null = null;
 
 async function fetchJson<T>(relativePath: string): Promise<T> {
   const response = await fetch(baseUrl + relativePath);
@@ -27,4 +33,19 @@ export function loadMonsters(): Promise<Monster[]> {
 export function loadSkills(): Promise<Skill[]> {
   skillsPromise ??= fetchJson<Skill[]>('data/skills.json');
   return skillsPromise;
+}
+
+export function loadAttributes(): Promise<Attribute[]> {
+  attributesPromise ??= fetchJson<Attribute[]>('data/attributes.json');
+  return attributesPromise;
+}
+
+export function loadAbilities(): Promise<Ability[]> {
+  abilitiesPromise ??= fetchJson<Ability[]>('data/abilities.json');
+  return abilitiesPromise;
+}
+
+export function loadPickups(): Promise<PickupData> {
+  pickupsPromise ??= fetchJson<PickupData>('data/pickups.json');
+  return pickupsPromise;
 }

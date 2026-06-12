@@ -39,7 +39,9 @@ npm run preview      # ビルド結果のプレビュー
 
 ```bash
 npm run data:monsters -- "path/to/MonsterData.json"   # public/data/monsters.json を生成
-npm run data:skills                                    # Web Archive から public/data/skills.json を生成
+npm run data:skills                                    # Web Archive から skills.json を生成
+npm run data:traits-abilities                          # Web Archive から attributes.json / abilities.json を生成
+npm run data:pickups                                   # Web Archive から pickups.json を生成
 ```
 
 ---
@@ -72,7 +74,10 @@ src/
 - **トップ（ポータル）**：検索フォームとカテゴリのアコーディオン。項目を押す／検索すると、対応する各ページへ遷移します。
 - **モンスター図鑑**：一覧（既定で全件・No.昇順）／ランク・系統・サイズ・名前で絞り込み／詳細（特性・耐性・ステータス・装備・スキル）
 - **モンスター検索**：耐性30種の閾値（○○↑）＋特性で絞り込み
+- **特性**：一覧（294件・特性効果系／パラメータ系／耐性系）／詳細（効果・ＳＰ効果・この特性を持つモンスター／スキル）
+- **特技**：一覧（303件・呪文／斬撃／体技／踊り／ブレス・ふえ／その他）／詳細（効果・この特技を覚えるスキル）
 - **スキル**：一覧（425件・特技系／パラメータ系）／詳細（スキル構成・このスキルを持つモンスター）
+- **ピックアップ**：転生モンスター・ご当地スキル・キラー系スキル・各種耐性スキル・パラメータ上昇スキル・れんぞく回数
 - **ビルドシミュレーター**：検索 → 選択 → ビルド画面。特性・スキル・武器鍛冶を編集モーダルで入れ替え、最終耐性をリアルタイムに計算
 
 ### 表示する耐性について（実効耐性）
