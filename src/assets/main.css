@@ -85,10 +85,10 @@
   transform: translateY(-6px);
 }
 
-/* ---- モーダル：上からふわっと滑り降りて表示 ---- */
+/* ---- モーダル：上からゆっくりふわっと滑り降りて表示 ---- */
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.4s ease;
 }
 .modal-enter-from,
 .modal-leave-to {
@@ -97,8 +97,8 @@
 .modal-enter-active .modal-panel,
 .modal-leave-active .modal-panel {
   transition:
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.3s ease;
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease;
 }
 .modal-enter-from .modal-panel,
 .modal-leave-to .modal-panel {

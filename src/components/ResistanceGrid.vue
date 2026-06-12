@@ -17,27 +17,36 @@ const rows = computed<ResistanceCellView[][]>(() => {
 </script>
 
 <template>
-  <!-- グレーの見出しバー＋3列。耐性名はグレー帯、値はテキストの周りだけ色付き（ピル）。罫線は余白を持たせる。 -->
+  <!-- グレーの見出しバー＋3列。耐性名は横に連続したグレー帯、値はテキストの周りだけ色付き（ピル）。 -->
   <div class="border rounded overflow-hidden">
     <div v-if="title" class="bg-gray-100 font-bold px-3 py-2 border-b">{{ title }}</div>
-    <div class="px-2 py-2">
-      <template v-for="(row, rowIndex) in rows" :key="rowIndex">
-        <div class="flex">
-          <div
-            v-for="(cell, colIndex) in row"
-            :key="cell.element"
-            class="flex-1 px-2"
-            :class="{ 'border-l border-gray-200': colIndex > 0 }"
-          >
-            <div class="bg-gray-100 text-center text-xs py-1 rounded-sm">{{ cell.element }}</div>
-            <hr class="my-1 border-gray-200" />
-            <div class="text-center py-1">
-              <span class="inline-block rounded px-4 py-0.5" :class="cell.colorClass">{{ cell.text }}</span>
-            </div>
-          </div>
+    <div
+      v-for="(row, rowIndex) in rows"
+      :key="rowIndex"
+      :class="{ 'border-b border-gray-200': rowIndex < rows.length - 1 }"
+    >
+      <!-- 耐性名：横に連続したグレー帯 -->
+      <div class="flex bg-gray-100 border-b border-gray-200">
+        <div
+          v-for="(cell, colIndex) in row"
+          :key="cell.element"
+          class="flex-1 text-center text-xs py-1.5"
+          :class="{ 'border-l border-gray-200': colIndex > 0 }"
+        >
+          {{ cell.element }}
         </div>
-        <hr v-if="rowIndex < rows.length - 1" class="my-2 border-gray-200" />
-      </template>
+      </div>
+      <!-- 値：白地にピル -->
+      <div class="flex">
+        <div
+          v-for="(cell, colIndex) in row"
+          :key="cell.element"
+          class="flex-1 text-center py-2"
+          :class="{ 'border-l border-gray-200': colIndex > 0 }"
+        >
+          <span class="inline-block rounded px-4 py-0.5" :class="cell.colorClass">{{ cell.text }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
