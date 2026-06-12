@@ -5,7 +5,7 @@ import AppFooter from '@/components/AppFooter.vue';
 
 <template>
   <AppHeader />
-  <main class="max-w-screen-xl mx-auto px-3">
+  <main class="max-w-5xl mx-auto px-3">
     <router-view v-slot="{ Component, route }">
       <transition name="route-fade" mode="out-in">
         <component :is="Component" :key="route.path" />

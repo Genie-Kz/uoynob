@@ -123,8 +123,7 @@ const statRows = computed(() => {
         </table>
 
         <!-- 耐性 -->
-        <h3 class="text-lg font-bold mb-2">耐性（新生配合時）</h3>
-        <ResistanceGrid :cells="resistanceCells" class="mb-4" />
+        <ResistanceGrid title="耐性（新生配合時）" :cells="resistanceCells" class="mb-4" />
 
         <!-- ステータス -->
         <h3 class="text-lg font-bold mb-2">ステータス</h3>

@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <footer class="max-w-screen-xl mx-auto px-3 mt-10 pt-4 border-t text-center text-sm text-gray-500">
+  <footer class="max-w-5xl mx-auto px-3 mt-10 pt-4 border-t text-center text-sm text-gray-500">
     <p class="mb-1">
       <router-link :to="{ name: 'home' }" class="text-gray-500 hover:underline">home</router-link>
     </p>

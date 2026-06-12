@@ -191,11 +191,10 @@ function handlePick(value: string): void {
         </div>
 
         <!-- 最終耐性 -->
-        <h3 class="text-lg font-bold mb-2">最終耐性</h3>
-        <ResistanceGrid :cells="resistanceCells" class="mb-5" />
+        <ResistanceGrid title="最終耐性" :cells="resistanceCells" class="mb-5" />
 
         <!-- 特性 -->
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-2 pr-[13px]">
           <h3 class="text-lg font-bold">
             特性
             <span class="text-sm text-gray-500 font-normal">
@@ -230,7 +229,7 @@ function handlePick(value: string): void {
         </ul>
 
         <!-- スキル -->
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-2 pr-[13px]">
           <h3 class="text-lg font-bold">
             スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
           </h3>
@@ -257,7 +256,7 @@ function handlePick(value: string): void {
         </ul>
 
         <!-- 武器鍛冶 -->
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-2 pr-[13px]">
           <h3 class="text-lg font-bold">
             武器鍛冶 <span class="text-sm text-gray-500 font-normal">別々の耐性を3つまで・各+1</span>
           </h3>
