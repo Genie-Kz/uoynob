@@ -48,7 +48,8 @@
 
 @layer components {
   .app-link {
-    @apply text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline;
+    /* ホバー（PC）に加え、タップ中（:active）でも下線を表示してタッチ端末でも分かるように */
+    @apply text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline active:underline;
   }
 }
 

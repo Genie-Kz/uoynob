@@ -44,7 +44,7 @@ function toggleCard(cardId: string): void {
         :aria-expanded="!!openCardIds[card.id]"
         @click="toggleCard(card.id)"
       >
-        <span class="group-hover:underline">{{ card.title }}</span>
+        <span class="group-hover:underline group-active:underline">{{ card.title }}</span>
         <span
           class="text-xs text-gray-500 transition-transform duration-200"
           :class="{ 'rotate-180': openCardIds[card.id] }"
