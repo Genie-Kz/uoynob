@@ -86,7 +86,12 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHashHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to, from, savedPosition) {
+    // 戻る/進むでは元の位置へ
+    if (savedPosition) return savedPosition;
+    // クエリ（共有URL）だけの変化ではスクロールを動かさない（ビルド編集中のガタつき防止）
+    if (to.path === from.path) return false;
+    // ページ遷移時のみ先頭へ
     return { top: 0 };
   },
 });

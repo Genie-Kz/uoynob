@@ -194,26 +194,26 @@ function handlePick(value: string): void {
         <ResistanceGrid title="最終耐性" :cells="resistanceCells" class="mb-5" />
 
         <!-- 特性 -->
-        <div class="flex items-center justify-between mb-2 pr-[13px]">
-          <h3 class="text-lg font-bold">
-            特性
-            <span class="text-sm text-gray-500 font-normal">
-              {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
-            </span>
-          </h3>
+        <h3 class="text-lg font-bold mb-2">
+          特性
+          <span class="text-sm text-gray-500 font-normal">
+            {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
+          </span>
+        </h3>
+        <div class="flex items-end justify-between mb-2 pr-[13px]">
+          <div>
+            <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
+            <select
+              :value="bodySize"
+              class="border rounded px-2 py-1 text-sm"
+              @change="changeBodySize(($event.target as HTMLSelectElement).value as BodySize)"
+            >
+              <option v-for="size in BODY_SIZES" :key="size" :value="size">{{ bodySizeLabel(size) }}</option>
+            </select>
+          </div>
           <button type="button" class="text-sm border rounded px-2 py-1 hover:bg-gray-50" @click="resetTraits">
             リセット
           </button>
-        </div>
-        <div class="mb-2">
-          <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
-          <select
-            :value="bodySize"
-            class="border rounded px-2 py-1 text-sm"
-            @change="changeBodySize(($event.target as HTMLSelectElement).value as BodySize)"
-          >
-            <option v-for="size in BODY_SIZES" :key="size" :value="size">{{ bodySizeLabel(size) }}</option>
-          </select>
         </div>
         <ul class="border rounded divide-y mb-5">
           <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between px-3 py-2">
