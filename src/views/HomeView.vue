@@ -1,49 +1,70 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { NAV_CARDS } from '@/constants/navigation';
+
+const router = useRouter();
+const searchKeyword = ref('');
+const openCardIds = ref<Record<string, boolean>>({});
+
+function submitSearch(): void {
+  const keyword = searchKeyword.value.trim();
+  if (!keyword) return;
+  router.push({ name: 'monster-list', query: { q: keyword } });
+}
+
+function toggleCard(cardId: string): void {
+  openCardIds.value[cardId] = !openCardIds.value[cardId];
+}
+</script>
 
 <template>
-  <div>
+  <div class="max-w-xl mx-auto">
     <div class="text-center my-4">
-      <h2 class="text-2xl font-bold">凡庸な イルルカSP</h2>
-      <p class="text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
+      <h2 class="text-xl font-bold">凡庸な イルルカSP</h2>
+      <p class="text-sm text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
     </div>
 
-    <hr class="my-4" />
+    <!-- サイト内検索（モンスター名）→ 検索結果ページへ遷移 -->
+    <form class="flex mb-4" @submit.prevent="submitSearch">
+      <input
+        v-model="searchKeyword"
+        type="text"
+        placeholder="モンスター名で検索"
+        class="flex-1 border rounded-l px-3 py-2"
+        aria-label="モンスター名で検索"
+      />
+      <button type="submit" class="border border-l-0 rounded-r px-4 bg-gray-50 hover:bg-gray-100">検索</button>
+    </form>
 
-    <dl class="grid grid-cols-1 sm:grid-cols-4 gap-y-2 text-sm">
-      <dt class="font-semibold">当サイトについて</dt>
-      <dd class="sm:col-span-3">
-        プレイデータをもとに、モンスターのライブラリ情報（耐性・特性・ステータス）を掲載しています。<br />
-        元サイト「凡庸な イルルカSP」のクライアントサイド再現版です。検索やビルドシミュレーターなどサーバーサイドで動いていた処理は、すべてブラウザ内で動作します。
-      </dd>
-      <dt class="font-semibold">タイトル</dt>
-      <dd class="sm:col-span-3">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</dd>
-      <dt class="font-semibold">ジャンル</dt>
-      <dd class="sm:col-span-3">RPG</dd>
-      <dt class="font-semibold">対応OS</dt>
-      <dd class="sm:col-span-3">iOS／Android</dd>
-    </dl>
+    <!-- カテゴリ（アコーディオン。項目を押すと各ページへ遷移） -->
+    <div v-for="card in NAV_CARDS" :key="card.id" class="border rounded mb-2 overflow-hidden">
+      <button
+        type="button"
+        class="w-full flex items-center justify-between px-3 py-2 font-semibold bg-gray-50 hover:bg-gray-100"
+        :aria-expanded="!!openCardIds[card.id]"
+        @click="toggleCard(card.id)"
+      >
+        <span>{{ card.title }}</span>
+        <span
+          class="text-xs text-gray-500 transition-transform duration-200"
+          :class="{ 'rotate-180': openCardIds[card.id] }"
+        >
+          ▼
+        </span>
+      </button>
 
-    <div class="border rounded p-4 my-5">
-      <h3 class="font-bold mb-3">ツール</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <router-link
-          :to="{ name: 'search-monster' }"
-          class="border border-blue-500 text-blue-600 rounded text-center py-2 hover:bg-blue-50"
-        >
-          モンスター検索
-        </router-link>
-        <router-link
-          :to="{ name: 'simulator-select' }"
-          class="border border-blue-500 text-blue-600 rounded text-center py-2 hover:bg-blue-50"
-        >
-          ビルドシミュレーター
-        </router-link>
-        <router-link
-          :to="{ name: 'monster-list' }"
-          class="border border-blue-500 text-blue-600 rounded text-center py-2 hover:bg-blue-50"
-        >
-          モンスター図鑑（一覧）
-        </router-link>
+      <div class="collapsible" :class="{ 'is-open': openCardIds[card.id] }">
+        <div class="collapsible-inner">
+          <ul class="divide-y border-t">
+            <li v-for="item in card.items" :key="item.label" class="px-3 py-2">
+              <router-link v-if="item.to" :to="item.to" class="app-link block">{{ item.label }}</router-link>
+              <span v-else class="text-gray-400" title="このデータは未提供です（本サイトはモンスターデータを収録）">
+                {{ item.label }}
+              </span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

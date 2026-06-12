@@ -1,9 +1,12 @@
 /**
  * ビルドシミュレーターの耐性計算エンジン。
  *
+ * 前提: 元データ(monster[element])は「スタンダードボディ・特性なし」の素の値。
+ * よってボディサイズ補正も特性効果も、この素の値に対して加算していく。
+ *
  * 計算の流れ:
  *   1. 各耐性要素ごとに「増減段階(delta)」を積み上げる
- *      - ボディサイズ補正（元のサイズからの差分）
+ *      - ボディサイズ補正（選択サイズの補正をそのまま加算。スタンダード/スモールは0）
  *      - 特性（全ガード＋／メタル系／こうどう系）
  *      - スキルの「〇〇ガード＋」（1つにつき +2、重複可）
  *      - 武器鍛冶（別々の耐性に各 +1）
@@ -36,7 +39,7 @@ import {
   WEAPON_FORGE_BOOST_STEP,
 } from '@/constants/buildRules';
 import { isAttributeResistance, resistanceLevelOf, resistanceValueOfLevel } from './resistance';
-import { resistanceValueOf } from './monster';
+import { defaultEditableTraits, resistanceValueOf } from './monster';
 import { guardAbilityToElement } from './skillAnalysis';
 
 /** ビルド構成（シミュレーターの入力） */
@@ -74,10 +77,10 @@ function addToElements(delta: DeltaMap, elements: readonly string[], step: numbe
   for (const element of elements) delta[element] += step;
 }
 
-/** ボディサイズ補正（元のサイズからの差分で適用し、二重計上を防ぐ） */
-function applyBodySizeBonus(delta: DeltaMap, naturalSize: BodySize, selectedSize: BodySize): void {
-  const bonusDelta = SIZE_RESISTANCE_BONUS[selectedSize] - SIZE_RESISTANCE_BONUS[naturalSize];
-  if (bonusDelta !== 0) addToElements(delta, SIZE_AILMENT_ELEMENTS, bonusDelta);
+/** ボディサイズ補正（素の値＝スタンダード基準に、選択サイズの補正をそのまま加算） */
+function applyBodySizeBonus(delta: DeltaMap, selectedSize: BodySize): void {
+  const bonus = SIZE_RESISTANCE_BONUS[selectedSize];
+  if (bonus !== 0) addToElements(delta, SIZE_AILMENT_ELEMENTS, bonus);
 }
 
 /** 特性による耐性変化（全ガード＋／メタル系／こうどう系）。メタル・こうどうは各1回のみ。 */
@@ -139,7 +142,7 @@ export function computeBuildResistances(config: BuildConfiguration): ResistanceO
   const { monster, bodySize, traits, skills, forgeElements } = config;
 
   const delta = createZeroDeltaMap();
-  applyBodySizeBonus(delta, monster.サイズ特性, bodySize);
+  applyBodySizeBonus(delta, bodySize);
   applyTraitEffects(delta, traits);
   applySkillGuards(delta, skills);
   applyWeaponForge(delta, forgeElements);
@@ -157,4 +160,19 @@ export function computeBuildResistances(config: BuildConfiguration): ResistanceO
       raised: finalLevel > baseLevel,
     };
   });
+}
+
+/**
+ * モンスターの既定ビルド構成（本来の姿）。
+ * 本来のボディサイズと、デフォルトで持つ特性を装備し、スキル・武器鍛冶なしの状態。
+ * これを計算すると、素データに特性・サイズ補正を加味した「実効耐性」が得られる。
+ */
+export function defaultBuildConfiguration(monster: Monster): BuildConfiguration {
+  return {
+    monster,
+    bodySize: monster.サイズ特性,
+    traits: defaultEditableTraits(monster, monster.サイズ特性),
+    skills: [],
+    forgeElements: [],
+  };
 }

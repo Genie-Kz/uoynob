@@ -88,16 +88,20 @@ describe('computeBuildResistances - 下限・負の蓄積', () => {
 });
 
 describe('computeBuildResistances - 各補正', () => {
-  it('ボディサイズ補正は元サイズからの差分で適用', () => {
+  it('ボディサイズ補正は素の値（スタンダード基準）に選択サイズの補正をそのまま加算', () => {
     const standard = createMonster({ サイズ特性: 'スタンダードボディ', ザキ: '普通' });
     const asMega = computeBuildResistances(buildConfig(standard, { bodySize: 'メガボディ' as BodySize }));
     // ザキは状態異常系。メガ(+2) → 普通(1)+2=3=半減
     expect(outcomeOf(asMega, 'ザキ').finalValue).toBe('半減');
 
-    // 元々メガのモンスターをメガのまま → 差分0で変化なし
+    // 元々メガのモンスターも、素データはスタンダード基準なので +2 が乗る
     const naturalMega = createMonster({ サイズ特性: 'メガボディ', ザキ: '普通' });
     const keepMega = computeBuildResistances(buildConfig(naturalMega));
-    expect(outcomeOf(keepMega, 'ザキ').finalValue).toBe('普通');
+    expect(outcomeOf(keepMega, 'ザキ').finalValue).toBe('半減');
+
+    // スタンダードのままなら補正0
+    const keepStandard = computeBuildResistances(buildConfig(standard));
+    expect(outcomeOf(keepStandard, 'ザキ').finalValue).toBe('普通');
   });
 
   it('スキルのガード＋は重複で+4になる', () => {

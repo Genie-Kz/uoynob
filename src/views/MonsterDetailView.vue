@@ -5,7 +5,8 @@ import { useSkills } from '@/composables/useSkills';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { equippableWeaponsOf } from '@/domain/monster';
 import { skillsForMonster } from '@/domain/skillLookup';
-import { buildBaseResistanceCells } from '@/presentation/resistanceCells';
+import { computeBuildResistances, defaultBuildConfiguration } from '@/domain/buildSimulator';
+import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
@@ -18,7 +19,9 @@ const { skills } = useSkills();
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
-const resistanceCells = computed(() => (monster.value ? buildBaseResistanceCells(monster.value) : []));
+const resistanceCells = computed(() =>
+  monster.value ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value))) : [],
+);
 const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(monster.value) : []));
 const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],

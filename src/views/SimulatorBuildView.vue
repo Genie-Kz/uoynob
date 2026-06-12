@@ -13,7 +13,7 @@ import { SKILL_SLOT_COUNT_BY_SIZE, TRAIT_SLOT_COUNT_BY_SIZE } from '@/constants/
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
-import { buildOutcomeResistanceCells } from '@/presentation/resistanceCells';
+import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
@@ -41,7 +41,7 @@ const {
 } = useBuildSimulator(monster);
 
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
-const resistanceCells = computed(() => buildOutcomeResistanceCells(resistanceOutcomes.value));
+const resistanceCells = computed(() => buildResistanceCells(resistanceOutcomes.value));
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const skillById = computed(() => new Map((skills.value ?? []).map((skill) => [skill.id, skill])));

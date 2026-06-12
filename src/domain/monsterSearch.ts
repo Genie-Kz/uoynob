@@ -1,7 +1,8 @@
 /** 耐性・特性によるモンスター検索ロジック */
 import type { Monster } from '@/types/monster';
 import { resistanceLevelOf } from './resistance';
-import { resistanceValueOf, traitsOf } from './monster';
+import { traitsOf } from './monster';
+import { effectiveResistanceValue } from './effectiveResistance';
 
 /** 「この耐性をこの段階以上で持つ」という条件 */
 export interface ResistanceThreshold {
@@ -24,8 +25,9 @@ export function isEmptyCriteria(criteria: MonsterSearchCriteria): boolean {
 export function searchMonsters(monsters: Monster[], criteria: MonsterSearchCriteria): Monster[] {
   const { thresholds, requiredTraits } = criteria;
   return monsters.filter((monster) => {
+    // 検索も図鑑表示と同じ「実効耐性」で判定する
     const meetsResistances = thresholds.every(
-      (threshold) => resistanceLevelOf(resistanceValueOf(monster, threshold.element)) >= threshold.minLevel,
+      (threshold) => resistanceLevelOf(effectiveResistanceValue(monster, threshold.element)) >= threshold.minLevel,
     );
     if (!meetsResistances) return false;
 
