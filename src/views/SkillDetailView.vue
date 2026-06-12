@@ -64,11 +64,11 @@ function isGuardAbility(name: string): boolean {
             <router-link
               v-if="resolveMonsterId(monsterRef.id)"
               :to="{ name: 'monster-detail', params: { id: resolveMonsterId(monsterRef.id) } }"
-              class="border rounded px-2 py-1 text-sm app-link"
+              class="tag-link app-link"
             >
               {{ monsterRef.name }}
             </router-link>
-            <span v-else class="border rounded px-2 py-1 text-sm text-gray-600">{{ monsterRef.name }}</span>
+            <span v-else class="tag-link text-gray-600">{{ monsterRef.name }}</span>
           </template>
           <span v-if="!skill.monsters.length" class="text-gray-500">なし</span>
         </div>

@@ -47,7 +47,7 @@ const ability = computed(() => abilities.value?.find((candidate) => candidate.id
             v-for="skillRef in ability.skills"
             :key="skillRef.id"
             :to="{ name: 'skill-detail', params: { id: skillRef.id } }"
-            class="border rounded px-2 py-1 text-sm app-link"
+            class="tag-link app-link"
           >
             {{ skillRef.name }}
           </router-link>

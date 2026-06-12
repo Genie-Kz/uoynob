@@ -192,11 +192,7 @@ function handlePick(value: string): void {
 
         <!-- 共有 -->
         <div class="mb-4">
-          <button
-            type="button"
-            class="text-sm border rounded px-3 py-1 hover:bg-gray-50"
-            @click="copyShareUrl"
-          >
+          <button type="button" class="btn-neutral" @click="copyShareUrl">
             {{ copied ? 'コピーしました！' : 'この構成を共有（URLをコピー）' }}
           </button>
         </div>
@@ -216,7 +212,7 @@ function handlePick(value: string): void {
             <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
             <select
               :value="bodySize"
-              class="border rounded px-2 py-1 text-sm"
+              class="border rounded px-3 py-2 text-sm"
               @change="changeBodySize(($event.target as HTMLSelectElement).value as BodySize)"
             >
               <option v-for="size in BODY_SIZES" :key="size" :value="size">{{ bodySizeLabel(size) }}</option>
@@ -224,7 +220,7 @@ function handlePick(value: string): void {
           </div>
           <button
             type="button"
-            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            class="btn-outline-primary"
             @click="resetTraits"
           >
             リセット
@@ -235,7 +231,7 @@ function handlePick(value: string): void {
             <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
             <button
               type="button"
-              class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+              class="btn-outline-primary"
               @click="openTraitPicker(index)"
             >
               選択
@@ -250,7 +246,7 @@ function handlePick(value: string): void {
           </h3>
           <button
             type="button"
-            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            class="btn-outline-primary"
             @click="resetSkills"
           >
             リセット
@@ -266,7 +262,7 @@ function handlePick(value: string): void {
             <span v-else class="text-gray-400">（空き）</span>
             <button
               type="button"
-              class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+              class="btn-outline-primary"
               @click="openSkillPicker(index)"
             >
               選択
@@ -281,7 +277,7 @@ function handlePick(value: string): void {
           </h3>
           <button
             type="button"
-            class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+            class="btn-outline-primary"
             @click="resetForge"
           >
             リセット
@@ -298,7 +294,7 @@ function handlePick(value: string): void {
             </span>
             <button
               type="button"
-              class="border border-blue-500 text-blue-600 rounded px-2 py-0.5 text-sm hover:bg-blue-50"
+              class="btn-outline-primary"
               @click="openForgePicker(index)"
             >
               選択

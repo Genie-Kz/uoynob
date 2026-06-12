@@ -103,7 +103,7 @@ const statRows = computed(() => {
               v-for="skill in learnableSkills"
               :key="skill.id"
               :to="{ name: 'skill-detail', params: { id: skill.id } }"
-              class="border rounded px-2 py-1 text-sm app-link"
+              class="tag-link app-link"
             >
               {{ skill.name }}
             </router-link>

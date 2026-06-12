@@ -51,6 +51,22 @@
     /* ホバー（PC）に加え、タップ中（:active）でも下線を表示してタッチ端末でも分かるように */
     @apply text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline active:underline;
   }
+
+  /* タップしやすいボタン（スマホ配慮） */
+  .btn-outline-primary {
+    @apply inline-flex items-center justify-center rounded border border-blue-500 bg-white px-4 py-2 text-sm text-blue-600 transition-colors duration-200 hover:bg-blue-50;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded border border-blue-500 bg-blue-600 px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-blue-700 disabled:opacity-50;
+  }
+  .btn-neutral {
+    @apply inline-flex items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50;
+  }
+
+  /* リンク状のタグ（一覧・詳細のバッジリンク） */
+  .tag-link {
+    @apply inline-block rounded border px-3 py-2 text-sm;
+  }
 }
 
 /* ---- 画面遷移のフェード（router-view） ---- */

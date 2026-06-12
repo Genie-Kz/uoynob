@@ -64,7 +64,7 @@ function confirm(): void {
               v-for="item in filteredItems"
               :key="item.value"
               type="button"
-              class="border border-blue-500 rounded px-3 py-1 text-sm"
+              class="border border-blue-500 rounded px-3 py-2 text-sm transition-colors duration-200"
               :class="
                 selectedValue === item.value
                   ? 'bg-blue-600 text-white'
@@ -82,19 +82,12 @@ function confirm(): void {
           <input
             v-model="keyword"
             type="text"
-            class="border rounded w-full px-2 py-1 mb-3"
+            class="border rounded w-full px-3 py-2 mb-3"
             placeholder="入力して絞り込み"
           />
           <div class="flex justify-end gap-2">
-            <button type="button" class="border rounded px-4 py-1 text-sm hover:bg-gray-50" @click="emit('close')">
-              閉じる
-            </button>
-            <button
-              type="button"
-              class="border border-blue-500 bg-blue-600 text-white rounded px-4 py-1 text-sm disabled:opacity-50"
-              :disabled="selectedValue === null"
-              @click="confirm"
-            >
+            <button type="button" class="btn-neutral" @click="emit('close')">閉じる</button>
+            <button type="button" class="btn-primary" :disabled="selectedValue === null" @click="confirm">
               選択
             </button>
           </div>

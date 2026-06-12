@@ -51,7 +51,7 @@ function monsterRoute(ref: PickupRef) {
             v-for="ref in entry.items"
             :key="ref.id"
             :to="{ name: 'skill-detail', params: { id: ref.id } }"
-            class="border rounded px-2 py-1 text-sm app-link"
+            class="tag-link app-link"
           >
             {{ ref.name }}
           </router-link>
@@ -60,10 +60,10 @@ function monsterRoute(ref: PickupRef) {
         <!-- モンスター一覧 -->
         <div v-else-if="entry.type === 'monsters'" class="flex flex-wrap gap-1">
           <template v-for="ref in entry.items" :key="ref.id">
-            <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="border rounded px-2 py-1 text-sm app-link">
+            <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="tag-link app-link">
               {{ ref.name }}
             </router-link>
-            <span v-else class="border rounded px-2 py-1 text-sm text-gray-600">{{ ref.name }}</span>
+            <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
           </template>
         </div>
 
@@ -73,10 +73,10 @@ function monsterRoute(ref: PickupRef) {
             <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
             <div class="flex flex-wrap gap-1">
               <template v-for="ref in group.items" :key="ref.id">
-                <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="border rounded px-2 py-1 text-sm app-link">
+                <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="tag-link app-link">
                   {{ ref.name }}
                 </router-link>
-                <span v-else class="border rounded px-2 py-1 text-sm text-gray-600">{{ ref.name }}</span>
+                <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
               </template>
               <span v-if="!group.items.length" class="text-gray-500">なし</span>
             </div>
