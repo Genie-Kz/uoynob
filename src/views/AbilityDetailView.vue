@@ -55,5 +55,14 @@ const ability = computed(() => abilities.value?.find((candidate) => candidate.id
         </div>
       </div>
     </DataState>
+
+    <PageBreadcrumb
+      :items="[
+        { label: 'ホーム', to: { name: 'home' } },
+        { label: '特技', to: { name: 'ability-list' } },
+        { label: ability?.name ?? '詳細' },
+      ]"
+      class="mt-6"
+    />
   </div>
 </template>

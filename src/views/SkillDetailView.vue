@@ -74,5 +74,14 @@ function isGuardAbility(name: string): boolean {
         </div>
       </div>
     </DataState>
+
+    <PageBreadcrumb
+      :items="[
+        { label: 'ホーム', to: { name: 'home' } },
+        { label: 'スキル', to: { name: 'skill-list' } },
+        { label: skill?.name ?? '詳細' },
+      ]"
+      class="mt-6"
+    />
   </div>
 </template>

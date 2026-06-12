@@ -10,6 +10,7 @@ import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
+import StatusTable from '@/components/StatusTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
 const props = defineProps<{ id: string }>();
@@ -18,6 +19,11 @@ const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+const breadcrumbItems = computed(() => [
+  { label: 'ホーム', to: { name: 'home' } },
+  { label: 'モンスター', to: { name: 'monster-list' } },
+  { label: monster.value?.名前 ?? '詳細' },
+]);
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
 const resistanceCells = computed(() =>
   monster.value ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value))) : [],
@@ -59,11 +65,7 @@ const statRows = computed(() => {
 <template>
   <div>
     <PageBreadcrumb
-      :items="[
-        { label: 'ホーム', to: { name: 'home' } },
-        { label: 'モンスター', to: { name: 'monster-list' } },
-        { label: monster?.名前 ?? '詳細' },
-      ]"
+      :items="breadcrumbItems"
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
@@ -126,15 +128,7 @@ const statRows = computed(() => {
         <ResistanceGrid title="耐性（新生配合時）" :cells="resistanceCells" class="mb-4" />
 
         <!-- ステータス -->
-        <h3 class="text-lg font-bold mb-2">ステータス</h3>
-        <table class="w-full text-sm border-collapse mb-4">
-          <tbody>
-            <tr v-for="row in statRows" :key="row.label" class="border-b">
-              <th class="text-left bg-gray-50 border px-2 py-1 w-1/4">{{ row.label }}</th>
-              <td class="border px-2 py-1">{{ row.value }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <StatusTable title="ステータス" :rows="statRows" class="mb-4" />
 
         <!-- 装備 -->
         <h3 class="text-lg font-bold mb-2">装備</h3>
@@ -145,5 +139,7 @@ const statRows = computed(() => {
         </router-link>
       </div>
     </DataState>
+
+    <PageBreadcrumb :items="breadcrumbItems" class="mt-6" />
   </div>
 </template>

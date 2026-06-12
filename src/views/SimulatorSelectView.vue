@@ -18,5 +18,10 @@ const { monsters, isLoading, errorMessage } = useMonsters();
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <MonsterTable :monsters="monsters ?? []" link-route-name="simulator-build" />
     </DataState>
+
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'ビルドシミュレーター' }]"
+      class="mt-6"
+    />
   </div>
 </template>

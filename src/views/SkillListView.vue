@@ -82,5 +82,7 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
         </table>
       </div>
     </DataState>
+
+    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'スキル' }]" class="mt-6" />
   </div>
 </template>

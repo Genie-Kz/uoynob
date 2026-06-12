@@ -123,5 +123,7 @@ const hasCriteria = computed(
       <p v-else-if="!hasCriteria" class="text-amber-700">耐性または特性を1つ以上指定してください。</p>
       <MonsterTable v-else :monsters="searchResults" link-route-name="monster-detail" />
     </DataState>
+
+    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]" class="mt-6" />
   </div>
 </template>

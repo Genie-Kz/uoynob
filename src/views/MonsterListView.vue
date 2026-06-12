@@ -33,5 +33,7 @@ const result = computed(() =>
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <MonsterTable :monsters="result.monsters" link-route-name="monster-detail" />
     </DataState>
+
+    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター' }]" class="mt-6" />
   </div>
 </template>

@@ -87,5 +87,14 @@ const hasSpDescription = computed(
         </div>
       </div>
     </DataState>
+
+    <PageBreadcrumb
+      :items="[
+        { label: 'ホーム', to: { name: 'home' } },
+        { label: '特性', to: { name: 'attribute-list' } },
+        { label: attribute?.name ?? '詳細' },
+      ]"
+      class="mt-6"
+    />
   </div>
 </template>

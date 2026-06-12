@@ -17,6 +17,7 @@ import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
+import StatusTable from '@/components/StatusTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import PickerModal from '@/components/PickerModal.vue';
 import type { PickerItem } from '@/types/picker';
@@ -30,6 +31,11 @@ const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+const breadcrumbItems = computed(() => [
+  { label: 'ホーム', to: { name: 'home' } },
+  { label: 'ビルドシミュレーター', to: { name: 'simulator-select' } },
+  { label: monster.value?.名前 ?? '詳細' },
+]);
 
 // マウント時点のクエリを控え、URL共有パラメータからの復元に使う
 const initialQuery = { ...route.query };
@@ -172,11 +178,7 @@ function handlePick(value: string): void {
 <template>
   <div>
     <PageBreadcrumb
-      :items="[
-        { label: 'ホーム', to: { name: 'home' } },
-        { label: 'ビルドシミュレーター', to: { name: 'simulator-select' } },
-        { label: monster?.名前 ?? '詳細' },
-      ]"
+      :items="breadcrumbItems"
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
@@ -297,17 +299,11 @@ function handlePick(value: string): void {
         </ul>
 
         <!-- ステータス -->
-        <h3 class="text-lg font-bold mb-2">ステータス</h3>
-        <table class="w-full text-sm border-collapse mb-4">
-          <tbody>
-            <tr v-for="row in statRows" :key="row.label" class="border-b">
-              <th class="text-left bg-gray-50 border px-2 py-1 w-1/4">{{ row.label }}</th>
-              <td class="border px-2 py-1">{{ row.value }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <StatusTable title="ステータス" :rows="statRows" class="mb-4" />
       </div>
     </DataState>
+
+    <PageBreadcrumb :items="breadcrumbItems" class="mt-6" />
 
     <PickerModal
       :open="picker.open"

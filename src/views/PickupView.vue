@@ -84,5 +84,10 @@ function monsterRoute(ref: PickupRef) {
         </div>
       </div>
     </DataState>
+
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: entry?.title ?? 'ピックアップ' }]"
+      class="mt-6"
+    />
   </div>
 </template>

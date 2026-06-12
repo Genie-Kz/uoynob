@@ -65,5 +65,7 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
         </table>
       </div>
     </DataState>
+
+    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特性' }]" class="mt-6" />
   </div>
 </template>
