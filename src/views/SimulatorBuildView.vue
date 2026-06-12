@@ -94,7 +94,7 @@ function skillGuardSummary(skill: Skill): string {
 }
 
 /* ---- 入れ替えモーダル ---- */
-type PickerMode = 'trait' | 'skill' | 'forge';
+type PickerMode = 'size' | 'trait' | 'skill' | 'forge';
 
 const picker = ref<{
   open: boolean;
@@ -111,6 +111,17 @@ const picker = ref<{
   items: [],
   current: '',
 });
+
+function openBodySizePicker(): void {
+  picker.value = {
+    open: true,
+    mode: 'size',
+    index: 0,
+    title: 'ボディサイズを選択',
+    items: BODY_SIZES.map((size) => ({ label: bodySizeLabel(size), value: size })),
+    current: bodySize.value,
+  };
+}
 
 function openTraitPicker(index: number): void {
   picker.value = {
@@ -150,7 +161,8 @@ function openForgePicker(index: number): void {
 
 function handlePick(value: string): void {
   const { mode, index } = picker.value;
-  if (mode === 'trait') setTrait(index, value);
+  if (mode === 'size') changeBodySize(value as BodySize);
+  else if (mode === 'trait') setTrait(index, value);
   else if (mode === 'skill') setSkill(index, value ? (skillById.value.get(value) ?? null) : null);
   else setForgeElement(index, value);
   picker.value.open = false;
@@ -201,41 +213,23 @@ function handlePick(value: string): void {
         <ResistanceGrid title="最終耐性" :cells="resistanceCells" class="mb-5" />
 
         <!-- 特性 -->
-        <h3 class="text-lg font-bold mb-2">
-          特性
-          <span class="text-sm text-gray-500 font-normal">
-            {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
-          </span>
-        </h3>
-        <div class="flex items-end justify-between mb-2 pr-2">
-          <div>
-            <label class="text-sm text-gray-600 block mb-1">ボディサイズ（枠数・耐性に影響）</label>
-            <select
-              :value="bodySize"
-              class="border rounded px-3 py-2 text-sm"
-              @change="changeBodySize(($event.target as HTMLSelectElement).value as BodySize)"
-            >
-              <option v-for="size in BODY_SIZES" :key="size" :value="size">{{ bodySizeLabel(size) }}</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            class="btn-outline-primary"
-            @click="resetTraits"
-          >
-            リセット
-          </button>
+        <div class="flex items-center justify-between mb-2 pr-2">
+          <h3 class="text-lg font-bold">
+            特性
+            <span class="text-sm text-gray-500 font-normal">
+              {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
+            </span>
+          </h3>
+          <button type="button" class="btn-outline-primary" @click="resetTraits">リセット</button>
         </div>
         <ul class="border rounded divide-y mb-5">
+          <li class="flex items-center justify-between px-3 py-2">
+            <span>ボディサイズ：{{ bodySize }}</span>
+            <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
+          </li>
           <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between px-3 py-2">
             <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
-            <button
-              type="button"
-              class="btn-outline-primary"
-              @click="openTraitPicker(index)"
-            >
-              選択
-            </button>
+            <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
           </li>
         </ul>
 
