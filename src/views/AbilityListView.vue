@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAbilities } from '@/composables/useAbilities';
 import { ABILITY_CATEGORY_BY_SLUG } from '@/constants/categories';
+import { includesKeyword } from '@/domain/textSearch';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -19,7 +20,7 @@ const visibleAbilities = computed(() => {
   let list = [...(abilities.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   if (categoryName.value) list = list.filter((ability) => ability.category === categoryName.value);
   const query = keyword.value.trim();
-  if (query) list = list.filter((ability) => ability.name.includes(query));
+  if (query) list = list.filter((ability) => includesKeyword(ability.name, query));
   return list;
 });
 

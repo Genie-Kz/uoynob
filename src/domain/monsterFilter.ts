@@ -7,6 +7,7 @@ import {
   lineageInfoOf,
 } from '@/constants/monsterTaxonomy';
 import type { MonsterRank } from '@/types/monster';
+import { includesKeyword } from './textSearch';
 
 export interface MonsterListFilter {
   rankSlug?: string;
@@ -51,7 +52,7 @@ export function filterMonsterList(all: Monster[], filter: MonsterListFilter): Fi
   if (nameQuery) {
     return {
       title: `「${nameQuery}」の検索結果`,
-      monsters: all.filter((monster) => monster.名前.includes(nameQuery)),
+      monsters: all.filter((monster) => includesKeyword(monster.名前, nameQuery)),
     };
   }
 

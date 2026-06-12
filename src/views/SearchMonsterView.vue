@@ -5,6 +5,7 @@ import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
+import { includesKeyword } from '@/domain/textSearch';
 import DataState from '@/components/DataState.vue';
 import MonsterTable from '@/components/MonsterTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
@@ -31,7 +32,7 @@ const searchResults = ref<Monster[] | null>(null);
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const visibleTraitNames = computed(() => {
   const keyword = traitKeyword.value.trim();
-  return keyword ? allTraitNames.value.filter((name) => name.includes(keyword)) : allTraitNames.value;
+  return keyword ? allTraitNames.value.filter((name) => includesKeyword(name, keyword)) : allTraitNames.value;
 });
 
 const thresholds = computed<ResistanceThreshold[]>(() =>

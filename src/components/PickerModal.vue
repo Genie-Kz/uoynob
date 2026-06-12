@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
+import { includesKeyword } from '@/domain/textSearch';
 
 const props = defineProps<{
   open: boolean;
@@ -33,7 +34,7 @@ watch(
 const filteredItems = computed(() => {
   const query = keyword.value.trim();
   if (!query) return props.items;
-  return props.items.filter((item) => item.label.includes(query));
+  return props.items.filter((item) => includesKeyword(item.label, query));
 });
 
 function selectItem(value: string): void {

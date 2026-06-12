@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import type { Skill, SkillCategory } from '@/types/skill';
 import { useSkills } from '@/composables/useSkills';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
+import { includesKeyword } from '@/domain/textSearch';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -24,7 +25,7 @@ const visibleSkills = computed(() => {
   let list = [...(skills.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   if (categoryName.value) list = list.filter((skill) => skill.category === categoryName.value);
   const query = keyword.value.trim();
-  if (query) list = list.filter((skill) => skill.name.includes(query));
+  if (query) list = list.filter((skill) => includesKeyword(skill.name, query));
   return list;
 });
 

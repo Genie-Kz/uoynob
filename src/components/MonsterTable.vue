@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import type { Monster } from '@/types/monster';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
+import { includesKeyword } from '@/domain/textSearch';
 import MonsterIcon from './MonsterIcon.vue';
 
 const props = defineProps<{
@@ -22,9 +23,9 @@ const visibleMonsters = computed(() => {
   if (!query) return sortedMonsters.value;
   return sortedMonsters.value.filter(
     (monster) =>
-      monster.名前.includes(query) ||
-      lineageInfoOf(monster.系統).label.includes(query) ||
-      monster.ランク.includes(query),
+      includesKeyword(monster.名前, query) ||
+      includesKeyword(lineageInfoOf(monster.系統).label, query) ||
+      includesKeyword(monster.ランク, query),
   );
 });
 </script>
