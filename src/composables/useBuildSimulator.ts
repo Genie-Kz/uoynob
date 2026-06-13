@@ -1,6 +1,7 @@
 /** ビルドシミュレーターの状態管理コンポーザブル */
 import { computed, ref, watch, type Ref } from 'vue';
 import type { LocationQuery } from 'vue-router';
+import type { Attribute } from '@/types/attribute';
 import type { BodySize, Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import type { ForgeStatUp, Monshou, StatValues, Weapon } from '@/types/stats';
@@ -22,7 +23,7 @@ import { guardAbilityToElement } from '@/domain/skillAnalysis';
 /**
  * URL共有用のクエリ。ビルドタブ・系図個体値タブの全状態を復元できる。
  *   s = ボディサイズ / t = 特性 / k = スキル / f = 武器鍛冶
- *   i = 個体値 / g = 家系図 / p = 親レベル合計 / w = 武器No / m = 紋晶 / x = SP化特性
+ *   i = 個体値 / g = 家系図 / p = 親レベル合計 / w = 武器No / m = 紋晶 / x = SP化特性ID
  */
 export interface BuildShareQuery {
   [key: string]: string;
@@ -81,6 +82,7 @@ export function useBuildSimulator(
   allMonsters: Ref<Monster[] | null>,
   skills: Ref<Skill[] | null>,
   weapons: Ref<Weapon[] | null>,
+  attributes: Ref<Attribute[] | null>,
   initialQuery: LocationQuery,
 ) {
   const bodySize = ref<BodySize>('スタンダードボディ');
@@ -102,6 +104,10 @@ export function useBuildSimulator(
 
   const traitMaster = computed(() => collectAllTraitNames(allMonsters.value ?? []));
   const skillById = computed(() => new Map((skills.value ?? []).map((skill) => [skill.id, skill])));
+  const attributeById = computed(() => new Map((attributes.value ?? []).map((attribute) => [attribute.id, attribute])));
+  const attributeIdByName = computed(
+    () => new Map((attributes.value ?? []).map((attribute) => [attribute.name, attribute.id])),
+  );
   const equippedSkills = computed(() => skillSlots.value.filter((skill): skill is Skill => skill !== null));
 
   /**
@@ -210,17 +216,27 @@ export function useBuildSimulator(
       monshouNames.value = m ? [m.name] : [];
     }
 
-    const spNames = readQuery(query, 'x');
-    if (spNames !== undefined) {
-      spTraitNames.value = spNames ? spNames.split(',') : [];
+    const spCodes = readQuery(query, 'x');
+    if (spCodes !== undefined) {
+      if (!spCodes) {
+        spTraitNames.value = [];
+      } else if (/^\d+(?:-\d+)*$/.test(spCodes)) {
+        spTraitNames.value = spCodes
+          .split('-')
+          .map((id) => attributeById.value.get(id)?.name)
+          .filter((name): name is string => !!name);
+      } else {
+        // 旧形式（日本語名のカンマ区切り）も既存の共有URL用に読み込む。
+        spTraitNames.value = spCodes.split(',');
+      }
     }
   }
 
   const hasInitialized = ref(false);
   watch(
-    [monster, skills, weapons],
+    [monster, skills, weapons, attributes],
     () => {
-      if (hasInitialized.value || !monster.value || !skills.value || !weapons.value) return;
+      if (hasInitialized.value || !monster.value || !skills.value || !weapons.value || !attributes.value) return;
       hasInitialized.value = true;
       const hasShareParams = SHARE_PARAM_KEYS.some((key) => readQuery(initialQuery, key) !== undefined);
       if (hasShareParams) restoreFromQuery(initialQuery, monster.value);
@@ -340,6 +356,11 @@ export function useBuildSimulator(
     });
   });
 
+  function encodeSpTraits(): string {
+    const ids = spTraitNames.value.map((name) => attributeIdByName.value.get(name));
+    return ids.every((id): id is string => !!id) ? ids.join('-') : spTraitNames.value.join(',');
+  }
+
   const shareQuery = computed<BuildShareQuery>(() => ({
     s: String(BODY_SIZES.indexOf(bodySize.value)),
     t: traitSlots.value.map((name) => (name ? String(traitMaster.value.indexOf(name)) : '')).join('-'),
@@ -357,7 +378,7 @@ export function useBuildSimulator(
     p: String(parentLevelTotal.value),
     w: weapon.value ? String(weapon.value.no) : '',
     m: monshouNames.value.length ? String(MONSHOU_LIST.findIndex((entry) => entry.name === monshouNames.value[0])) : '',
-    x: spTraitNames.value.join(','),
+    x: encodeSpTraits(),
   }));
 
   return {

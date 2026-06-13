@@ -6,7 +6,7 @@ import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/composables/useBuildSimulator';
-import { loadWeapons } from '@/api/datasets';
+import { loadAttributes, loadWeapons } from '@/api/datasets';
 import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
@@ -32,6 +32,7 @@ const router = useRouter();
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 const { data: weapons } = useAsyncData(loadWeapons);
+const { data: attributes } = useAsyncData(loadAttributes);
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
 const breadcrumbItems = computed(() => [
@@ -42,7 +43,7 @@ const breadcrumbItems = computed(() => [
 
 const initialQuery = { ...route.query };
 
-const sim = useBuildSimulator(monster, monsters, skills, weapons, initialQuery);
+const sim = useBuildSimulator(monster, monsters, skills, weapons, attributes, initialQuery);
 const {
   bodySize,
   traitSlots,

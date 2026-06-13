@@ -27,6 +27,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/SearchMonsterView.vue'),
   },
   {
+    path: '/site-search',
+    name: 'site-search',
+    component: () => import('@/views/SiteSearchView.vue'),
+  },
+  {
     path: '/attributes',
     name: 'attribute-list',
     component: () => import('@/views/AttributeListView.vue'),

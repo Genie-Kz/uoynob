@@ -1,74 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { NAV_CARDS } from '@/constants/navigation';
-import { useMonsters } from '@/composables/useMonsters';
-import { useSkills } from '@/composables/useSkills';
-import { useAsyncData } from '@/composables/useAsyncData';
-import { loadAttributes } from '@/api/datasets';
-import { includesKeyword } from '@/domain/textSearch';
 
-const { monsters } = useMonsters();
-const { skills } = useSkills();
-const { data: attributes } = useAsyncData(loadAttributes);
-
+const router = useRouter();
 const searchKeyword = ref('');
 const openCardIds = ref<Record<string, boolean>>({});
 
-/** 1グループあたりの最大表示件数 */
-const MAX_PER_GROUP = 20;
-
-interface SearchHit {
-  id: string;
-  label: string;
-  to: RouteLocationRaw;
-}
-interface SearchGroup {
-  type: string;
-  hits: SearchHit[];
-  total: number;
-}
-
-const searchGroups = computed<SearchGroup[]>(() => {
+function submitSearch(): void {
   const keyword = searchKeyword.value.trim();
-  if (!keyword) return [];
-
-  const monsterHits = (monsters.value ?? []).filter((m) => includesKeyword(m.名前, keyword));
-  const traitHits = (attributes.value ?? []).filter((a) => includesKeyword(a.name, keyword));
-  const skillHits = (skills.value ?? []).filter((s) => includesKeyword(s.name, keyword));
-
-  return [
-    {
-      type: 'モンスター',
-      total: monsterHits.length,
-      hits: monsterHits.slice(0, MAX_PER_GROUP).map((m) => ({
-        id: m.id,
-        label: m.名前,
-        to: { name: 'monster-detail', params: { id: m.id } },
-      })),
-    },
-    {
-      type: '特性',
-      total: traitHits.length,
-      hits: traitHits.slice(0, MAX_PER_GROUP).map((a) => ({
-        id: a.id,
-        label: a.name,
-        to: { name: 'attribute-detail', params: { id: a.id } },
-      })),
-    },
-    {
-      type: 'スキル',
-      total: skillHits.length,
-      hits: skillHits.slice(0, MAX_PER_GROUP).map((s) => ({
-        id: s.id,
-        label: s.name,
-        to: { name: 'skill-detail', params: { id: s.id } },
-      })),
-    },
-  ].filter((group) => group.total > 0);
-});
-
-const hasResults = computed(() => searchGroups.value.length > 0);
+  if (!keyword) return;
+  void router.push({ name: 'site-search', query: { q: keyword } });
+}
 
 function toggleCard(cardId: string): void {
   openCardIds.value[cardId] = !openCardIds.value[cardId];
@@ -81,35 +24,17 @@ function toggleCard(cardId: string): void {
       <p class="text-sm text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
     </div>
 
-    <!-- サイト内検索（モンスター・特性・スキル名）→ 各詳細ページへ直接遷移 -->
-    <div class="mb-4">
+    <!-- サイト内検索（1件なら詳細、複数なら候補一覧へ遷移） -->
+    <form class="flex gap-2 mb-4" @submit.prevent="submitSearch">
       <input
         v-model="searchKeyword"
-        type="text"
+        type="search"
         placeholder="モンスター・特性・スキル名で検索"
-        class="w-full border rounded px-3 py-2"
+        class="min-w-0 flex-1 border rounded px-3 py-2"
         aria-label="モンスター・特性・スキル名で検索"
       />
-
-      <div v-if="searchKeyword.trim()" class="border rounded mt-2 divide-y">
-        <p v-if="!hasResults" class="px-3 py-3 text-sm text-gray-500">該当する項目が見つかりませんでした。</p>
-        <section v-for="group in searchGroups" :key="group.type" class="py-2">
-          <p class="px-3 pb-1 text-xs font-bold text-gray-500">
-            {{ group.type }}<span class="font-normal text-gray-400 ml-1">{{ group.total }}件</span>
-          </p>
-          <ul>
-            <li v-for="hit in group.hits" :key="hit.id">
-              <router-link :to="hit.to" class="block px-3 py-1.5 text-sm hover:bg-gray-50 app-link">
-                {{ hit.label }}
-              </router-link>
-            </li>
-          </ul>
-          <p v-if="group.total > group.hits.length" class="px-3 pt-1 text-xs text-gray-400">
-            ほか {{ group.total - group.hits.length }} 件（絞り込んでください）
-          </p>
-        </section>
-      </div>
-    </div>
+      <button type="submit" class="btn-primary">検索</button>
+    </form>
 
     <!-- カテゴリ（アコーディオン。項目を押すと各ページへ遷移） -->
     <div v-for="card in NAV_CARDS" :key="card.id" class="border rounded mb-2 overflow-hidden">
