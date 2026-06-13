@@ -25,6 +25,28 @@
       name="twitter:description"
       content="イルルカSPのモンスター図鑑、耐性・特性検索、スキルデータ、ビルドシミュレーターを収録。"
     />
+    <script>
+      (() => {
+        try {
+          const storedTheme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', storedTheme === 'dark' || (!storedTheme && prefersDark));
+        } catch {
+          // localStorageを利用できない場合はライトモードで表示する。
+        }
+      })();
+    </script>
+    <style>
+      html {
+        background-color: #ffffff;
+      }
+      html.dark {
+        background-color: #181818;
+      }
+      #app:not([data-v-app]) {
+        visibility: hidden;
+      }
+    </style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
