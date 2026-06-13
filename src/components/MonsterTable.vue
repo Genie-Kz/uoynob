@@ -4,6 +4,7 @@ import type { Monster } from '@/types/monster';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { LINEAGE_ICON, LINEAGE_LABEL } from '@/constants/lineageIcons';
 import { includesKeyword } from '@/domain/textSearch';
+import BodySizeIcon from './BodySizeIcon.vue';
 import MonsterIcon from './MonsterIcon.vue';
 
 const props = defineProps<{
@@ -79,7 +80,9 @@ const visibleMonsters = computed(() => {
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
             </td>
-            <td class="px-2 py-1 border">{{ monster.サイズ特性 }}</td>
+            <td class="px-2 py-1 border text-center">
+              <BodySizeIcon :size="monster.サイズ特性" />
+            </td>
           </tr>
         </tbody>
       </table>

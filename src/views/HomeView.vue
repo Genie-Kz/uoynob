@@ -32,9 +32,9 @@ function toggleCard(cardId: string): void {
       <input
         v-model="searchKeyword"
         type="search"
-        placeholder="モンスター・特性・スキル名で検索"
+        placeholder="モンスター・特性・スキル・特技名で検索"
         class="min-w-0 flex-1 border rounded px-3 py-2"
-        aria-label="モンスター・特性・スキル名で検索"
+        aria-label="モンスター・特性・スキル・特技名で検索"
       />
       <button type="submit" class="btn-primary">検索</button>
     </form>

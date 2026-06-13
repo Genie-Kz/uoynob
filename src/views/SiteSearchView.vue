@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
 import { loadAttributes } from '@/api/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { useAbilities } from '@/composables/useAbilities';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
@@ -13,6 +14,7 @@ const route = useRoute();
 const router = useRouter();
 const { monsters, isLoading: monstersLoading, errorMessage: monstersError } = useMonsters();
 const { skills, isLoading: skillsLoading, errorMessage: skillsError } = useSkills();
+const { abilities, isLoading: abilitiesLoading, errorMessage: abilitiesError } = useAbilities();
 const {
   data: attributes,
   isLoading: attributesLoading,
@@ -22,10 +24,18 @@ const {
 const keyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''));
 const inputKeyword = ref(keyword.value);
 const isLoading = computed(
-  () => monstersLoading.value || skillsLoading.value || attributesLoading.value,
+  () =>
+    monstersLoading.value ||
+    skillsLoading.value ||
+    abilitiesLoading.value ||
+    attributesLoading.value,
 );
 const errorMessage = computed(
-  () => monstersError.value ?? skillsError.value ?? attributesError.value,
+  () =>
+    monstersError.value ??
+    skillsError.value ??
+    abilitiesError.value ??
+    attributesError.value,
 );
 const results = computed(() =>
   searchSite(
@@ -33,6 +43,7 @@ const results = computed(() =>
       monsters: monsters.value ?? [],
       attributes: attributes.value ?? [],
       skills: skills.value ?? [],
+      abilities: abilities.value ?? [],
     },
     keyword.value,
   ),
@@ -43,6 +54,7 @@ function routeFor(hit: SiteSearchHit): RouteLocationRaw {
     monster: 'monster-detail',
     attribute: 'attribute-detail',
     skill: 'skill-detail',
+    ability: 'ability-detail',
   }[hit.kind];
   return { name: routeName, params: { id: hit.id } };
 }
@@ -77,9 +89,9 @@ function submitSearch(): void {
       <input
         v-model="inputKeyword"
         type="search"
-        placeholder="モンスター・特性・スキル名で検索"
+        placeholder="モンスター・特性・スキル・特技名で検索"
         class="min-w-0 flex-1 border rounded px-3 py-2"
-        aria-label="モンスター・特性・スキル名で検索"
+        aria-label="モンスター・特性・スキル・特技名で検索"
       />
       <button type="submit" class="btn-primary">検索</button>
     </form>

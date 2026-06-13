@@ -1,9 +1,10 @@
+import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
 import type { Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { includesKeyword } from './textSearch';
 
-export type SiteSearchKind = 'monster' | 'attribute' | 'skill';
+export type SiteSearchKind = 'monster' | 'attribute' | 'skill' | 'ability';
 
 export interface SiteSearchHit {
   kind: SiteSearchKind;
@@ -16,6 +17,7 @@ export interface SiteSearchData {
   monsters: Monster[];
   attributes: Attribute[];
   skills: Skill[];
+  abilities: Ability[];
 }
 
 /** サイト内検索の候補を、ページ種類が分かる情報付きで返す。 */
@@ -47,6 +49,14 @@ export function searchSite(data: SiteSearchData, keyword: string): SiteSearchHit
         kindLabel: 'スキル',
         id: skill.id,
         label: skill.name,
+      })),
+    ...data.abilities
+      .filter((ability) => includesKeyword(ability.name, query))
+      .map((ability) => ({
+        kind: 'ability' as const,
+        kindLabel: '特技',
+        id: ability.id,
+        label: ability.name,
       })),
   ];
 }

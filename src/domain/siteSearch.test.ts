@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createGuardSkill, createMonster } from '@/test/fixtures';
+import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
 import { searchSite } from './siteSearch';
 
@@ -13,6 +14,14 @@ const attribute = {
   skills: [],
 } satisfies Attribute;
 
+const ability = {
+  id: '001',
+  name: 'スライム斬り',
+  category: '斬撃',
+  description: '',
+  skills: [],
+} satisfies Ability;
+
 describe('searchSite', () => {
   const data = {
     monsters: [
@@ -21,6 +30,7 @@ describe('searchSite', () => {
     ],
     attributes: [attribute],
     skills: [createGuardSkill('001', 'スライムソウル', [])],
+    abilities: [ability],
   };
 
   it('種類を付けて全データを横断検索する', () => {
@@ -28,6 +38,7 @@ describe('searchSite', () => {
       { kind: 'monster', kindLabel: 'モンスター', id: '001-1', label: 'スライム' },
       { kind: 'attribute', kindLabel: '特性', id: '001', label: 'スライムキラー' },
       { kind: 'skill', kindLabel: 'スキル', id: '001', label: 'スライムソウル' },
+      { kind: 'ability', kindLabel: '特技', id: '001', label: 'スライム斬り' },
     ]);
   });
 
