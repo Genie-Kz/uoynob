@@ -32,9 +32,10 @@ const searchBodySize = ref<BodySize | ''>('');
 
 const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
   { label: 'デフォルトサイズ', value: '' },
-  { label: 'スタンダードボディ', value: 'スタンダードボディ' },
   { label: 'スモールボディ', value: 'スモールボディ' },
+  { label: 'スタンダードボディ', value: 'スタンダードボディ' },
   { label: 'メガボディ', value: 'メガボディ' },
+  { label: 'ギガボディ', value: 'ギガボディ' },
   { label: '超ギガボディ', value: '超ギガボディ' },
 ];
 

@@ -17,6 +17,57 @@ function createAttribute(id: string, name: string): Attribute {
 }
 
 describe('useBuildSimulator', () => {
+  it.each([
+    ['AI4回行動', 'AI2～3回行動'],
+    ['AI3～4回行動', 'AI2回行動'],
+  ])('超ギガボディからサイズを小さくすると%sを%sへ変換する', async (originalTrait, replacedTrait) => {
+    const target = createMonster({
+      サイズ特性: '超ギガボディ',
+      新生前特性1: originalTrait,
+    });
+
+    for (const bodySize of [
+      'スモールボディ',
+      'スタンダードボディ',
+      'メガボディ',
+      'ギガボディ',
+    ] as const) {
+      const simulator = useBuildSimulator(
+        ref(target),
+        ref([target]),
+        ref([]),
+        ref([]),
+        ref([]),
+        {},
+      );
+
+      await nextTick();
+      simulator.changeBodySize(bodySize);
+
+      expect(simulator.traitSlots.value).toContain(replacedTrait);
+      expect(simulator.traitSlots.value).not.toContain(originalTrait);
+    }
+  });
+
+  it('超ギガボディのままならAI4回行動を維持する', async () => {
+    const target = createMonster({
+      サイズ特性: '超ギガボディ',
+      新生前特性1: 'AI4回行動',
+    });
+    const simulator = useBuildSimulator(
+      ref(target),
+      ref([target]),
+      ref([]),
+      ref([]),
+      ref([]),
+      {},
+    );
+
+    await nextTick();
+
+    expect(simulator.traitSlots.value).toContain('AI4回行動');
+  });
+
   it('特性をリセットするとSP化の状態もリセットする', async () => {
     const target = createMonster({ 新生前特性1: 'つねにアタックカンタ' });
     const monster = ref(target);

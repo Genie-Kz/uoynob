@@ -59,6 +59,46 @@ describe('searchMonsters', () => {
     })).toEqual([]);
   });
 
+  it.each([
+    ['AI4回行動', 'AI2～3回行動'],
+    ['AI3～4回行動', 'AI2回行動'],
+  ])('超ギガボディからサイズを小さくすると%sを%sとして検索する', (originalTrait, replacedTrait) => {
+    const monster = createMonster({
+      サイズ特性: '超ギガボディ',
+      新生前特性1: originalTrait,
+    });
+
+    for (const bodySize of [
+      'スモールボディ',
+      'スタンダードボディ',
+      'メガボディ',
+      'ギガボディ',
+    ] as const) {
+      expect(searchMonsters([monster], {
+        thresholds: [],
+        requiredTraits: [replacedTrait],
+        bodySize,
+      })).toEqual([monster]);
+      expect(searchMonsters([monster], {
+        thresholds: [],
+        requiredTraits: [originalTrait],
+        bodySize,
+      })).toEqual([]);
+    }
+  });
+
+  it('デフォルトの超ギガボディでは行動回数特性を変換しない', () => {
+    const monster = createMonster({
+      サイズ特性: '超ギガボディ',
+      新生前特性1: 'AI4回行動',
+    });
+
+    expect(searchMonsters([monster], {
+      thresholds: [],
+      requiredTraits: ['AI4回行動'],
+    })).toEqual([monster]);
+  });
+
   it('条件が空かどうかを判定できる', () => {
     expect(isEmptyCriteria({ thresholds: [], requiredTraits: [] })).toBe(true);
     expect(isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] })).toBe(false);

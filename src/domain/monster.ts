@@ -2,6 +2,11 @@
 import type { BodySize, Monster, ResistanceValue } from '@/types/monster';
 import { TRAIT_FIELDS, WEAPONS } from '@/constants/monsterTaxonomy';
 
+const SUPER_GIGA_ACTION_TRAIT_REPLACEMENTS: Record<string, string> = {
+  AI4回行動: 'AI2～3回行動',
+  'AI3～4回行動': 'AI2回行動',
+};
+
 /** 指定耐性要素の値を取得 */
 export function resistanceValueOf(monster: Monster, element: string): ResistanceValue {
   return monster[element] as ResistanceValue;
@@ -39,7 +44,12 @@ export function defaultEditableTraits(monster: Monster, bodySize: BodySize): str
   if (isMegaOrLarger) traits.push(monster.メガ特性);
   if (isGigaOrLarger) traits.push(monster.ギガ特性);
   if (bodySize === '超ギガボディ') traits.push(monster.超ギガ特性);
-  return traits.map((trait) => trait ?? '');
+  return traits.map((trait) => {
+    if (monster.サイズ特性 !== '超ギガボディ' || bodySize === '超ギガボディ') {
+      return trait ?? '';
+    }
+    return SUPER_GIGA_ACTION_TRAIT_REPLACEMENTS[trait] ?? trait ?? '';
+  });
 }
 
 /** 全モンスターから重複なく特性名を収集（特性入れ替えモーダルの候補に使う） */
