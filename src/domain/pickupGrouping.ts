@@ -3,7 +3,11 @@ import type { PickupRef } from '@/types/pickup';
 import type { Skill } from '@/types/skill';
 import type { StatKey } from '@/types/stats';
 import { STAT_KEYS } from '@/constants/statsRules';
-import { SHINSHO_BY_LOCAL_SKILL, LOCAL_SKILLS_BY_SHINSHO } from '@/constants/pickupGroups';
+import {
+  GUARDS_BY_RESISTANCE_PICKUP,
+  SHINSHO_BY_LOCAL_SKILL,
+  LOCAL_SKILLS_BY_SHINSHO,
+} from '@/constants/pickupGroups';
 import { skillStatBonus } from './statBonus';
 
 export interface PickupSkillGroup {
@@ -67,30 +71,24 @@ function groupByStat(items: PickupRef[], skillById: Map<string, Skill>): PickupS
   }).filter((group) => group.items.length > 0);
 }
 
-/** 耐性スキルを得られる「〇〇ガード＋」ごとに分類 */
-function groupByGuard(items: PickupRef[], skillById: Map<string, Skill>): PickupSkillGroup[] {
-  const buckets = new Map<string, PickupRef[]>();
-  const others: PickupRef[] = [];
+/** 指定された「〇〇ガード＋」だけを、指定順で分類 */
+function groupByGuard(
+  items: PickupRef[],
+  skillById: Map<string, Skill>,
+  guardNames: readonly string[],
+): PickupSkillGroup[] {
+  const buckets = new Map<string, PickupRef[]>(guardNames.map((guardName) => [guardName, []]));
   for (const item of items) {
     const skill = skillById.get(item.id);
-    const guards = new Set<string>();
     for (const part of skill?.composition ?? []) {
-      if (part.type === 'attribute' && /ガード[＋+]$/.test(part.name)) guards.add(part.name);
-    }
-    if (guards.size === 0) {
-      others.push(item);
-      continue;
-    }
-    for (const guard of guards) {
-      if (!buckets.has(guard)) buckets.set(guard, []);
-      buckets.get(guard)!.push(item);
+      if (part.type !== 'attribute') continue;
+      const bucket = buckets.get(part.name);
+      if (bucket && !bucket.some((candidate) => candidate.id === item.id)) bucket.push(item);
     }
   }
-  const groups = [...buckets.entries()]
-    .map(([label, groupItems]) => ({ label, items: groupItems }))
-    .sort((a, b) => b.items.length - a.items.length || a.label.localeCompare(b.label, 'ja'));
-  if (others.length) groups.push({ label: 'その他', items: others });
-  return groups;
+  return guardNames
+    .map((guardName) => ({ label: guardName, items: buckets.get(guardName)! }))
+    .filter((group) => group.items.length > 0);
 }
 
 /**
@@ -105,14 +103,7 @@ export function groupPickupSkills(
   if (key === 'skill-local') return groupByShinsho(items);
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
   if (key === 'skill-parameter-up') return groupByStat(items, skillById);
-  if (
-    key === 'skill-resistance-spell' ||
-    key === 'skill-resistance-breath' ||
-    key === 'skill-resistance-condition' ||
-    key === 'skill-resistance-seal' ||
-    key === 'skill-resistance-weaken'
-  ) {
-    return groupByGuard(items, skillById);
-  }
+  const guardNames = GUARDS_BY_RESISTANCE_PICKUP[key];
+  if (guardNames) return groupByGuard(items, skillById, guardNames);
   return null;
 }

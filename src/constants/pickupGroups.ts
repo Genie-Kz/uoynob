@@ -40,3 +40,39 @@ export const LOCAL_SKILLS_BY_SHINSHO: { shinsho: string; skills: string[] }[] = 
 export const SHINSHO_BY_LOCAL_SKILL: Record<string, string> = Object.fromEntries(
   LOCAL_SKILLS_BY_SHINSHO.flatMap((group) => group.skills.map((name) => [name, group.shinsho])),
 );
+
+/** 耐性スキルのピックアップごとに表示するガード特性。配列順を表示順として扱う。 */
+export const GUARDS_BY_RESISTANCE_PICKUP: Record<string, readonly string[]> = {
+  'skill-resistance-spell': [
+    'メラガード＋',
+    'ギラガード＋',
+    'イオガード＋',
+    'バギガード＋',
+    'ヒャドガード＋',
+    'ジバリアガード＋',
+    'デインガード＋',
+    'ドルマガード＋',
+    'ベタンガード＋',
+  ],
+  'skill-resistance-breath': ['炎ブレスガード＋', '吹雪ブレスガード＋'],
+  'skill-resistance-condition': [
+    'ザキガード＋',
+    'どくガード＋',
+    '呪いガード＋',
+    'マインドガード＋',
+    'こんらんガード＋',
+    'マヒガード＋',
+    'ねむりガード＋',
+    'マヌーサガード＋',
+    'マホトラガード＋',
+    'ハックガード＋',
+  ],
+  'skill-resistance-seal': [
+    'マホトーンガード＋',
+    '斬撃封じガード＋',
+    '体技封じガード＋',
+    '息封じガード＋',
+    '踊り封じガード＋',
+  ],
+  'skill-resistance-weaken': ['ダウンガード＋', 'ルカニガード＋', 'ボミエガード＋', 'フールガード＋'],
+};
