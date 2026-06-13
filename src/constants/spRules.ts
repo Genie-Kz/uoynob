@@ -1,5 +1,6 @@
 /** SP化できる特性かどうかの判定 */
 import { BODY_SIZES } from './monsterTaxonomy';
+import { ALL_GUARD_TRAIT } from './buildRules';
 import { AI_ACTION_MULTIPLIER, METAL_BODY_HP_MULTIPLIER } from './statsRules';
 
 /** SP化できない特性（これ以外はSP化トグル可能） */
@@ -7,6 +8,7 @@ export const CANNOT_BE_SP_TRAITS = new Set<string>([
   ...BODY_SIZES,
   ...Object.keys(AI_ACTION_MULTIPLIER),
   ...Object.keys(METAL_BODY_HP_MULTIPLIER),
+  ALL_GUARD_TRAIT,
   'こうどうおそい',
   'こうどうはやい',
   '超こうどうはやい',

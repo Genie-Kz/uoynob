@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import type { Monster } from '@/types/monster';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
+import { LINEAGE_ICON, LINEAGE_LABEL } from '@/constants/lineageIcons';
 import { includesKeyword } from '@/domain/textSearch';
 import MonsterIcon from './MonsterIcon.vue';
 
@@ -68,7 +69,16 @@ const visibleMonsters = computed(() => {
               </router-link>
             </td>
             <td class="px-2 py-1 border">{{ monster.ランク }}</td>
-            <td class="px-2 py-1 border">{{ lineageInfoOf(monster.系統).label }}</td>
+            <td class="px-2 py-1 border">
+              <img
+                v-if="LINEAGE_ICON[monster.系統]"
+                :src="LINEAGE_ICON[monster.系統]"
+                :alt="LINEAGE_LABEL[monster.系統] ?? monster.系統"
+                :title="LINEAGE_LABEL[monster.系統] ?? monster.系統"
+                class="w-6 h-6 inline-block"
+              />
+              <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
+            </td>
             <td class="px-2 py-1 border">{{ monster.サイズ特性 }}</td>
           </tr>
         </tbody>

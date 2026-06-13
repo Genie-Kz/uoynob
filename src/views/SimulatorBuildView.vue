@@ -8,7 +8,7 @@ import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/composables/useBuildSimulator';
 import { loadWeapons } from '@/api/datasets';
 import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
-import { SKILL_SLOT_COUNT_BY_SIZE, TRAIT_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
+import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
 import { canBeSp } from '@/constants/spRules';
@@ -42,7 +42,7 @@ const breadcrumbItems = computed(() => [
 
 const initialQuery = { ...route.query };
 
-const sim = useBuildSimulator(monster, monsters, skills, initialQuery);
+const sim = useBuildSimulator(monster, monsters, skills, weapons, initialQuery);
 const {
   bodySize,
   traitSlots,
@@ -111,9 +111,6 @@ const equippableWeapons = computed(() =>
   (weapons.value ?? []).filter((w) => equippableTypes.value.includes(w.type)),
 );
 
-function bodySizeLabel(size: BodySize): string {
-  return `${size}（特性${TRAIT_SLOT_COUNT_BY_SIZE[size]}・スキル${SKILL_SLOT_COUNT_BY_SIZE[size]}）`;
-}
 function skillGuardSummary(skill: Skill): string {
   return [...summarizeGuardEffects(skill)].map(([element, count]) => `${element}+${count * 2}`).join(' ');
 }
@@ -139,7 +136,7 @@ function openBodySizePicker(): void {
     mode: 'size',
     index: 0,
     title: 'ボディサイズを選択',
-    items: BODY_SIZES.map((size) => ({ label: bodySizeLabel(size), value: size })),
+    items: BODY_SIZES.map((size) => ({ label: size, value: size })),
     current: bodySize.value,
   };
 }
@@ -161,7 +158,7 @@ function openSkillPicker(index: number): void {
     title: 'スキルを選択',
     items: [
       { label: '（空きにする）', value: '' },
-      ...(skills.value ?? []).map((skill) => ({ label: `${skill.name}〔${skill.category}〕`, value: skill.id })),
+      ...(skills.value ?? []).map((skill) => ({ label: skill.name, value: skill.id })),
     ],
     current: skillSlots.value[index]?.id ?? '',
   };
@@ -255,7 +252,7 @@ const monshouOptions = MONSHOU_LIST;
             :class="activeTab === 'family' ? 'border-blue-500 text-blue-600 font-bold' : 'border-transparent text-gray-500'"
             @click="activeTab = 'family'"
           >
-            系図・個体値
+            ステータス・系図
           </button>
         </div>
 
@@ -271,12 +268,7 @@ const monshouOptions = MONSHOU_LIST;
 
           <!-- 特性 -->
           <div class="flex items-center justify-between mb-2 pr-2">
-            <h3 class="text-lg font-bold">
-              特性
-              <span class="text-sm text-gray-500 font-normal">
-                {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
-              </span>
-            </h3>
+            <h3 class="text-lg font-bold">特性</h3>
             <button type="button" class="btn-outline-primary" @click="resetTraits">リセット</button>
           </div>
           <ul class="border rounded divide-y mb-5">
@@ -290,7 +282,7 @@ const monshouOptions = MONSHOU_LIST;
                 <button
                   v-if="trait && canBeSp(trait)"
                   type="button"
-                  class="rounded border px-2 py-0.5 text-xs"
+                  class="rounded border px-3 py-1 text-sm font-semibold"
                   :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
                   @click="toggleSp(trait)"
                 >
@@ -309,7 +301,7 @@ const monshouOptions = MONSHOU_LIST;
               <button
                 v-if="canBeSp(trait)"
                 type="button"
-                class="rounded border px-2 py-0.5 text-xs"
+                class="rounded border px-3 py-1 text-sm font-semibold"
                 :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
                 @click="toggleSp(trait)"
               >
@@ -330,7 +322,6 @@ const monshouOptions = MONSHOU_LIST;
             <li v-for="(skill, index) in skillSlots" :key="index" class="flex items-center justify-between px-3 py-2">
               <span v-if="skill">
                 {{ skill.name }}
-                <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs ml-1">{{ skill.category }}</span>
                 <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{ skillGuardSummary(skill) }}</span>
               </span>
               <span v-else class="text-gray-400">（空き）</span>
@@ -340,9 +331,7 @@ const monshouOptions = MONSHOU_LIST;
 
           <!-- 武器鍛冶 -->
           <div class="flex items-center justify-between mb-2 pr-2">
-            <h3 class="text-lg font-bold">
-              武器鍛冶 <span class="text-sm text-gray-500 font-normal">耐性+1段階 または ステータスアップ（3枠）</span>
-            </h3>
+            <h3 class="text-lg font-bold">武器鍛冶</h3>
             <button type="button" class="btn-outline-primary" @click="resetForge">リセット</button>
           </div>
           <ul class="border rounded divide-y mb-5">
@@ -359,6 +348,18 @@ const monshouOptions = MONSHOU_LIST;
             </li>
           </ul>
 
+        </div>
+
+        <!-- ステータス・系図タブ -->
+        <div v-show="activeTab === 'family'">
+          <FamilyTreeIv
+            :family-tree="familyTree"
+            :individual-values="individualValues"
+            @set-lineage="setFamilyLineage"
+            @fill="fillFamilyTree"
+            @set-iv="setIndividualValue"
+          />
+
           <!-- 装備（武器） -->
           <h3 class="text-lg font-bold mb-2">装備（武器）</h3>
           <div class="border rounded flex items-center justify-between px-3 py-2 mb-5">
@@ -373,7 +374,7 @@ const monshouOptions = MONSHOU_LIST;
           </div>
 
           <!-- 紋晶 -->
-          <h3 class="text-lg font-bold mb-2">紋晶</h3>
+          <h3 class="text-lg font-bold mb-2">紋晶<span class="text-sm text-gray-500 font-normal ml-1">（1つのみ）</span></h3>
           <div class="flex flex-wrap gap-2 mb-5">
             <button
               v-for="m in monshouOptions"
@@ -400,17 +401,6 @@ const monshouOptions = MONSHOU_LIST;
             />
             <span class="text-sm text-gray-500">（両親のレベル合計。最大200で全ステータス+5%）</span>
           </div>
-        </div>
-
-        <!-- 系図・個体値タブ -->
-        <div v-show="activeTab === 'family'">
-          <FamilyTreeIv
-            :family-tree="familyTree"
-            :individual-values="individualValues"
-            @set-lineage="setFamilyLineage"
-            @fill="fillFamilyTree"
-            @set-iv="setIndividualValue"
-          />
         </div>
       </div>
     </DataState>

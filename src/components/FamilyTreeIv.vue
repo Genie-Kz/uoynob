@@ -47,12 +47,38 @@ function lineageOf(index: number): string | null {
   return props.familyTree[index] ?? null;
 }
 
+/* ---- 系統で一括設定（押下フィードバック） ---- */
+const lastFilled = ref<string | null>(null);
+function onFill(lineage: string): void {
+  emit('fill', lineage);
+  lastFilled.value = lineage;
+  window.setTimeout(() => {
+    if (lastFilled.value === lineage) lastFilled.value = null;
+  }, 800);
+}
+
 /* ---- 個体値 ---- */
 function onIvInput(stat: StatKey, event: Event): void {
   const range = INDIVIDUAL_VALUE_RANGE[stat];
   const raw = Number((event.target as HTMLInputElement).value);
   const clamped = Math.max(range.min, Math.min(range.max, Number.isFinite(raw) ? raw : 0));
   emit('setIv', stat, clamped);
+}
+
+/** 個体値が最大（＋方向）／最小（−方向）／中間のいずれか */
+function ivState(stat: StatKey): 'max' | 'min' | 'mid' {
+  const value = props.individualValues[stat];
+  const range = INDIVIDUAL_VALUE_RANGE[stat];
+  if (value >= range.max) return 'max';
+  if (value <= range.min) return 'min';
+  return 'mid';
+}
+/** 個体値入力欄の状態別カラー（落ち着いた赤系／青系） */
+function ivInputClass(stat: StatKey): string {
+  const state = ivState(stat);
+  if (state === 'max') return 'border-rose-300 bg-rose-50 text-rose-700';
+  if (state === 'min') return 'border-sky-300 bg-sky-50 text-sky-700';
+  return '';
 }
 </script>
 
@@ -118,18 +144,20 @@ function onIvInput(stat: StatKey, event: Event): void {
     <div class="mb-6">
       <p class="text-xs text-gray-500 mb-1">系統で一括設定</p>
       <p class="text-xs text-gray-400 mb-2">
-        選んだ系統で系図を埋めます。左の親・左の祖父母・左から2番目の曽祖父母は自身の系統、曽祖父母の一番左は対応系統になります。
+        選んだ系統で系図を埋めます。左の親・左の祖父母・曽祖父母の一番左は自身の系統、曽祖父母の左から2番目は対応系統になります。
       </p>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <button
           v-for="lineage in STAT_LINEAGES"
           :key="lineage"
           type="button"
-          class="flex items-center gap-2 border rounded px-3 py-2 hover:bg-blue-50"
-          @click="emit('fill', lineage)"
+          class="flex items-center gap-2 border rounded px-3 py-2 transition active:scale-95"
+          :class="lastFilled === lineage ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300' : 'hover:bg-blue-50'"
+          @click="onFill(lineage)"
         >
           <img :src="LINEAGE_ICON[lineage]" alt="" class="w-6 h-6" />
           <span class="text-sm">{{ LINEAGE_LABEL[lineage] }}</span>
+          <span v-if="lastFilled === lineage" class="ml-auto text-blue-600 text-sm font-bold">✓設定</span>
         </button>
       </div>
     </div>
@@ -140,14 +168,24 @@ function onIvInput(stat: StatKey, event: Event): void {
     <div class="space-y-2">
       <div v-for="stat in STAT_KEYS" :key="stat" class="flex items-center gap-2">
         <span class="w-16 text-sm text-gray-600">{{ STAT_LABEL[stat] }}</span>
-        <input
-          type="number"
-          class="border rounded px-3 py-2 w-24 text-sm"
-          :min="INDIVIDUAL_VALUE_RANGE[stat].min"
-          :max="INDIVIDUAL_VALUE_RANGE[stat].max"
-          :value="individualValues[stat]"
-          @input="onIvInput(stat, $event)"
-        />
+        <div class="relative">
+          <input
+            type="number"
+            class="border rounded pl-3 pr-7 py-2 w-24 text-sm"
+            :class="ivInputClass(stat)"
+            :min="INDIVIDUAL_VALUE_RANGE[stat].min"
+            :max="INDIVIDUAL_VALUE_RANGE[stat].max"
+            :value="individualValues[stat]"
+            @input="onIvInput(stat, $event)"
+          />
+          <span
+            v-if="ivState(stat) !== 'mid'"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none"
+            :class="ivState(stat) === 'max' ? 'text-rose-500' : 'text-sky-500'"
+          >
+            {{ ivState(stat) === 'max' ? '↑' : '↓' }}
+          </span>
+        </div>
         <div class="flex gap-1">
           <button type="button" class="btn-neutral !px-3 !py-1" @click="emit('setIv', stat, INDIVIDUAL_VALUE_RANGE[stat].min)">最小</button>
           <button type="button" class="btn-neutral !px-3 !py-1" @click="emit('setIv', stat, 0)">0</button>

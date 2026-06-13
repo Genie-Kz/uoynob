@@ -12,6 +12,12 @@ import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
 import StatusTable from '@/components/StatusTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import icon25 from '@/assets/images/icons/trait/icon-25.jpg';
+import icon50 from '@/assets/images/icons/trait/icon-50.jpg';
+import icon100 from '@/assets/images/icons/trait/icon-100.jpg';
+import iconMega from '@/assets/images/icons/trait/icon-m.jpg';
+import iconGiga from '@/assets/images/icons/trait/icon-g.png';
+import iconSuperGiga from '@/assets/images/icons/trait/icon-sg.png';
 
 const props = defineProps<{ id: string }>();
 
@@ -33,18 +39,33 @@ const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],
 );
 
-const traitRows = computed(() => {
+/** 「、」区切りの特性文字列を配列に分解する */
+function splitTraits(value: string | undefined | null): string[] {
+  return (value ?? '')
+    .split('、')
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+interface TraitRow {
+  /** ラベルをアイコン画像で表すか、テキストで表すか */
+  icon?: string;
+  label: string;
+  values: string[];
+}
+
+const traitRows = computed<TraitRow[]>(() => {
   const target = monster.value;
   if (!target) return [];
   return [
-    { label: 'サイズ特性', value: target.サイズ特性 },
-    { label: '新生前特性', value: [target.新生前特性1, target.新生前特性2].filter(Boolean).join('、') },
-    { label: '特性(Lv25)', value: target.特性25 || '-' },
-    { label: '特性(Lv50)', value: target.特性50 || '-' },
-    { label: '特性(Lv100)', value: target.特性100 || '-' },
-    { label: 'メガ特性', value: target.メガ特性 || '-' },
-    { label: 'ギガ特性', value: target.ギガ特性 || '-' },
-    { label: '超ギガ特性', value: target.超ギガ特性 || '-' },
+    { label: 'サイズ特性', values: splitTraits(target.サイズ特性) },
+    { label: '新生前特性', values: [target.新生前特性1, target.新生前特性2].flatMap(splitTraits) },
+    { icon: icon25, label: 'Lv25', values: splitTraits(target.特性25) },
+    { icon: icon50, label: 'Lv50', values: splitTraits(target.特性50) },
+    { icon: icon100, label: 'Lv100', values: splitTraits(target.特性100) },
+    { icon: iconMega, label: 'メガ特性', values: splitTraits(target.メガ特性) },
+    { icon: iconGiga, label: 'ギガ特性', values: splitTraits(target.ギガ特性) },
+    { icon: iconSuperGiga, label: '超ギガ特性', values: splitTraits(target.超ギガ特性) },
   ];
 });
 
@@ -118,8 +139,18 @@ const statRows = computed(() => {
         <table class="w-full text-sm border-collapse mb-4">
           <tbody>
             <tr v-for="row in traitRows" :key="row.label" class="border-b">
-              <th class="text-left bg-gray-50 border px-2 py-1 w-1/4">{{ row.label }}</th>
-              <td class="border px-2 py-1">{{ row.value }}</td>
+              <th class="text-left bg-gray-50 border px-2 py-1 w-1/4 align-top">
+                <span class="inline-flex items-center gap-1">
+                  <img v-if="row.icon" :src="row.icon" :alt="row.label" class="w-5 h-5" />
+                  <span v-else>{{ row.label }}</span>
+                </span>
+              </th>
+              <td class="border px-2 py-1 align-top">
+                <template v-if="row.values.length">
+                  <div v-for="name in row.values" :key="name">{{ name }}</div>
+                </template>
+                <span v-else class="text-gray-400">-</span>
+              </td>
             </tr>
           </tbody>
         </table>

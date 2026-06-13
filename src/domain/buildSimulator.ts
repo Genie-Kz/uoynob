@@ -23,7 +23,6 @@ import type { Skill } from '@/types/skill';
 import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
 import {
   ATTRIBUTE_BOOST_CAP_LEVEL,
-  NON_ATTRIBUTE_BOOST_CAP_LEVEL,
   REFLECT_LEVEL,
   WEAKEST_LEVEL,
 } from '@/constants/resistances';
@@ -59,6 +58,8 @@ export interface ResistanceOutcome {
   element: ResistanceElement;
   baseValue: ResistanceValue;
   finalValue: ResistanceValue;
+  /** 最終段階レベル（非属性は「無効」を超えて 6,7,8... と上がりうる） */
+  finalLevel: number;
   /** 元から変化したか */
   changed: boolean;
   /** 上昇したか（false なら下降） */
@@ -115,26 +116,30 @@ function applySkillGuards(delta: DeltaMap, skills: Skill[]): void {
   }
 }
 
-/** 武器鍛冶（別々の耐性に各 +1。重複は1回扱い） */
-function applyWeaponForge(delta: DeltaMap, forgeElements: string[]): void {
-  const distinctElements = new Set(forgeElements.filter(Boolean));
-  for (const element of distinctElements) {
-    if (element in delta) delta[element] += WEAPON_FORGE_BOOST_STEP;
-  }
+/** その耐性要素の上昇上限レベル（属性は「回復」、非属性は上限なし）。元の段階が上ならそれを維持。 */
+function upperCapLevelOf(element: string, baseLevel: number): number {
+  const boostCap = isAttributeResistance(element)
+    ? ATTRIBUTE_BOOST_CAP_LEVEL
+    : Number.POSITIVE_INFINITY;
+  return Math.max(boostCap, baseLevel);
 }
 
-/** 最終段階を上限・下限ルールでクランプして算出 */
+/** 最終段階を上限・下限ルールでクランプして算出（武器鍛冶を除く増減を反映） */
 function clampFinalLevel(element: string, baseLevel: number, delta: number): number {
   // 反射は元々持つ場合のみ。下がらず常に反射のまま。
   if (baseLevel === REFLECT_LEVEL) return REFLECT_LEVEL;
 
-  const boostCap = isAttributeResistance(element)
-    ? ATTRIBUTE_BOOST_CAP_LEVEL
-    : NON_ATTRIBUTE_BOOST_CAP_LEVEL;
-  // 元の耐性が上限より高い場合はその段階を維持する
-  const upperCap = Math.max(boostCap, baseLevel);
   const rawLevel = baseLevel + delta;
-  return Math.max(WEAKEST_LEVEL, Math.min(upperCap, rawLevel));
+  return Math.max(WEAKEST_LEVEL, Math.min(upperCapLevelOf(element, baseLevel), rawLevel));
+}
+
+/**
+ * 武器鍛冶の +1 を適用する（耐性計算の最後）。
+ * 弱点によるマイナス耐性の蓄積とは無関係に、確定後の段階から一段階引き上げる。
+ */
+function applyForgeStep(element: string, baseLevel: number, level: number): number {
+  if (baseLevel === REFLECT_LEVEL) return REFLECT_LEVEL;
+  return Math.min(upperCapLevelOf(element, baseLevel), level + WEAPON_FORGE_BOOST_STEP);
 }
 
 /** ビルド構成から、全耐性要素の最終結果を計算する */
@@ -145,17 +150,20 @@ export function computeBuildResistances(config: BuildConfiguration): ResistanceO
   applyBodySizeBonus(delta, bodySize);
   applyTraitEffects(delta, traits);
   applySkillGuards(delta, skills);
-  applyWeaponForge(delta, forgeElements);
+  // 武器鍛冶は最後に適用するため、ここでは delta に含めない
+  const forgeSet = new Set(forgeElements.filter(Boolean));
 
   return RESISTANCE_ELEMENTS.map((element) => {
     const baseValue = resistanceValueOf(monster, element);
     const baseLevel = resistanceLevelOf(baseValue);
-    const finalLevel = clampFinalLevel(element, baseLevel, delta[element]);
+    let finalLevel = clampFinalLevel(element, baseLevel, delta[element]);
+    if (forgeSet.has(element)) finalLevel = applyForgeStep(element, baseLevel, finalLevel);
     const finalValue = resistanceValueOfLevel(finalLevel);
     return {
       element,
       baseValue,
       finalValue,
+      finalLevel,
       changed: finalLevel !== baseLevel,
       raised: finalLevel > baseLevel,
     };

@@ -11,15 +11,18 @@ import {
 } from '@/constants/buildRules';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
-import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
-import { LINEAGE_DEFAULT_OPPOSITE } from '@/constants/lineageIcons';
+import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST, STAT_KEYS } from '@/constants/statsRules';
+import { LINEAGE_DEFAULT_OPPOSITE, STAT_LINEAGES } from '@/constants/lineageIcons';
 import { collectAllTraitNames, defaultEditableTraits } from '@/domain/monster';
 import { computeBuildResistances } from '@/domain/buildSimulator';
 import { computeStats } from '@/domain/statsCalculator';
+import { parseStatAttribute } from '@/domain/statBonus';
+import { guardAbilityToElement } from '@/domain/skillAnalysis';
 
 /**
- * URL共有用のクエリ（耐性ビルド部分のみ）。
- *   s = ボディサイズ番号 / t = 特性スロット / k = スキルスロット / f = 武器鍛冶スロット
+ * URL共有用のクエリ。ビルドタブ・系図個体値タブの全状態を復元できる。
+ *   s = ボディサイズ / t = 特性 / k = スキル / f = 武器鍛冶
+ *   i = 個体値 / g = 家系図 / p = 親レベル合計 / w = 武器No / m = 紋晶 / x = SP化特性
  */
 export interface BuildShareQuery {
   [key: string]: string;
@@ -27,7 +30,16 @@ export interface BuildShareQuery {
   t: string;
   k: string;
   f: string;
+  i: string;
+  g: string;
+  p: string;
+  w: string;
+  m: string;
+  x: string;
 }
+
+/** 復元判定に使う共有パラメータのキー */
+const SHARE_PARAM_KEYS = ['s', 't', 'k', 'f', 'i', 'g', 'p', 'w', 'm', 'x'] as const;
 
 const FAMILY_TREE_SIZE = 14;
 /** 家系図のインデックス（重み順 [4,4,2,2,2,2,1,1,1,1,1,1,1,1] に対応） */
@@ -35,14 +47,23 @@ const LEFT_PARENT_INDEX = 0;
 const LEFT_GRANDPARENT_INDEX = 2;
 const LEFTMOST_GREAT_GRANDPARENT_INDEX = 6;
 const SECOND_GREAT_GRANDPARENT_INDEX = 7;
+/** モンスター系統に対応する系統を初期表示するセル（曽祖父母の左から2番目） */
+const OPPOSITE_LINEAGE_INDEX = SECOND_GREAT_GRANDPARENT_INDEX;
 const DEFAULT_PARENT_LEVEL_TOTAL = 200;
 const FORGE_STAT_UP_BY_LABEL = new Map(FORGE_STAT_UP_OPTIONS.map((option) => [option.label, option]));
 const RESISTANCE_ELEMENT_SET = new Set<string>(RESISTANCE_ELEMENTS);
+/** 武器鍛冶スロットのURLエンコード用：耐性要素＋ステータスアップを通し番号で表す */
+const FORGE_OPTION_VALUES: string[] = [
+  ...RESISTANCE_ELEMENTS,
+  ...FORGE_STAT_UP_OPTIONS.map((option) => option.label),
+];
+/** 個体値の区切り（負数の「-」と衝突しないよう「_」を使う） */
+const IV_SEPARATOR = '_';
 
-/** 系図の初期値：基本は自身の系統、曽祖父母の一番左だけ対応系統にする */
+/** 系図の初期値：基本は自身の系統、対応系統セルだけ対応系統にする */
 function defaultFamilyTree(own: string): (string | null)[] {
   const tree = Array<string | null>(FAMILY_TREE_SIZE).fill(own);
-  tree[LEFTMOST_GREAT_GRANDPARENT_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
+  tree[OPPOSITE_LINEAGE_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
   return tree;
 }
 
@@ -59,6 +80,7 @@ export function useBuildSimulator(
   monster: Ref<Monster | null>,
   allMonsters: Ref<Monster[] | null>,
   skills: Ref<Skill[] | null>,
+  weapons: Ref<Weapon[] | null>,
   initialQuery: LocationQuery,
 ) {
   const bodySize = ref<BodySize>('スタンダードボディ');
@@ -82,16 +104,19 @@ export function useBuildSimulator(
   const skillById = computed(() => new Map((skills.value ?? []).map((skill) => [skill.id, skill])));
   const equippedSkills = computed(() => skillSlots.value.filter((skill): skill is Skill => skill !== null));
 
-  /** スキルによって追加される特性（構成内の特性タイプを重複なく） */
+  /**
+   * スキルによって追加される特性（構成内の特性タイプを重複なく）。
+   * 「〇〇ガード＋」やステータス上昇系（最大ＨＰ＋N など）は特性ではないため除外する。
+   */
   const skillAddedTraits = computed(() => {
     const seen = new Set<string>();
     const result: string[] = [];
     for (const skill of equippedSkills.value) {
       for (const item of skill.composition) {
-        if (item.type === 'attribute' && !seen.has(item.name)) {
-          seen.add(item.name);
-          result.push(item.name);
-        }
+        if (item.type !== 'attribute' || seen.has(item.name)) continue;
+        if (guardAbilityToElement(item.name) || parseStatAttribute(item.name)) continue;
+        seen.add(item.name);
+        result.push(item.name);
       }
     }
     return result;
@@ -124,7 +149,7 @@ export function useBuildSimulator(
     spTraitNames.value = [];
   }
 
-  /** URLクエリから耐性ビルド部分を復元 */
+  /** URLクエリからビルド・系図個体値の全状態を復元 */
   function restoreFromQuery(query: LocationQuery, target: Monster): void {
     initializeDefaults(target);
     const sizeIndex = Number(readQuery(query, 's'));
@@ -146,17 +171,58 @@ export function useBuildSimulator(
     const forgeCodes = (readQuery(query, 'f') ?? '').split('-');
     forgeSlots.value = Array.from({ length: WEAPON_FORGE_SLOT_COUNT }, (_unused, index) => {
       const code = forgeCodes[index];
-      return code ? (RESISTANCE_ELEMENTS[Number(code)] ?? '') : '';
+      return code !== '' && code !== undefined ? (FORGE_OPTION_VALUES[Number(code)] ?? '') : '';
     });
+
+    // ---- 系図・個体値タブ ----
+    const ivCodes = (readQuery(query, 'i') ?? '').split(IV_SEPARATOR);
+    if (readQuery(query, 'i') !== undefined) {
+      const next = zeroIndividualValues();
+      STAT_KEYS.forEach((stat, index) => {
+        const value = Number(ivCodes[index]);
+        if (Number.isFinite(value)) next[stat] = value;
+      });
+      individualValues.value = next;
+    }
+
+    const familyCodes = readQuery(query, 'g');
+    if (familyCodes !== undefined) {
+      const codes = familyCodes.split('-');
+      familyTree.value = Array.from({ length: FAMILY_TREE_SIZE }, (_unused, index) => {
+        const code = codes[index];
+        return code !== '' && code !== undefined ? (STAT_LINEAGES[Number(code)] ?? null) : null;
+      });
+    }
+
+    const parentLevel = readQuery(query, 'p');
+    if (parentLevel !== undefined && Number.isFinite(Number(parentLevel))) {
+      parentLevelTotal.value = Number(parentLevel);
+    }
+
+    const weaponNo = readQuery(query, 'w');
+    if (weaponNo) {
+      weapon.value = (weapons.value ?? []).find((w) => String(w.no) === weaponNo) ?? null;
+    }
+
+    const monshouCode = readQuery(query, 'm');
+    if (monshouCode) {
+      const m = MONSHOU_LIST[Number(monshouCode)];
+      monshouNames.value = m ? [m.name] : [];
+    }
+
+    const spNames = readQuery(query, 'x');
+    if (spNames !== undefined) {
+      spTraitNames.value = spNames ? spNames.split(',') : [];
+    }
   }
 
   const hasInitialized = ref(false);
   watch(
-    [monster, skills],
+    [monster, skills, weapons],
     () => {
-      if (hasInitialized.value || !monster.value || !skills.value) return;
+      if (hasInitialized.value || !monster.value || !skills.value || !weapons.value) return;
       hasInitialized.value = true;
-      const hasShareParams = (['s', 't', 'k', 'f'] as const).some((key) => readQuery(initialQuery, key) !== undefined);
+      const hasShareParams = SHARE_PARAM_KEYS.some((key) => readQuery(initialQuery, key) !== undefined);
       if (hasShareParams) restoreFromQuery(initialQuery, monster.value);
       else initializeDefaults(monster.value);
     },
@@ -187,8 +253,8 @@ export function useBuildSimulator(
   }
   /**
    * 家系図を特定系統で一括設定する。
-   * ただし 左の親・左の祖父母・左から2番目の曽祖父母はモンスター自身の系統、
-   * 曽祖父母の一番左は対応系統とする。
+   * ただし 左の親・左の祖父母・曽祖父母の一番左はモンスター自身の系統、
+   * 曽祖父母の左から2番目は対応系統とする。
    */
   function fillFamilyTree(lineage: string): void {
     if (!monster.value) return;
@@ -196,8 +262,8 @@ export function useBuildSimulator(
     const tree = Array<string | null>(FAMILY_TREE_SIZE).fill(lineage);
     tree[LEFT_PARENT_INDEX] = own;
     tree[LEFT_GRANDPARENT_INDEX] = own;
-    tree[SECOND_GREAT_GRANDPARENT_INDEX] = own;
-    tree[LEFTMOST_GREAT_GRANDPARENT_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
+    tree[LEFTMOST_GREAT_GRANDPARENT_INDEX] = own;
+    tree[OPPOSITE_LINEAGE_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
     familyTree.value = tree;
   }
   function setParentLevelTotal(value: number): void {
@@ -206,10 +272,9 @@ export function useBuildSimulator(
   function setWeapon(value: Weapon | null): void {
     weapon.value = value;
   }
+  /** 紋晶は1つのみ装備可能。選択中を再度押すと解除、別を押すと差し替え。 */
   function toggleMonshou(name: string): void {
-    monshouNames.value = monshouNames.value.includes(name)
-      ? monshouNames.value.filter((n) => n !== name)
-      : [...monshouNames.value, name];
+    monshouNames.value = monshouNames.value.includes(name) ? [] : [name];
   }
   function toggleSp(name: string): void {
     spTraitNames.value = spTraitNames.value.includes(name)
@@ -279,8 +344,19 @@ export function useBuildSimulator(
     t: traitSlots.value.map((name) => (name ? String(traitMaster.value.indexOf(name)) : '')).join('-'),
     k: skillSlots.value.map((skill) => (skill ? skill.id : '')).join('-'),
     f: forgeSlots.value
-      .map((value) => (RESISTANCE_ELEMENT_SET.has(value) ? String((RESISTANCE_ELEMENTS as readonly string[]).indexOf(value)) : ''))
+      .map((value) => {
+        const index = FORGE_OPTION_VALUES.indexOf(value);
+        return index >= 0 ? String(index) : '';
+      })
       .join('-'),
+    i: STAT_KEYS.map((stat) => String(individualValues.value[stat])).join(IV_SEPARATOR),
+    g: familyTree.value
+      .map((lineage) => (lineage ? String((STAT_LINEAGES as readonly string[]).indexOf(lineage)) : ''))
+      .join('-'),
+    p: String(parentLevelTotal.value),
+    w: weapon.value ? String(weapon.value.no) : '',
+    m: monshouNames.value.length ? String(MONSHOU_LIST.findIndex((entry) => entry.name === monshouNames.value[0])) : '',
+    x: spTraitNames.value.join(','),
   }));
 
   return {

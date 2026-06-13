@@ -1,6 +1,6 @@
 /** 耐性グリッド表示用のビューモデル生成 */
 import type { ResistanceOutcome } from '@/domain/buildSimulator';
-import { resistanceColorClass, resistanceDisplayText } from '@/domain/resistance';
+import { resistanceColorForElement, resistanceDisplayForElement } from '@/domain/resistance';
 
 export interface ResistanceCellView {
   element: string;
@@ -17,7 +17,7 @@ export interface ResistanceCellView {
 export function buildResistanceCells(outcomes: ResistanceOutcome[]): ResistanceCellView[] {
   return outcomes.map((outcome) => ({
     element: outcome.element,
-    text: resistanceDisplayText(outcome.finalValue),
-    colorClass: resistanceColorClass(outcome.finalValue),
+    text: resistanceDisplayForElement(outcome.element, outcome.finalLevel),
+    colorClass: resistanceColorForElement(outcome.element, outcome.finalLevel),
   }));
 }

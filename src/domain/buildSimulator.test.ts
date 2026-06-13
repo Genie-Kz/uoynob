@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeBuildResistances, type BuildConfiguration } from './buildSimulator';
 import type { ResistanceOutcome } from './buildSimulator';
+import { resistanceDisplayForElement } from './resistance';
 import { createGuardSkill, createMonster } from '@/test/fixtures';
 import type { BodySize, Monster } from '@/types/monster';
 
@@ -48,12 +49,14 @@ describe('computeBuildResistances - 上限ルール', () => {
     expect(outcomeOf(results, 'メラ').finalValue).toBe('回復');
   });
 
-  it('属性以外の耐性は上昇上限が「無効」', () => {
+  it('属性以外の耐性は「無効」を超えて 無効+N まで上がる', () => {
     const monster = createMonster({ ねむり: '激減' });
     const skill = createGuardSkill('001', 'ねむり強化', ['ねむりガード＋']);
     const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }));
-    // 激減(4) + 全ガード(1) + ねむりガード＋(2) = 7 → 属性以外なので無効(5)止まり（回復にならない）
-    expect(outcomeOf(results, 'ねむり').finalValue).toBe('無効');
+    // 激減(4) + 全ガード(1) + ねむりガード＋(2) = 7 → 無効(5)+2
+    const outcome = outcomeOf(results, 'ねむり');
+    expect(outcome.finalLevel).toBe(7);
+    expect(resistanceDisplayForElement('ねむり', outcome.finalLevel)).toBe('無効+2');
   });
 
   it('元々反射の耐性は下がらず常に反射のまま（例: JOKERのねむり）', () => {
@@ -64,10 +67,23 @@ describe('computeBuildResistances - 上限ルール', () => {
     expect(outcomeOf(results, 'ねむり').changed).toBe(false);
   });
 
-  it('元の耐性が上限より高い場合（非属性で元々回復）はその段階を維持', () => {
+  it('非属性で元々「回復」のものは 無効+1 と表記される', () => {
     const monster = createMonster({ ねむり: '回復' });
-    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'] }));
-    expect(outcomeOf(results, 'ねむり').finalValue).toBe('回復');
+    const results = computeBuildResistances(buildConfig(monster));
+    const outcome = outcomeOf(results, 'ねむり');
+    expect(outcome.finalLevel).toBe(6);
+    expect(resistanceDisplayForElement('ねむり', outcome.finalLevel)).toBe('無効+1');
+  });
+});
+
+describe('computeBuildResistances - 武器鍛冶+1の特殊仕様', () => {
+  it('弱点の負の蓄積を無視して、最後に一段階引き上げる', () => {
+    const monster = createMonster({ ねむり: '弱点' });
+    // こうどうはやい(-2)で弱点をさらに下回るが、鍛冶+1は確定後の弱点から一段階上げる
+    const results = computeBuildResistances(
+      buildConfig(monster, { traits: ['こうどうはやい'], forgeElements: ['ねむり'] }),
+    );
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('普通');
   });
 });
 

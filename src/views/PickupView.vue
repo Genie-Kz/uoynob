@@ -2,9 +2,11 @@
 import { computed } from 'vue';
 import type { PickupRef } from '@/types/pickup';
 import { useMonsters } from '@/composables/useMonsters';
+import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { loadPickups } from '@/api/datasets';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
+import { groupPickupSkills } from '@/domain/pickupGrouping';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -12,9 +14,17 @@ const props = defineProps<{ pickupKey: string }>();
 
 const { data: pickups, isLoading, errorMessage } = useAsyncData(loadPickups);
 const { monsters } = useMonsters();
+const { skills } = useSkills();
 
 const entry = computed(() => pickups.value?.[props.pickupKey] ?? null);
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
+
+/** スキル系ピックアップを目的別に分類したグループ（対象外は null） */
+const skillGroups = computed(() => {
+  const target = entry.value;
+  if (!target || target.type !== 'skills' || !skills.value) return null;
+  return groupPickupSkills(props.pickupKey, target.items, skills.value);
+});
 
 function totalCount(): number {
   const target = entry.value;
@@ -45,8 +55,26 @@ function monsterRoute(ref: PickupRef) {
         <h2 class="text-xl font-bold mb-1">{{ entry.title }}</h2>
         <p class="text-sm text-gray-500 mb-3">{{ totalCount() }} 件</p>
 
-        <!-- スキル一覧 -->
-        <div v-if="entry.type === 'skills'" class="flex flex-wrap gap-1">
+        <!-- スキル一覧（目的別に分類） -->
+        <div v-if="entry.type === 'skills' && skillGroups">
+          <section v-for="group in skillGroups" :key="group.label" class="mb-5">
+            <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
+            <div class="flex flex-wrap gap-1">
+              <router-link
+                v-for="ref in group.items"
+                :key="ref.id + ref.name"
+                :to="{ name: 'skill-detail', params: { id: ref.id } }"
+                class="tag-link app-link"
+              >
+                {{ ref.name }}
+              </router-link>
+              <span v-if="!group.items.length" class="text-gray-500">なし</span>
+            </div>
+          </section>
+        </div>
+
+        <!-- スキル一覧（分類なし） -->
+        <div v-else-if="entry.type === 'skills'" class="flex flex-wrap gap-1">
           <router-link
             v-for="ref in entry.items"
             :key="ref.id"

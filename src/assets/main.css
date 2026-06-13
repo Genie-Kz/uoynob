@@ -143,3 +143,110 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   ダークモード
+   Tailwind のユーティリティ（utilities レイヤー）に対し、
+   ここはレイヤー外の素のCSSなのでカスケード順で優先される。
+   各コンポーネントに dark: を書かずに主要な面色・文字色を上書きする。
+   ============================================================ */
+html.dark {
+  color-scheme: dark;
+}
+.dark body {
+  background-color: #181818;
+  color: #e6e6e6;
+}
+.dark *,
+.dark ::after,
+.dark ::before,
+.dark ::backdrop,
+.dark ::file-selector-button {
+  border-color: #3a3a3a;
+}
+
+/* 背景色 */
+.dark .bg-white,
+.dark .bg-white\/95 {
+  background-color: #232323;
+}
+.dark .bg-gray-50 {
+  background-color: #262626;
+}
+.dark .bg-gray-100 {
+  background-color: #2c2c2c;
+}
+.dark .bg-gray-200 {
+  background-color: #383838;
+}
+
+/* 文字色 */
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: #e6e6e6;
+}
+.dark .text-gray-600 {
+  color: #c2c2c2;
+}
+.dark .text-gray-500 {
+  color: #9a9a9a;
+}
+.dark .text-gray-400,
+.dark .text-gray-300 {
+  color: #6f6f6f;
+}
+
+/* バッジ・補助色 */
+.dark .bg-sky-200 {
+  background-color: #1e3a52;
+  color: #d6ecff;
+}
+.dark .bg-sky-50 {
+  background-color: #21303f;
+}
+.dark .bg-blue-50 {
+  background-color: #1e2c44;
+}
+.dark .bg-rose-50 {
+  background-color: #3a2626;
+}
+
+/* 注意・エラー枠 */
+.dark .bg-yellow-50 {
+  background-color: #3a3320;
+}
+.dark .bg-red-50 {
+  background-color: #3a2222;
+}
+.dark .text-red-700 {
+  color: #fca5a5;
+}
+
+/* フォーム要素 */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #232323;
+  color: #e6e6e6;
+}
+
+/* コンポーネントクラス（@apply で色がベイクされているため個別に上書き） */
+.dark .btn-neutral {
+  background-color: #262626;
+  color: #e6e6e6;
+}
+.dark .btn-neutral:hover {
+  background-color: #333333;
+}
+.dark .btn-outline-primary {
+  background-color: #232323;
+}
+.dark .btn-outline-primary:hover {
+  background-color: #1e2c44;
+}
+.dark .app-link {
+  color: #7db8ff;
+}
+.dark .app-link:hover {
+  color: #a9d2ff;
+}
