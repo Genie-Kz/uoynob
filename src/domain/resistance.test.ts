@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   isAttributeResistance,
   resistanceColorClass,
+  resistanceColorForElement,
+  resistanceDisplayForElement,
   resistanceDisplayText,
   resistanceLevelOf,
   resistanceValueOfLevel,
@@ -44,5 +46,15 @@ describe('resistance helpers', () => {
     expect(isAttributeResistance('炎')).toBe(true);
     expect(isAttributeResistance('ねむり')).toBe(false);
     expect(isAttributeResistance('ザキ')).toBe(false);
+  });
+
+  it('元から反射の状態異常耐性は無効+Nにせず反射として表示する', () => {
+    expect(resistanceDisplayForElement('ねむり', 7, true)).toBe('反射');
+    expect(resistanceColorForElement('ねむり', 7, true)).toBe('bg-resistance-reflect');
+  });
+
+  it('強化でレベル7になった状態異常耐性は無効+2として表示する', () => {
+    expect(resistanceDisplayForElement('ねむり', 7)).toBe('無効+2');
+    expect(resistanceColorForElement('ねむり', 7)).toBe('bg-resistance-invalid');
   });
 });

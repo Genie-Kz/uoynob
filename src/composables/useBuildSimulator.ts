@@ -289,6 +289,7 @@ export function useBuildSimulator(
     if (!monster.value) return;
     bodySize.value = monster.value.サイズ特性;
     traitSlots.value = defaultEditableTraits(monster.value, bodySize.value);
+    spTraitNames.value = [];
     fillSkillSlots(bodySize.value);
   }
   function resetSkills(): void {

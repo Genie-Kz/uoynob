@@ -44,7 +44,10 @@ function isOverInvalid(element: string, level: number): boolean {
  * 段階レベルと耐性要素から表示テキストを返す。
  * 非属性で「無効」を超えた場合は「無効+1」「無効+2」… と数値表記する。
  */
-export function resistanceDisplayForElement(element: string, level: number): string {
+export function resistanceDisplayForElement(element: string, level: number, isOriginallyReflect = false): string {
+  if (isOriginallyReflect) {
+    return resistanceDisplayText('反射');
+  }
   if (isOverInvalid(element, level)) {
     return `無効+${level - NON_ATTRIBUTE_BOOST_CAP_LEVEL}`;
   }
@@ -52,7 +55,10 @@ export function resistanceDisplayForElement(element: string, level: number): str
 }
 
 /** 段階レベルと耐性要素から背景色クラスを返す（無効+N は「無効」と同色） */
-export function resistanceColorForElement(element: string, level: number): string {
+export function resistanceColorForElement(element: string, level: number, isOriginallyReflect = false): string {
+  if (isOriginallyReflect) {
+    return resistanceColorClass('反射');
+  }
   if (isOverInvalid(element, level)) {
     return resistanceColorClass('無効');
   }

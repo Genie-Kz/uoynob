@@ -15,9 +15,12 @@ export interface ResistanceCellView {
  * 図鑑・ビルドシミュレーターで同じ見た目（値のみ）を使う。
  */
 export function buildResistanceCells(outcomes: ResistanceOutcome[]): ResistanceCellView[] {
-  return outcomes.map((outcome) => ({
-    element: outcome.element,
-    text: resistanceDisplayForElement(outcome.element, outcome.finalLevel),
-    colorClass: resistanceColorForElement(outcome.element, outcome.finalLevel),
-  }));
+  return outcomes.map((outcome) => {
+    const isOriginallyReflect = outcome.baseValue === '反射';
+    return {
+      element: outcome.element,
+      text: resistanceDisplayForElement(outcome.element, outcome.finalLevel, isOriginallyReflect),
+      colorClass: resistanceColorForElement(outcome.element, outcome.finalLevel, isOriginallyReflect),
+    };
+  });
 }
