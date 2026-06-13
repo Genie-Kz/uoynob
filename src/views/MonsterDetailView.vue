@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
+import { usePageSeo } from '@/composables/usePageSeo';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { equippableWeaponsOf } from '@/domain/monster';
 import { skillsForMonster } from '@/domain/skillLookup';
@@ -38,6 +39,14 @@ const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(mo
 const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],
 );
+
+const seoDescription = computed(() => {
+  const target = monster.value;
+  if (!target) return null;
+  return `イルルカSPの${target.名前}（ランク${target.ランク}・${lineage.value?.label ?? target.系統}）の特性、耐性、ステータス、スキル、装備情報。`;
+});
+
+usePageSeo(() => monster.value?.名前, seoDescription);
 
 /** 「、」区切りの特性文字列を配列に分解する */
 function splitTraits(value: string | undefined | null): string[] {

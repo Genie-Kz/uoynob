@@ -6,6 +6,7 @@ import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/composables/useBuildSimulator';
+import { usePageSeo } from '@/composables/usePageSeo';
 import { loadAttributes, loadWeapons } from '@/api/datasets';
 import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
@@ -35,6 +36,18 @@ const { data: weapons } = useAsyncData(loadWeapons);
 const { data: attributes } = useAsyncData(loadAttributes);
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+
+const seoDescription = computed(() => {
+  const target = monster.value;
+  if (!target) return null;
+  return `イルルカSPの${target.名前}について、スキル、特性、耐性、ステータスを調整してビルドを作成・共有できるシミュレーター。`;
+});
+
+usePageSeo(
+  () => (monster.value ? `${monster.value.名前} ビルドシミュレーター` : null),
+  seoDescription,
+);
+
 const breadcrumbItems = computed(() => [
   { label: 'ホーム', to: { name: 'home' } },
   { label: 'ビルドシミュレーター', to: { name: 'simulator-select' } },

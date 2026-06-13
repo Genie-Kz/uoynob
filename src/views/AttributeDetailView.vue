@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useAttributes } from '@/composables/useAttributes';
 import { useMonsters } from '@/composables/useMonsters';
+import { usePageSeo } from '@/composables/usePageSeo';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
@@ -17,6 +18,15 @@ const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?
 const hasSpDescription = computed(
   () => !!attribute.value?.descriptionSp && !attribute.value.descriptionSp.includes('ＳＰ特性は　ありません'),
 );
+
+const seoDescription = computed(() => {
+  const target = attribute.value;
+  if (!target) return null;
+  const description = target.description.replace(/\s+/g, ' ').trim();
+  return `イルルカSPの特性「${target.name}」の効果、SP効果、所持モンスターと習得スキル。${description}`;
+});
+
+usePageSeo(() => attribute.value?.name, seoDescription);
 </script>
 
 <template>

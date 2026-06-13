@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useAbilities } from '@/composables/useAbilities';
+import { usePageSeo } from '@/composables/usePageSeo';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -8,6 +9,15 @@ const props = defineProps<{ id: string }>();
 
 const { abilities, isLoading, errorMessage } = useAbilities();
 const ability = computed(() => abilities.value?.find((candidate) => candidate.id === props.id) ?? null);
+
+const seoDescription = computed(() => {
+  const target = ability.value;
+  if (!target) return null;
+  const description = target.description.replace(/\s+/g, ' ').trim();
+  return `イルルカSPの特技「${target.name}」の効果と、この特技を覚えるスキル。${description}`;
+});
+
+usePageSeo(() => ability.value?.name, seoDescription);
 </script>
 
 <template>

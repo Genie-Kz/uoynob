@@ -4,6 +4,7 @@ import type { PickupRef } from '@/types/pickup';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { usePageSeo } from '@/composables/usePageSeo';
 import { loadPickups } from '@/api/datasets';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import { groupPickupSkills } from '@/domain/pickupGrouping';
@@ -32,6 +33,14 @@ function totalCount(): number {
   if (target.type === 'monster-groups') return target.groups.reduce((sum, group) => sum + group.items.length, 0);
   return target.items.length;
 }
+
+const seoDescription = computed(() => {
+  const target = entry.value;
+  if (!target) return null;
+  return `イルルカSPの${target.title}を分類別に探せるピックアップ一覧。全${totalCount()}件を収録。`;
+});
+
+usePageSeo(() => entry.value?.title, seoDescription);
 
 function monsterRoute(ref: PickupRef) {
   const resolved = resolveMonsterId.value(ref.id);

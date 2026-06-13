@@ -22,6 +22,9 @@ function toggleCard(cardId: string): void {
   <div class="max-w-xl mx-auto">
     <div class="text-center my-4">
       <p class="text-sm text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
+      <p class="mt-2 text-sm text-gray-600">
+        モンスター図鑑、耐性・特性検索、スキルと特技のデータ、ビルドシミュレーターをまとめた攻略データベースです。
+      </p>
     </div>
 
     <!-- サイト内検索（1件なら詳細、複数なら候補一覧へ遷移） -->

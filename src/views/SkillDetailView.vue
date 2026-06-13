@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useSkills } from '@/composables/useSkills';
 import { useMonsters } from '@/composables/useMonsters';
+import { usePageSeo } from '@/composables/usePageSeo';
 import { guardAbilityToElement } from '@/domain/skillAnalysis';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/components/DataState.vue';
@@ -13,6 +14,18 @@ const { skills, isLoading, errorMessage } = useSkills();
 const { monsters } = useMonsters();
 
 const skill = computed(() => skills.value?.find((candidate) => candidate.id === props.id) ?? null);
+
+const seoDescription = computed(() => {
+  const target = skill.value;
+  if (!target) return null;
+  const composition = target.composition
+    .slice(0, 5)
+    .map((item) => item.name)
+    .join('、');
+  return `イルルカSPのスキル「${target.name}」の構成、習得特技・特性、所持モンスター。主な構成：${composition}`;
+});
+
+usePageSeo(() => skill.value?.name, seoDescription);
 
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
