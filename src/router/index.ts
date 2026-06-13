@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
+import { redirectSingleSiteSearchResult } from './siteSearchGuard';
 
 /**
  * ルート定義。各ビューは遅延読み込み。
@@ -124,3 +125,5 @@ export const router = createRouter({
     return { top: 0 };
   },
 });
+
+router.beforeEach(redirectSingleSiteSearchResult);

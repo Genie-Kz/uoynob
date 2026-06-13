@@ -7,6 +7,7 @@ import { useAbilities } from '@/composables/useAbilities';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
+import { routeForSiteSearchHit } from '@/router/siteSearchGuard';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -50,28 +51,12 @@ const results = computed(() =>
 );
 
 function routeFor(hit: SiteSearchHit): RouteLocationRaw {
-  const routeName = {
-    monster: 'monster-detail',
-    attribute: 'attribute-detail',
-    skill: 'skill-detail',
-    ability: 'ability-detail',
-  }[hit.kind];
-  return { name: routeName, params: { id: hit.id } };
+  return routeForSiteSearchHit(hit);
 }
 
 watch(keyword, (value) => {
   inputKeyword.value = value;
 });
-
-watch(
-  [isLoading, errorMessage, results, keyword],
-  ([loading, error, hits, query]) => {
-    if (!loading && !error && query && hits.length === 1) {
-      void router.replace(routeFor(hits[0]));
-    }
-  },
-  { immediate: true },
-);
 
 function submitSearch(): void {
   const query = inputKeyword.value.trim();
