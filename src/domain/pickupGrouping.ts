@@ -16,6 +16,8 @@ export function isGroupedSkillPickup(key: string): boolean {
   return (
     key === 'skill-local' ||
     key === 'skill-parameter-up' ||
+    key === 'skill-resistance-spell' ||
+    key === 'skill-resistance-breath' ||
     key === 'skill-resistance-condition' ||
     key === 'skill-resistance-seal' ||
     key === 'skill-resistance-weaken'
@@ -104,6 +106,8 @@ export function groupPickupSkills(
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
   if (key === 'skill-parameter-up') return groupByStat(items, skillById);
   if (
+    key === 'skill-resistance-spell' ||
+    key === 'skill-resistance-breath' ||
     key === 'skill-resistance-condition' ||
     key === 'skill-resistance-seal' ||
     key === 'skill-resistance-weaken'

@@ -37,6 +37,14 @@ function monsterRoute(ref: PickupRef) {
   const resolved = resolveMonsterId.value(ref.id);
   return resolved ? { name: 'monster-detail', params: { id: resolved } } : null;
 }
+
+function groupId(index: number): string {
+  return `pickup-group-${index}`;
+}
+
+function scrollToGroup(index: number): void {
+  document.getElementById(groupId(index))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 </script>
 
 <template>
@@ -57,7 +65,27 @@ function monsterRoute(ref: PickupRef) {
 
         <!-- スキル一覧（目的別に分類） -->
         <div v-if="entry.type === 'skills' && skillGroups">
-          <section v-for="group in skillGroups" :key="group.label" class="mb-5">
+          <nav aria-label="分類へのリンク" class="border rounded bg-gray-50 p-3 mb-5">
+            <p class="text-sm font-bold mb-2">分類から探す</p>
+            <div class="flex flex-wrap gap-2">
+              <a
+                v-for="(group, index) in skillGroups"
+                :key="group.label"
+                :href="`#${groupId(index)}`"
+                class="tag-link app-link bg-white"
+                @click.prevent="scrollToGroup(index)"
+              >
+                {{ group.label }}
+              </a>
+            </div>
+          </nav>
+
+          <section
+            v-for="(group, index) in skillGroups"
+            :id="groupId(index)"
+            :key="group.label"
+            class="mb-5 scroll-mt-3"
+          >
             <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
             <div class="flex flex-wrap gap-1">
               <router-link
@@ -97,7 +125,27 @@ function monsterRoute(ref: PickupRef) {
 
         <!-- グループ分けされたモンスター一覧（れんぞく回数など） -->
         <div v-else>
-          <section v-for="group in entry.groups" :key="group.label" class="mb-5">
+          <nav aria-label="分類へのリンク" class="border rounded bg-gray-50 p-3 mb-5">
+            <p class="text-sm font-bold mb-2">分類から探す</p>
+            <div class="flex flex-wrap gap-2">
+              <a
+                v-for="(group, index) in entry.groups"
+                :key="group.label"
+                :href="`#${groupId(index)}`"
+                class="tag-link app-link bg-white"
+                @click.prevent="scrollToGroup(index)"
+              >
+                {{ group.label }}
+              </a>
+            </div>
+          </nav>
+
+          <section
+            v-for="(group, index) in entry.groups"
+            :id="groupId(index)"
+            :key="group.label"
+            class="mb-5 scroll-mt-3"
+          >
             <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
             <div class="flex flex-wrap gap-1">
               <template v-for="ref in group.items" :key="ref.id">

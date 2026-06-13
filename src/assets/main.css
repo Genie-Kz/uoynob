@@ -179,6 +179,12 @@ html.dark {
 .dark .bg-gray-200 {
   background-color: #383838;
 }
+.dark .hover\:bg-gray-50:hover {
+  background-color: #303030;
+}
+.dark .hover\:bg-gray-100:hover {
+  background-color: #383838;
+}
 
 /* 文字色 */
 .dark .text-gray-800,
