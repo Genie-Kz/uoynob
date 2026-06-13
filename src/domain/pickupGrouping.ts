@@ -5,6 +5,7 @@ import type { StatKey } from '@/types/stats';
 import { STAT_KEYS } from '@/constants/statsRules';
 import {
   GUARDS_BY_RESISTANCE_PICKUP,
+  KILLER_ATTRIBUTES,
   SHINSHO_BY_LOCAL_SKILL,
   LOCAL_SKILLS_BY_SHINSHO,
 } from '@/constants/pickupGroups';
@@ -19,6 +20,7 @@ export interface PickupSkillGroup {
 export function isGroupedSkillPickup(key: string): boolean {
   return (
     key === 'skill-local' ||
+    key === 'skill-killer' ||
     key === 'skill-parameter-up' ||
     key === 'skill-resistance-spell' ||
     key === 'skill-resistance-breath' ||
@@ -71,13 +73,13 @@ function groupByStat(items: PickupRef[], skillById: Map<string, Skill>): PickupS
   }).filter((group) => group.items.length > 0);
 }
 
-/** 指定された「〇〇ガード＋」だけを、指定順で分類 */
-function groupByGuard(
+/** 指定された特性だけを、指定順で分類 */
+function groupByAttribute(
   items: PickupRef[],
   skillById: Map<string, Skill>,
-  guardNames: readonly string[],
+  attributeNames: readonly string[],
 ): PickupSkillGroup[] {
-  const buckets = new Map<string, PickupRef[]>(guardNames.map((guardName) => [guardName, []]));
+  const buckets = new Map<string, PickupRef[]>(attributeNames.map((attributeName) => [attributeName, []]));
   for (const item of items) {
     const skill = skillById.get(item.id);
     for (const part of skill?.composition ?? []) {
@@ -86,8 +88,8 @@ function groupByGuard(
       if (bucket && !bucket.some((candidate) => candidate.id === item.id)) bucket.push(item);
     }
   }
-  return guardNames
-    .map((guardName) => ({ label: guardName, items: buckets.get(guardName)! }))
+  return attributeNames
+    .map((attributeName) => ({ label: attributeName, items: buckets.get(attributeName)! }))
     .filter((group) => group.items.length > 0);
 }
 
@@ -102,8 +104,9 @@ export function groupPickupSkills(
 ): PickupSkillGroup[] | null {
   if (key === 'skill-local') return groupByShinsho(items);
   const skillById = new Map(skills.map((skill) => [skill.id, skill]));
+  if (key === 'skill-killer') return groupByAttribute(items, skillById, KILLER_ATTRIBUTES);
   if (key === 'skill-parameter-up') return groupByStat(items, skillById);
   const guardNames = GUARDS_BY_RESISTANCE_PICKUP[key];
-  if (guardNames) return groupByGuard(items, skillById, guardNames);
+  if (guardNames) return groupByAttribute(items, skillById, guardNames);
   return null;
 }

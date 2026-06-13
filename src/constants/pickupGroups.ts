@@ -76,3 +76,6 @@ export const GUARDS_BY_RESISTANCE_PICKUP: Record<string, readonly string[]> = {
   ],
   'skill-resistance-weaken': ['ダウンガード＋', 'ルカニガード＋', 'ボミエガード＋', 'フールガード＋'],
 };
+
+/** キラー系スキルで表示する特性。配列順を表示順として扱う。 */
+export const KILLER_ATTRIBUTES = ['メタルキラー', 'ギガキラー', 'スタンダードキラー'] as const;

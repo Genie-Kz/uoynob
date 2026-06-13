@@ -1,7 +1,45 @@
 import { describe, expect, it } from 'vitest';
 import { createGuardSkill } from '@/test/fixtures';
-import { GUARDS_BY_RESISTANCE_PICKUP } from '@/constants/pickupGroups';
+import { GUARDS_BY_RESISTANCE_PICKUP, KILLER_ATTRIBUTES } from '@/constants/pickupGroups';
 import { groupPickupSkills, isGroupedSkillPickup } from './pickupGrouping';
+
+describe('groupPickupSkills - キラー系スキル', () => {
+  const items = [
+    { id: '001', name: 'メタル対策' },
+    { id: '002', name: '大型対策' },
+    { id: '003', name: '複数キラー' },
+  ];
+  const skills = [
+    createGuardSkill('001', 'メタル対策', ['メタルキラー']),
+    createGuardSkill('002', '大型対策', ['ギガキラー']),
+    createGuardSkill('003', '複数キラー', ['スタンダードキラー', 'ギガキラー', 'メタルキラー']),
+  ];
+
+  it('指定された順で分類し、複数キラーのスキルを各分類に掲載する', () => {
+    expect(isGroupedSkillPickup('skill-killer')).toBe(true);
+    expect(groupPickupSkills('skill-killer', items, skills)).toEqual([
+      {
+        label: 'メタルキラー',
+        items: [
+          { id: '001', name: 'メタル対策' },
+          { id: '003', name: '複数キラー' },
+        ],
+      },
+      {
+        label: 'ギガキラー',
+        items: [
+          { id: '002', name: '大型対策' },
+          { id: '003', name: '複数キラー' },
+        ],
+      },
+      { label: 'スタンダードキラー', items: [{ id: '003', name: '複数キラー' }] },
+    ]);
+  });
+
+  it('分類順を固定する', () => {
+    expect(KILLER_ATTRIBUTES).toEqual(['メタルキラー', 'ギガキラー', 'スタンダードキラー']);
+  });
+});
 
 describe('groupPickupSkills - 耐性スキル', () => {
   const items = [
