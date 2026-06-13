@@ -247,6 +247,9 @@ html.dark {
 .dark .text-red-700 {
   color: #fca5a5;
 }
+.dark .text-amber-700 {
+  color: #fcd34d;
+}
 
 /* フォーム要素 */
 .dark input,
@@ -285,13 +288,34 @@ html.dark {
   color: #aecbfa;
 }
 
-/* 耐性ピルは常に淡い背景色のため、ダークモードでは文字を濃色で固定して読みやすくする */
-.dark .bg-resistance-weak,
-.dark .bg-resistance-little,
-.dark .bg-resistance-half,
-.dark .bg-resistance-large,
-.dark .bg-resistance-invalid,
-.dark .bg-resistance-recover,
+/* 耐性ピルはライトモードだと淡い／ネオン色で暗い背景に馴染まないため、
+   ダークモードでは彩度を落とした暗めの面色＋明るい文字に置き換える。
+   弱点=赤、軽減→激減→無効=青緑のグラデーション、回復=緑、反射=紫 で段階を保つ。 */
+.dark .bg-resistance-weak {
+  background-color: #6e3b3b;
+  color: #f3d2d2;
+}
+.dark .bg-resistance-little {
+  background-color: #303f42;
+  color: #d2e6e8;
+}
+.dark .bg-resistance-half {
+  background-color: #2b4a4d;
+  color: #cfeced;
+}
+.dark .bg-resistance-large {
+  background-color: #265a5e;
+  color: #d0f2f5;
+}
+.dark .bg-resistance-invalid {
+  background-color: #1d6e6e;
+  color: #d6ffff;
+}
+.dark .bg-resistance-recover {
+  background-color: #2c6b46;
+  color: #d4ffe2;
+}
 .dark .bg-resistance-reflect {
-  color: #1f2937;
+  background-color: #6b3b6b;
+  color: #f3d4f3;
 }
