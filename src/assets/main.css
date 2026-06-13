@@ -250,3 +250,14 @@ html.dark {
 .dark .app-link:hover {
   color: #a9d2ff;
 }
+
+/* 耐性ピルは常に淡い背景色のため、ダークモードでは文字を濃色で固定して読みやすくする */
+.dark .bg-resistance-weak,
+.dark .bg-resistance-little,
+.dark .bg-resistance-half,
+.dark .bg-resistance-large,
+.dark .bg-resistance-invalid,
+.dark .bg-resistance-recover,
+.dark .bg-resistance-reflect {
+  color: #1f2937;
+}
