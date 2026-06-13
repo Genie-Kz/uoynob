@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   setLineage: [index: number, lineage: string | null];
+  fill: [lineage: string];
   setIv: [stat: StatKey, value: number];
 }>();
 
@@ -107,10 +108,29 @@ function onIvInput(stat: StatKey, event: Event): void {
             >
               <img v-if="lineageOf(i)" :src="LINEAGE_ICON[lineageOf(i)!]" alt="" class="w-8 h-8" />
               <span v-else class="w-8 h-8 rounded bg-gray-100"></span>
-              <span class="text-sm">{{ lineageOf(i) ? LINEAGE_LABEL[lineageOf(i)!] : '未設定' }}</span>
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 系統で一括設定 -->
+    <div class="mb-6">
+      <p class="text-xs text-gray-500 mb-1">系統で一括設定</p>
+      <p class="text-xs text-gray-400 mb-2">
+        選んだ系統で系図を埋めます。左の親・左の祖父母・左から2番目の曽祖父母は自身の系統、曽祖父母の一番左は対応系統になります。
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <button
+          v-for="lineage in STAT_LINEAGES"
+          :key="lineage"
+          type="button"
+          class="flex items-center gap-2 border rounded px-3 py-2 hover:bg-blue-50"
+          @click="emit('fill', lineage)"
+        >
+          <img :src="LINEAGE_ICON[lineage]" alt="" class="w-6 h-6" />
+          <span class="text-sm">{{ LINEAGE_LABEL[lineage] }}</span>
+        </button>
       </div>
     </div>
 

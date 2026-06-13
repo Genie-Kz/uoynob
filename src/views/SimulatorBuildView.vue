@@ -65,6 +65,7 @@ const {
   setForgeElement,
   setIndividualValue,
   setFamilyLineage,
+  fillFamilyTree,
   setParentLevelTotal,
   setWeapon,
   toggleMonshou,
@@ -284,8 +285,8 @@ const monshouOptions = MONSHOU_LIST;
               <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
             </li>
             <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between gap-2 px-3 py-2">
+              <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
               <span class="flex items-center gap-2">
-                <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
                 <button
                   v-if="trait && canBeSp(trait)"
                   type="button"
@@ -295,9 +296,27 @@ const monshouOptions = MONSHOU_LIST;
                 >
                   SP
                 </button>
+                <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
               </span>
-              <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
             </li>
+          </ul>
+
+          <!-- スキルで追加される特性 -->
+          <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
+          <ul class="border rounded divide-y mb-5">
+            <li v-for="trait in skillAddedTraits" :key="trait" class="flex items-center justify-between gap-2 px-3 py-2">
+              <span>{{ trait }}</span>
+              <button
+                v-if="canBeSp(trait)"
+                type="button"
+                class="rounded border px-2 py-0.5 text-xs"
+                :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+                @click="toggleSp(trait)"
+              >
+                SP
+              </button>
+            </li>
+            <li v-if="!skillAddedTraits.length" class="px-3 py-2 text-gray-400">スキル未選択</li>
           </ul>
 
           <!-- スキル -->
@@ -317,24 +336,6 @@ const monshouOptions = MONSHOU_LIST;
               <span v-else class="text-gray-400">（空き）</span>
               <button type="button" class="btn-outline-primary" @click="openSkillPicker(index)">選択</button>
             </li>
-          </ul>
-
-          <!-- スキルで追加される特性 -->
-          <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
-          <ul class="border rounded divide-y mb-5">
-            <li v-for="trait in skillAddedTraits" :key="trait" class="flex items-center gap-2 px-3 py-2">
-              <span>{{ trait }}</span>
-              <button
-                v-if="canBeSp(trait)"
-                type="button"
-                class="rounded border px-2 py-0.5 text-xs"
-                :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
-                @click="toggleSp(trait)"
-              >
-                SP
-              </button>
-            </li>
-            <li v-if="!skillAddedTraits.length" class="px-3 py-2 text-gray-400">スキル未選択</li>
           </ul>
 
           <!-- 武器鍛冶 -->
@@ -407,6 +408,7 @@ const monshouOptions = MONSHOU_LIST;
             :family-tree="familyTree"
             :individual-values="individualValues"
             @set-lineage="setFamilyLineage"
+            @fill="fillFamilyTree"
             @set-iv="setIndividualValue"
           />
         </div>
@@ -423,8 +425,8 @@ const monshouOptions = MONSHOU_LIST;
       @select="handlePick"
       @close="picker.open = false"
     />
-  </div>
 
-  <!-- 下部固定ステータスバー -->
-  <StatsBar :stats="stats" />
+    <!-- 下部固定ステータスバー -->
+    <StatsBar :stats="stats" />
+  </div>
 </template>

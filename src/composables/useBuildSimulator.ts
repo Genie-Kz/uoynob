@@ -12,6 +12,7 @@ import {
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
+import { LINEAGE_DEFAULT_OPPOSITE } from '@/constants/lineageIcons';
 import { collectAllTraitNames, defaultEditableTraits } from '@/domain/monster';
 import { computeBuildResistances } from '@/domain/buildSimulator';
 import { computeStats } from '@/domain/statsCalculator';
@@ -29,8 +30,21 @@ export interface BuildShareQuery {
 }
 
 const FAMILY_TREE_SIZE = 14;
+/** 家系図のインデックス（重み順 [4,4,2,2,2,2,1,1,1,1,1,1,1,1] に対応） */
+const LEFT_PARENT_INDEX = 0;
+const LEFT_GRANDPARENT_INDEX = 2;
+const LEFTMOST_GREAT_GRANDPARENT_INDEX = 6;
+const SECOND_GREAT_GRANDPARENT_INDEX = 7;
+const DEFAULT_PARENT_LEVEL_TOTAL = 200;
 const FORGE_STAT_UP_BY_LABEL = new Map(FORGE_STAT_UP_OPTIONS.map((option) => [option.label, option]));
 const RESISTANCE_ELEMENT_SET = new Set<string>(RESISTANCE_ELEMENTS);
+
+/** 系図の初期値：基本は自身の系統、曽祖父母の一番左だけ対応系統にする */
+function defaultFamilyTree(own: string): (string | null)[] {
+  const tree = Array<string | null>(FAMILY_TREE_SIZE).fill(own);
+  tree[LEFTMOST_GREAT_GRANDPARENT_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
+  return tree;
+}
 
 function readQuery(query: LocationQuery, key: string): string | undefined {
   const value = query[key];
@@ -103,9 +117,8 @@ export function useBuildSimulator(
     skillSlots.value = emptySkillSlots(bodySize.value);
     forgeSlots.value = emptyForgeSlots();
     individualValues.value = zeroIndividualValues();
-    // 家系図の初期値はそのモンスター自身の系統（純血）
-    familyTree.value = Array(FAMILY_TREE_SIZE).fill(target.系統);
-    parentLevelTotal.value = 0;
+    familyTree.value = defaultFamilyTree(target.系統);
+    parentLevelTotal.value = DEFAULT_PARENT_LEVEL_TOTAL;
     weapon.value = null;
     monshouNames.value = [];
     spTraitNames.value = [];
@@ -171,6 +184,21 @@ export function useBuildSimulator(
   }
   function setFamilyLineage(index: number, lineage: string | null): void {
     familyTree.value[index] = lineage;
+  }
+  /**
+   * 家系図を特定系統で一括設定する。
+   * ただし 左の親・左の祖父母・左から2番目の曽祖父母はモンスター自身の系統、
+   * 曽祖父母の一番左は対応系統とする。
+   */
+  function fillFamilyTree(lineage: string): void {
+    if (!monster.value) return;
+    const own = monster.value.系統;
+    const tree = Array<string | null>(FAMILY_TREE_SIZE).fill(lineage);
+    tree[LEFT_PARENT_INDEX] = own;
+    tree[LEFT_GRANDPARENT_INDEX] = own;
+    tree[SECOND_GREAT_GRANDPARENT_INDEX] = own;
+    tree[LEFTMOST_GREAT_GRANDPARENT_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
+    familyTree.value = tree;
   }
   function setParentLevelTotal(value: number): void {
     parentLevelTotal.value = value;
@@ -280,6 +308,7 @@ export function useBuildSimulator(
     setForgeElement,
     setIndividualValue,
     setFamilyLineage,
+    fillFamilyTree,
     setParentLevelTotal,
     setWeapon,
     toggleMonshou,

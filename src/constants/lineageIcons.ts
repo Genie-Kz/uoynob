@@ -22,6 +22,21 @@ export const LINEAGE_ICON: Record<string, string> = {
   ゾンビ: zombie,
 };
 
+/**
+ * 系図の初期値・一括設定で使う、系統ごとの対応系統。
+ * 選択モンスターの系統に対して、曽祖父母の一番左に置く系統を決める。
+ */
+export const LINEAGE_DEFAULT_OPPOSITE: Record<string, string> = {
+  スライム: '悪魔',
+  悪魔: 'スライム',
+  ドラゴン: '自然',
+  自然: 'ドラゴン',
+  '???': '魔獣',
+  魔獣: '???',
+  ゾンビ: '物質',
+  物質: 'ゾンビ',
+};
+
 /** 表示用ラベル（???は ？？？系 と表示） */
 export const LINEAGE_LABEL: Record<string, string> = {
   物質: '物質系',
