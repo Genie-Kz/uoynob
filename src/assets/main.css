@@ -204,11 +204,37 @@ html.dark {
 .dark .bg-sky-50 {
   background-color: #21303f;
 }
-.dark .bg-blue-50 {
-  background-color: #1e2c44;
-}
 .dark .bg-rose-50 {
   background-color: #3a2626;
+}
+
+/* アクセント（青）をダークモード全体で1つのトーンに統一して馴染ませる。
+   文字/枠線は淡いアズール、塗りは少し明るめの青、選択中の淡色背景は深い藍。 */
+.dark .text-blue-600,
+.dark .text-blue-700 {
+  color: #8ab4f8;
+}
+.dark .text-blue-800 {
+  color: #aecbfa;
+}
+.dark .border-blue-500 {
+  border-color: #4f6aa3;
+}
+.dark .bg-blue-50,
+.dark .hover\:bg-blue-50:hover {
+  background-color: #233453;
+}
+.dark .bg-blue-100 {
+  background-color: #2b4068;
+}
+.dark .bg-blue-600 {
+  background-color: #3b6fd4;
+}
+.dark .hover\:bg-blue-700:hover {
+  background-color: #3360bd;
+}
+.dark .ring-blue-300 {
+  --tw-ring-color: #4f6aa3;
 }
 
 /* 注意・エラー枠 */
@@ -240,15 +266,23 @@ html.dark {
 }
 .dark .btn-outline-primary {
   background-color: #232323;
+  border-color: #4f6aa3;
+  color: #8ab4f8;
 }
 .dark .btn-outline-primary:hover {
-  background-color: #1e2c44;
+  background-color: #233453;
+}
+.dark .btn-primary {
+  background-color: #3b6fd4;
+}
+.dark .btn-primary:hover {
+  background-color: #3360bd;
 }
 .dark .app-link {
-  color: #7db8ff;
+  color: #8ab4f8;
 }
 .dark .app-link:hover {
-  color: #a9d2ff;
+  color: #aecbfa;
 }
 
 /* 耐性ピルは常に淡い背景色のため、ダークモードでは文字を濃色で固定して読みやすくする */
