@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS, INDIVIDUAL_VALUE_RANGE } from '@/constants/statsRules';
 import { LINEAGE_ICON, LINEAGE_LABEL, STAT_LINEAGES } from '@/constants/lineageIcons';
+import {
+  INDIVIDUAL_VALUE_TEMPLATES,
+  individualValuesFromTemplate,
+} from '@/domain/individualValueTemplate';
+import PickerModal from './PickerModal.vue';
 
 const props = defineProps<{
   familyTree: (string | null)[];
@@ -63,6 +68,41 @@ function onIvInput(stat: StatKey, event: Event): void {
   const raw = Number((event.target as HTMLInputElement).value);
   const clamped = Math.max(range.min, Math.min(range.max, Number.isFinite(raw) ? raw : 0));
   emit('setIv', stat, clamped);
+}
+
+const lastIvPreset = ref<string | null>(null);
+function setIvPreset(stat: StatKey, value: number): void {
+  emit('setIv', stat, value);
+  const presetKey = `${stat}:${value}`;
+  lastIvPreset.value = presetKey;
+  window.setTimeout(() => {
+    if (lastIvPreset.value === presetKey) lastIvPreset.value = null;
+  }, 800);
+}
+
+function ivPresetClass(stat: StatKey, value: number): string {
+  return lastIvPreset.value === `${stat}:${value}`
+    ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300'
+    : '';
+}
+
+const templatePickerOpen = ref(false);
+const templateItems = INDIVIDUAL_VALUE_TEMPLATES.map((template) => ({
+  label: template,
+  value: template,
+}));
+const currentTemplate = computed(
+  () =>
+    INDIVIDUAL_VALUE_TEMPLATES.find((template) => {
+      const values = individualValuesFromTemplate(template);
+      return STAT_KEYS.every((stat) => values[stat] === props.individualValues[stat]);
+    }) ?? '',
+);
+
+function applyIvTemplate(template: string): void {
+  const values = individualValuesFromTemplate(template);
+  for (const stat of STAT_KEYS) emit('setIv', stat, values[stat]);
+  templatePickerOpen.value = false;
 }
 
 /** 個体値が最大（＋方向）／最小（−方向）／中間のいずれか */
@@ -163,8 +203,17 @@ function ivInputClass(stat: StatKey): string {
     </div>
 
     <!-- 個体値 -->
-    <h3 class="text-lg font-bold mb-2">個体値</h3>
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <h3 class="text-lg font-bold">個体値</h3>
+      <button type="button" class="btn-outline-primary" @click="templatePickerOpen = true">
+        よく使う個体値
+      </button>
+    </div>
     <p class="text-sm text-gray-500 mb-2">HP・攻撃力・素早さは±100、MP・守備力・賢さは±200。</p>
+    <p class="text-xs text-gray-400 mb-3">
+      大文字が最大、小文字が最小です。3文字の全大文字表記では、書かれていない能力は最小になります。
+      H=HP、M=MP、A=攻撃力、D=守備力、S=素早さ、W=賢さ。
+    </p>
     <div class="space-y-2">
       <div v-for="stat in STAT_KEYS" :key="stat" class="flex items-center gap-2">
         <span class="w-16 text-sm text-gray-600">{{ STAT_LABEL[stat] }}</span>
@@ -187,9 +236,30 @@ function ivInputClass(stat: StatKey): string {
           </span>
         </div>
         <div class="flex gap-1">
-          <button type="button" class="btn-neutral !px-3 !py-1" @click="emit('setIv', stat, INDIVIDUAL_VALUE_RANGE[stat].min)">最小</button>
-          <button type="button" class="btn-neutral !px-3 !py-1" @click="emit('setIv', stat, 0)">0</button>
-          <button type="button" class="btn-neutral !px-3 !py-1" @click="emit('setIv', stat, INDIVIDUAL_VALUE_RANGE[stat].max)">最大</button>
+          <button
+            type="button"
+            class="btn-neutral !px-3 !py-1 active:scale-95"
+            :class="ivPresetClass(stat, INDIVIDUAL_VALUE_RANGE[stat].min)"
+            @click="setIvPreset(stat, INDIVIDUAL_VALUE_RANGE[stat].min)"
+          >
+            最小
+          </button>
+          <button
+            type="button"
+            class="btn-neutral !px-3 !py-1 active:scale-95"
+            :class="ivPresetClass(stat, 0)"
+            @click="setIvPreset(stat, 0)"
+          >
+            0
+          </button>
+          <button
+            type="button"
+            class="btn-neutral !px-3 !py-1 active:scale-95"
+            :class="ivPresetClass(stat, INDIVIDUAL_VALUE_RANGE[stat].max)"
+            @click="setIvPreset(stat, INDIVIDUAL_VALUE_RANGE[stat].max)"
+          >
+            最大
+          </button>
         </div>
       </div>
     </div>
@@ -221,5 +291,14 @@ function ivInputClass(stat: StatKey): string {
         </div>
       </div>
     </Transition>
+
+    <PickerModal
+      :open="templatePickerOpen"
+      title="よく使う個体値を選択"
+      :items="templateItems"
+      :current="currentTemplate"
+      @select="applyIvTemplate"
+      @close="templatePickerOpen = false"
+    />
   </div>
 </template>

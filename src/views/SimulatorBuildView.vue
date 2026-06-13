@@ -367,6 +367,7 @@ const monshouOptions = MONSHOU_LIST;
         <!-- ステータス・系図タブ -->
         <div v-show="activeTab === 'family'">
           <FamilyTreeIv
+            class="mb-5"
             :family-tree="familyTree"
             :individual-values="individualValues"
             @set-lineage="setFamilyLineage"
