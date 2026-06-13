@@ -8,6 +8,7 @@ import type { Skill } from '@/types/skill';
 import type { Attribute } from '@/types/attribute';
 import type { Ability } from '@/types/ability';
 import type { PickupData } from '@/types/pickup';
+import type { Weapon } from '@/types/stats';
 
 const baseUrl = import.meta.env.BASE_URL;
 
@@ -16,6 +17,7 @@ let skillsPromise: Promise<Skill[]> | null = null;
 let attributesPromise: Promise<Attribute[]> | null = null;
 let abilitiesPromise: Promise<Ability[]> | null = null;
 let pickupsPromise: Promise<PickupData> | null = null;
+let weaponsPromise: Promise<Weapon[]> | null = null;
 
 async function fetchJson<T>(relativePath: string): Promise<T> {
   const response = await fetch(baseUrl + relativePath);
@@ -48,4 +50,9 @@ export function loadAbilities(): Promise<Ability[]> {
 export function loadPickups(): Promise<PickupData> {
   pickupsPromise ??= fetchJson<PickupData>('data/pickups.json');
   return pickupsPromise;
+}
+
+export function loadWeapons(): Promise<Weapon[]> {
+  weaponsPromise ??= fetchJson<Weapon[]>('data/weapons.json');
+  return weaponsPromise;
 }

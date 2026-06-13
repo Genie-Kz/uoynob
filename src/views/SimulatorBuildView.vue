@@ -2,25 +2,27 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { BodySize } from '@/types/monster';
-import type { Skill } from '@/types/skill';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
+import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/composables/useBuildSimulator';
-import {
-  BODY_SIZES,
-  lineageInfoOf,
-} from '@/constants/monsterTaxonomy';
+import { loadWeapons } from '@/api/datasets';
+import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE, TRAIT_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
+import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
+import { canBeSp } from '@/constants/spRules';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
-import StatusTable from '@/components/StatusTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import PickerModal from '@/components/PickerModal.vue';
+import StatsBar from '@/components/StatsBar.vue';
+import FamilyTreeIv from '@/components/FamilyTreeIv.vue';
 import type { PickerItem } from '@/types/picker';
+import type { Skill } from '@/types/skill';
 
 const props = defineProps<{ id: string }>();
 
@@ -29,6 +31,7 @@ const router = useRouter();
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
+const { data: weapons } = useAsyncData(loadWeapons);
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
 const breadcrumbItems = computed(() => [
@@ -37,9 +40,9 @@ const breadcrumbItems = computed(() => [
   { label: monster.value?.名前 ?? '詳細' },
 ]);
 
-// マウント時点のクエリを控え、URL共有パラメータからの復元に使う
 const initialQuery = { ...route.query };
 
+const sim = useBuildSimulator(monster, monsters, skills, initialQuery);
 const {
   bodySize,
   traitSlots,
@@ -47,26 +50,38 @@ const {
   forgeSlots,
   traitMaster,
   skillById,
+  skillAddedTraits,
   resistanceOutcomes,
+  stats,
   shareQuery,
+  individualValues,
+  familyTree,
+  parentLevelTotal,
+  weapon,
+  monshouNames,
   changeBodySize,
   setTrait,
   setSkill,
   setForgeElement,
+  setIndividualValue,
+  setFamilyLineage,
+  setParentLevelTotal,
+  setWeapon,
+  toggleMonshou,
+  toggleSp,
+  isSp,
   resetTraits,
   resetSkills,
   resetForge,
-} = useBuildSimulator(monster, monsters, skills, initialQuery);
+} = sim;
 
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
 const resistanceCells = computed(() => buildResistanceCells(resistanceOutcomes.value));
 
-// 入力が変わるたびに URL を更新（履歴は汚さず replace）。これがそのまま共有リンクになる。
 watch(shareQuery, (query) => {
   router.replace({ name: 'simulator-build', params: { id: props.id }, query });
 });
 
-// 共有用：現在のURLをクリップボードへコピー
 const copied = ref(false);
 async function copyShareUrl(): Promise<void> {
   try {
@@ -78,38 +93,37 @@ async function copyShareUrl(): Promise<void> {
   }
 }
 
-const statRows = computed(() => {
-  const target = monster.value;
-  if (!target) return [];
-  return [
-    { label: 'ＨＰ', value: target.HP },
-    { label: 'ＭＰ', value: target.MP },
-    { label: '攻撃力', value: target.攻撃力 },
-    { label: '守備力', value: target.守備力 },
-    { label: '素早さ', value: target.素早さ },
-    { label: 'かしこさ', value: target.賢さ },
-  ];
+/* ---- タブ ---- */
+const activeTab = ref<'build' | 'family'>('build');
+
+/* ---- 武器 ---- */
+const weaponByNo = computed(() => new Map((weapons.value ?? []).map((w) => [w.no, w])));
+const hasAllWeaponTrait = computed(
+  () => traitSlots.value.includes('すべての武器装備') || skillAddedTraits.value.includes('すべての武器装備'),
+);
+const equippableTypes = computed<string[]>(() => {
+  if (hasAllWeaponTrait.value) return [...WEAPONS];
+  if (!monster.value) return [];
+  return WEAPONS.filter((type) => monster.value?.[type] === '〇');
 });
+const equippableWeapons = computed(() =>
+  (weapons.value ?? []).filter((w) => equippableTypes.value.includes(w.type)),
+);
 
 function bodySizeLabel(size: BodySize): string {
   return `${size}（特性${TRAIT_SLOT_COUNT_BY_SIZE[size]}・スキル${SKILL_SLOT_COUNT_BY_SIZE[size]}）`;
 }
-
 function skillGuardSummary(skill: Skill): string {
   return [...summarizeGuardEffects(skill)].map(([element, count]) => `${element}+${count * 2}`).join(' ');
 }
+function isResistanceForge(value: string): boolean {
+  return (RESISTANCE_ELEMENTS as readonly string[]).includes(value);
+}
 
 /* ---- 入れ替えモーダル ---- */
-type PickerMode = 'size' | 'trait' | 'skill' | 'forge';
+type PickerMode = 'size' | 'trait' | 'skill' | 'forge' | 'weapon';
 
-const picker = ref<{
-  open: boolean;
-  mode: PickerMode;
-  index: number;
-  title: string;
-  items: PickerItem[];
-  current: string;
-}>({
+const picker = ref<{ open: boolean; mode: PickerMode; index: number; title: string; items: PickerItem[]; current: string }>({
   open: false,
   mode: 'trait',
   index: 0,
@@ -128,7 +142,6 @@ function openBodySizePicker(): void {
     current: bodySize.value,
   };
 }
-
 function openTraitPicker(index: number): void {
   picker.value = {
     open: true,
@@ -139,7 +152,6 @@ function openTraitPicker(index: number): void {
     current: traitSlots.value[index] ?? '',
   };
 }
-
 function openSkillPicker(index: number): void {
   picker.value = {
     open: true,
@@ -153,15 +165,31 @@ function openSkillPicker(index: number): void {
     current: skillSlots.value[index]?.id ?? '',
   };
 }
-
 function openForgePicker(index: number): void {
   picker.value = {
     open: true,
     mode: 'forge',
     index,
     title: '武器鍛冶を選択',
-    items: [{ label: '（なし）', value: '' }, ...RESISTANCE_ELEMENTS.map((element) => ({ label: element, value: element }))],
+    items: [
+      { label: '（なし）', value: '' },
+      ...RESISTANCE_ELEMENTS.map((element) => ({ label: `${element}（耐性+1）`, value: element })),
+      ...FORGE_STAT_UP_OPTIONS.map((option) => ({ label: option.label, value: option.label })),
+    ],
     current: forgeSlots.value[index] ?? '',
+  };
+}
+function openWeaponPicker(): void {
+  picker.value = {
+    open: true,
+    mode: 'weapon',
+    index: 0,
+    title: '武器を選択',
+    items: [
+      { label: '（未装備）', value: '' },
+      ...equippableWeapons.value.map((w) => ({ label: `${w.name}〔${w.type}〕 攻+${w.攻撃力}`, value: String(w.no) })),
+    ],
+    current: weapon.value ? String(weapon.value.no) : '',
   };
 }
 
@@ -170,16 +198,22 @@ function handlePick(value: string): void {
   if (mode === 'size') changeBodySize(value as BodySize);
   else if (mode === 'trait') setTrait(index, value);
   else if (mode === 'skill') setSkill(index, value ? (skillById.value.get(value) ?? null) : null);
-  else setForgeElement(index, value);
+  else if (mode === 'forge') setForgeElement(index, value);
+  else if (mode === 'weapon') setWeapon(value ? (weaponByNo.value.get(Number(value)) ?? null) : null);
   picker.value.open = false;
 }
+
+function onParentLevelInput(event: Event): void {
+  const raw = Number((event.target as HTMLInputElement).value);
+  setParentLevelTotal(Math.max(0, Math.min(200, Number.isFinite(raw) ? raw : 0)));
+}
+
+const monshouOptions = MONSHOU_LIST;
 </script>
 
 <template>
-  <div>
-    <PageBreadcrumb
-      :items="breadcrumbItems"
-    />
+  <div class="pb-28">
+    <PageBreadcrumb :items="breadcrumbItems" />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <div v-if="!monster" class="border border-yellow-300 bg-yellow-50 rounded p-3">
@@ -204,102 +238,178 @@ function handlePick(value: string): void {
           </div>
         </div>
 
-        <!-- 共有 -->
-        <div class="mb-4">
-          <button type="button" class="btn-neutral" @click="copyShareUrl">
-            {{ copied ? 'コピーしました！' : 'この構成を共有（URLをコピー）' }}
-          </button>
-        </div>
-
-        <!-- 最終耐性 -->
-        <ResistanceGrid title="最終耐性" :cells="resistanceCells" class="mb-5" />
-
-        <!-- 特性 -->
-        <div class="flex items-center justify-between mb-2 pr-2">
-          <h3 class="text-lg font-bold">
-            特性
-            <span class="text-sm text-gray-500 font-normal">
-              {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
-            </span>
-          </h3>
-          <button type="button" class="btn-outline-primary" @click="resetTraits">リセット</button>
-        </div>
-        <ul class="border rounded divide-y mb-5">
-          <li class="flex items-center justify-between px-3 py-2">
-            <span>ボディサイズ：{{ bodySize }}</span>
-            <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
-          </li>
-          <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between px-3 py-2">
-            <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
-            <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
-          </li>
-        </ul>
-
-        <!-- スキル -->
-        <div class="flex items-center justify-between mb-2 pr-2">
-          <h3 class="text-lg font-bold">
-            スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
-          </h3>
+        <!-- タブ -->
+        <div class="flex border-b mb-4">
           <button
             type="button"
-            class="btn-outline-primary"
-            @click="resetSkills"
+            class="px-4 py-2 text-sm border-b-2 -mb-px"
+            :class="activeTab === 'build' ? 'border-blue-500 text-blue-600 font-bold' : 'border-transparent text-gray-500'"
+            @click="activeTab = 'build'"
           >
-            リセット
+            ビルド
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 text-sm border-b-2 -mb-px"
+            :class="activeTab === 'family' ? 'border-blue-500 text-blue-600 font-bold' : 'border-transparent text-gray-500'"
+            @click="activeTab = 'family'"
+          >
+            系図・個体値
           </button>
         </div>
-        <ul class="border rounded divide-y mb-5">
-          <li v-for="(skill, index) in skillSlots" :key="index" class="flex items-center justify-between px-3 py-2">
-            <span v-if="skill">
-              {{ skill.name }}
-              <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs ml-1">{{ skill.category }}</span>
-              <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{ skillGuardSummary(skill) }}</span>
-            </span>
-            <span v-else class="text-gray-400">（空き）</span>
-            <button
-              type="button"
-              class="btn-outline-primary"
-              @click="openSkillPicker(index)"
-            >
-              選択
+
+        <!-- ビルドタブ -->
+        <div v-show="activeTab === 'build'">
+          <div class="mb-4">
+            <button type="button" class="btn-neutral" @click="copyShareUrl">
+              {{ copied ? 'コピーしました！' : 'この構成を共有（URLをコピー）' }}
             </button>
-          </li>
-        </ul>
+          </div>
 
-        <!-- 武器鍛冶 -->
-        <div class="flex items-center justify-between mb-2 pr-2">
-          <h3 class="text-lg font-bold">
-            武器鍛冶 <span class="text-sm text-gray-500 font-normal">別々の耐性を3つまで・各+1</span>
-          </h3>
-          <button
-            type="button"
-            class="btn-outline-primary"
-            @click="resetForge"
-          >
-            リセット
-          </button>
-        </div>
-        <ul class="border rounded divide-y mb-5">
-          <li v-for="(element, index) in forgeSlots" :key="index" class="flex items-center justify-between px-3 py-2">
+          <ResistanceGrid title="最終耐性" :cells="resistanceCells" class="mb-5" />
+
+          <!-- 特性 -->
+          <div class="flex items-center justify-between mb-2 pr-2">
+            <h3 class="text-lg font-bold">
+              特性
+              <span class="text-sm text-gray-500 font-normal">
+                {{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] }}枠（サイズ1＋{{ TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }}）
+              </span>
+            </h3>
+            <button type="button" class="btn-outline-primary" @click="resetTraits">リセット</button>
+          </div>
+          <ul class="border rounded divide-y mb-5">
+            <li class="flex items-center justify-between px-3 py-2">
+              <span>ボディサイズ：{{ bodySize }}</span>
+              <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
+            </li>
+            <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between gap-2 px-3 py-2">
+              <span class="flex items-center gap-2">
+                <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
+                <button
+                  v-if="trait && canBeSp(trait)"
+                  type="button"
+                  class="rounded border px-2 py-0.5 text-xs"
+                  :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+                  @click="toggleSp(trait)"
+                >
+                  SP
+                </button>
+              </span>
+              <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
+            </li>
+          </ul>
+
+          <!-- スキル -->
+          <div class="flex items-center justify-between mb-2 pr-2">
+            <h3 class="text-lg font-bold">
+              スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
+            </h3>
+            <button type="button" class="btn-outline-primary" @click="resetSkills">リセット</button>
+          </div>
+          <ul class="border rounded divide-y mb-5">
+            <li v-for="(skill, index) in skillSlots" :key="index" class="flex items-center justify-between px-3 py-2">
+              <span v-if="skill">
+                {{ skill.name }}
+                <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs ml-1">{{ skill.category }}</span>
+                <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{ skillGuardSummary(skill) }}</span>
+              </span>
+              <span v-else class="text-gray-400">（空き）</span>
+              <button type="button" class="btn-outline-primary" @click="openSkillPicker(index)">選択</button>
+            </li>
+          </ul>
+
+          <!-- スキルで追加される特性 -->
+          <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
+          <ul class="border rounded divide-y mb-5">
+            <li v-for="trait in skillAddedTraits" :key="trait" class="flex items-center gap-2 px-3 py-2">
+              <span>{{ trait }}</span>
+              <button
+                v-if="canBeSp(trait)"
+                type="button"
+                class="rounded border px-2 py-0.5 text-xs"
+                :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+                @click="toggleSp(trait)"
+              >
+                SP
+              </button>
+            </li>
+            <li v-if="!skillAddedTraits.length" class="px-3 py-2 text-gray-400">スキル未選択</li>
+          </ul>
+
+          <!-- 武器鍛冶 -->
+          <div class="flex items-center justify-between mb-2 pr-2">
+            <h3 class="text-lg font-bold">
+              武器鍛冶 <span class="text-sm text-gray-500 font-normal">耐性+1段階 または ステータスアップ（3枠）</span>
+            </h3>
+            <button type="button" class="btn-outline-primary" @click="resetForge">リセット</button>
+          </div>
+          <ul class="border rounded divide-y mb-5">
+            <li v-for="(value, index) in forgeSlots" :key="index" class="flex items-center justify-between px-3 py-2">
+              <span>
+                鍛冶{{ index + 1 }}：
+                <template v-if="value">
+                  {{ value }}
+                  <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs">{{ isResistanceForge(value) ? '耐性+1' : 'ステータス' }}</span>
+                </template>
+                <span v-else class="text-gray-400">（なし）</span>
+              </span>
+              <button type="button" class="btn-outline-primary" @click="openForgePicker(index)">選択</button>
+            </li>
+          </ul>
+
+          <!-- 装備（武器） -->
+          <h3 class="text-lg font-bold mb-2">装備（武器）</h3>
+          <div class="border rounded flex items-center justify-between px-3 py-2 mb-5">
             <span>
-              鍛冶{{ index + 1 }}：
-              <template v-if="element">
-                {{ element }} <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs">+1</span>
+              <template v-if="weapon">
+                {{ weapon.name }}
+                <span class="text-xs text-gray-600 ml-1">攻+{{ weapon.攻撃力 }}</span>
               </template>
-              <span v-else class="text-gray-400">（なし）</span>
+              <span v-else class="text-gray-400">未装備</span>
             </span>
-            <button
-              type="button"
-              class="btn-outline-primary"
-              @click="openForgePicker(index)"
-            >
-              選択
-            </button>
-          </li>
-        </ul>
+            <button type="button" class="btn-outline-primary" @click="openWeaponPicker">選択</button>
+          </div>
 
-        <!-- ステータス -->
-        <StatusTable title="ステータス" :rows="statRows" class="mb-4" />
+          <!-- 紋晶 -->
+          <h3 class="text-lg font-bold mb-2">紋晶</h3>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <button
+              v-for="m in monshouOptions"
+              :key="m.name"
+              type="button"
+              class="rounded border px-3 py-2 text-sm"
+              :class="monshouNames.includes(m.name) ? 'border-blue-500 bg-blue-600 text-white' : 'border-blue-500 bg-white text-blue-600 hover:bg-blue-50'"
+              @click="toggleMonshou(m.name)"
+            >
+              {{ m.name }}
+            </button>
+          </div>
+
+          <!-- 親レベル合計 -->
+          <h3 class="text-lg font-bold mb-2">親レベル合計</h3>
+          <div class="flex items-center gap-2 mb-2">
+            <input
+              type="number"
+              class="border rounded px-3 py-2 w-28 text-sm"
+              min="0"
+              max="200"
+              :value="parentLevelTotal"
+              @input="onParentLevelInput"
+            />
+            <span class="text-sm text-gray-500">（両親のレベル合計。最大200で全ステータス+5%）</span>
+          </div>
+        </div>
+
+        <!-- 系図・個体値タブ -->
+        <div v-show="activeTab === 'family'">
+          <FamilyTreeIv
+            :family-tree="familyTree"
+            :individual-values="individualValues"
+            @set-lineage="setFamilyLineage"
+            @set-iv="setIndividualValue"
+          />
+        </div>
       </div>
     </DataState>
 
@@ -314,4 +424,7 @@ function handlePick(value: string): void {
       @close="picker.open = false"
     />
   </div>
+
+  <!-- 下部固定ステータスバー -->
+  <StatsBar :stats="stats" />
 </template>
