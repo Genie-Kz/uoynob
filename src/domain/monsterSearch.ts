@@ -1,8 +1,9 @@
 /** 耐性・特性によるモンスター検索ロジック */
-import type { Monster } from '@/types/monster';
+import type { BodySize, Monster } from '@/types/monster';
 import { resistanceLevelOf } from './resistance';
-import { traitsOf } from './monster';
+import { defaultEditableTraits } from './monster';
 import { effectiveResistanceValue } from './effectiveResistance';
+import { computeBuildResistances } from './buildSimulator';
 
 /** 「この耐性をこの段階以上で持つ」という条件 */
 export interface ResistanceThreshold {
@@ -14,6 +15,8 @@ export interface ResistanceThreshold {
 export interface MonsterSearchCriteria {
   thresholds: ResistanceThreshold[];
   requiredTraits: string[];
+  /** 未指定ならモンスター本来のサイズ、指定時はそのサイズに変更した状態で検索する */
+  bodySize?: BodySize | null;
 }
 
 /** 検索条件が空かどうか（空のときは全件表示を避けるために使う） */
@@ -23,15 +26,31 @@ export function isEmptyCriteria(criteria: MonsterSearchCriteria): boolean {
 
 /** 条件に合致するモンスターを返す（AND条件） */
 export function searchMonsters(monsters: Monster[], criteria: MonsterSearchCriteria): Monster[] {
-  const { thresholds, requiredTraits } = criteria;
+  const { thresholds, requiredTraits, bodySize = null } = criteria;
   return monsters.filter((monster) => {
-    // 検索も図鑑表示と同じ「実効耐性」で判定する
+    const searchSize = bodySize ?? monster.サイズ特性;
+    const traits = defaultEditableTraits(monster, searchSize).filter(Boolean);
+    const resistanceByElement = bodySize === null
+      ? null
+      : Object.fromEntries(
+          computeBuildResistances({
+            monster,
+            bodySize: searchSize,
+            traits,
+            skills: [],
+            forgeElements: [],
+          }).map((outcome) => [outcome.element, outcome.finalValue]),
+        );
+
     const meetsResistances = thresholds.every(
-      (threshold) => resistanceLevelOf(effectiveResistanceValue(monster, threshold.element)) >= threshold.minLevel,
+      (threshold) => {
+        const resistance = resistanceByElement?.[threshold.element]
+          ?? effectiveResistanceValue(monster, threshold.element);
+        return resistanceLevelOf(resistance) >= threshold.minLevel;
+      },
     );
     if (!meetsResistances) return false;
 
-    const ownTraits = traitsOf(monster);
-    return requiredTraits.every((trait) => ownTraits.includes(trait));
+    return requiredTraits.every((trait) => traits.includes(trait));
   });
 }

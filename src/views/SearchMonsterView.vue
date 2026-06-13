@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { Monster } from '@/types/monster';
+import type { BodySize, Monster } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
@@ -28,6 +28,15 @@ const selectedLevelByElement = ref<Record<string, number | null>>(
 const selectedTraits = ref<string[]>([]);
 const traitKeyword = ref('');
 const searchResults = ref<Monster[] | null>(null);
+const searchBodySize = ref<BodySize | ''>('');
+
+const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
+  { label: 'デフォルトサイズ', value: '' },
+  { label: 'スタンダードボディ', value: 'スタンダードボディ' },
+  { label: 'スモールボディ', value: 'スモールボディ' },
+  { label: 'メガボディ', value: 'メガボディ' },
+  { label: '超ギガボディ', value: '超ギガボディ' },
+];
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const visibleTraitNames = computed(() => {
@@ -43,13 +52,18 @@ const thresholds = computed<ResistanceThreshold[]>(() =>
 );
 
 function runSearch(): void {
-  const criteria = { thresholds: thresholds.value, requiredTraits: selectedTraits.value };
+  const criteria = {
+    thresholds: thresholds.value,
+    requiredTraits: selectedTraits.value,
+    bodySize: searchBodySize.value || null,
+  };
   searchResults.value = isEmptyCriteria(criteria) ? [] : searchMonsters(monsters.value ?? [], criteria);
 }
 
 function resetAll(): void {
   for (const element of RESISTANCE_ELEMENTS) selectedLevelByElement.value[element] = null;
   selectedTraits.value = [];
+  searchBodySize.value = '';
   searchResults.value = null;
 }
 
@@ -67,6 +81,16 @@ const hasCriteria = computed(
     </p>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <h3 class="font-bold mb-2">検索時のボディサイズ</h3>
+      <select v-model="searchBodySize" class="border rounded w-full sm:w-auto px-2 py-1 mb-2">
+        <option v-for="option in BODY_SIZE_OPTIONS" :key="option.label" :value="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+      <p class="text-sm text-gray-500 mb-4">
+        デフォルトサイズでは本来のサイズ、それ以外では全モンスターを選択したサイズにしたときの耐性・特性を検索します。
+      </p>
+
       <!-- 耐性 -->
       <h3 class="font-bold mb-2">耐性を選択</h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">

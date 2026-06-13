@@ -25,6 +25,40 @@ describe('searchMonsters', () => {
     expect(result.map((m) => m.名前)).toEqual(['A']);
   });
 
+  it('デフォルトでは本来のサイズによる耐性と特性で検索する', () => {
+    const mega = createMonster({
+      名前: 'メガ',
+      サイズ特性: 'メガボディ',
+      メガ特性: 'メガ固有特性',
+      ザキ: '普通',
+    });
+
+    expect(searchMonsters([mega], {
+      thresholds: [{ element: 'ザキ', minLevel: 3 }],
+      requiredTraits: ['メガ固有特性'],
+    })).toEqual([mega]);
+  });
+
+  it('指定サイズへ変更したときの耐性と特性で検索する', () => {
+    const mega = createMonster({
+      名前: 'メガ',
+      サイズ特性: 'メガボディ',
+      メガ特性: 'メガ固有特性',
+      ザキ: '普通',
+    });
+
+    expect(searchMonsters([mega], {
+      thresholds: [{ element: 'ザキ', minLevel: 1 }],
+      requiredTraits: [],
+      bodySize: 'スタンダードボディ',
+    })).toEqual([mega]);
+    expect(searchMonsters([mega], {
+      thresholds: [],
+      requiredTraits: ['メガ固有特性'],
+      bodySize: 'スタンダードボディ',
+    })).toEqual([]);
+  });
+
   it('条件が空かどうかを判定できる', () => {
     expect(isEmptyCriteria({ thresholds: [], requiredTraits: [] })).toBe(true);
     expect(isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] })).toBe(false);
