@@ -75,6 +75,7 @@ const {
   parentLevelTotal,
   weapon,
   monshouNames,
+  spTraitNames,
   changeBodySize,
   setTrait,
   setSkill,
@@ -317,7 +318,12 @@ const monshouOptions = MONSHOU_LIST;
             </li>
           </ul>
 
-          <DisadvantageTraits :traits="unfavorableTraits" />
+          <DisadvantageTraits
+            :traits="unfavorableTraits"
+            show-sp
+            :sp-traits="spTraitNames"
+            @toggle-sp="toggleSp"
+          />
 
           <!-- スキルで追加される特性 -->
           <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
