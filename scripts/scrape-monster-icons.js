@@ -1,19 +1,20 @@
-// Game8（https://game8.jp/dqm2/313658）のモンスター一覧から各モンスターのアイコン画像を取得し、
+// 外部のモンスター一覧ページから各モンスターのアイコン画像を取得し、
 // public/data/monster-icons/<図鑑No>.png として保存する。
 // アイコンは base（性格違いを除いた素のモンスター名）単位なので、図鑑No 単位で1枚に集約する。
+// 取得元ページのURLは環境変数 MONSTER_ICON_SOURCE_URL で指定する。
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
-const SOURCE_URL = 'https://game8.jp/dqm2/313658';
+const SOURCE_URL = process.env.MONSTER_ICON_SOURCE_URL;
 const OUT_DIR = path.join(projectRoot, 'public', 'data', 'monster-icons');
 const MONSTERS_JSON = path.join(projectRoot, 'public', 'data', 'monsters.json');
 const USER_AGENT = 'Mozilla/5.0 (compatible; iruluka-sp-icon-fetch/1.0)';
 const CONCURRENCY = 8;
 
-/** Game8 側と当サイトで表記が異なるモンスターの対応（当サイト名 → Game8名） */
+/** 取得元と当サイトで表記が異なるモンスターの対応（当サイト名 → 取得元の名前） */
 const NAME_ALIASES = {
   キャラピラー: 'キャタピラー',
   どんぐりベビー: 'どんぐりヘビー',
@@ -31,14 +32,14 @@ async function fetchText(url) {
   return res.text();
 }
 
-/** Game8 のHTMLから「正規化した名前 → アイコンURL」を作る（30pxのモンスターアイコンのみ対象） */
+/** HTMLから「正規化した名前 → アイコンURL」を作る（30pxのモンスターアイコンのみ対象） */
 function parseIconMap(html) {
   const map = new Map();
   for (const tag of html.match(/<img\b[^>]*>/g) ?? []) {
     const width = tag.match(/width="(\d+)"/)?.[1];
     if (width !== '30') continue;
     const name = tag.match(/alt="([^"]*?)画像"/)?.[1];
-    const src = tag.match(/data-src="(https:\/\/img\.game8\.jp\/[^"]+)"/)?.[1];
+    const src = tag.match(/data-src="(https?:\/\/[^"]+)"/)?.[1];
     if (name && src) map.set(normalizeName(name), src);
   }
   return map;
@@ -63,9 +64,12 @@ async function runPool(tasks, worker, concurrency) {
 }
 
 async function main() {
+  if (!SOURCE_URL) {
+    throw new Error('取得元ページのURLを環境変数 MONSTER_ICON_SOURCE_URL で指定してください。');
+  }
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  console.log('Game8 ページを取得中…');
+  console.log('一覧ページを取得中…');
   const html = await fetchText(SOURCE_URL);
   const iconMap = parseIconMap(html);
   console.log(`アイコン候補: ${iconMap.size} 件`);
