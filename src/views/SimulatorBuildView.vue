@@ -14,6 +14,7 @@ import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
 import { canBeSp } from '@/constants/spRules';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
+import { disadvantageTraits, totalDisadvantageCost } from '@/domain/traitDisadvantage';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
@@ -22,6 +23,7 @@ import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import PickerModal from '@/components/PickerModal.vue';
 import StatsBar from '@/components/StatsBar.vue';
 import FamilyTreeIv from '@/components/FamilyTreeIv.vue';
+import DisadvantageTraits from '@/components/DisadvantageTraits.vue';
 import type { PickerItem } from '@/types/picker';
 import type { Skill } from '@/types/skill';
 
@@ -92,6 +94,14 @@ const {
 
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
 const resistanceCells = computed(() => buildResistanceCells(resistanceOutcomes.value));
+const unfavorableTraits = computed(() => {
+  const target = monster.value;
+  if (!target) return [];
+  return disadvantageTraits(
+    target.ランク,
+    totalDisadvantageCost(traitSlots.value, target.名前),
+  );
+});
 
 watch(shareQuery, (query) => {
   router.replace({ name: 'simulator-build', params: { id: props.id }, query });
@@ -306,6 +316,8 @@ const monshouOptions = MONSHOU_LIST;
               </span>
             </li>
           </ul>
+
+          <DisadvantageTraits :traits="unfavorableTraits" />
 
           <!-- スキルで追加される特性 -->
           <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>

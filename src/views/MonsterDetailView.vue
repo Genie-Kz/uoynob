@@ -4,15 +4,17 @@ import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
-import { equippableWeaponsOf } from '@/domain/monster';
+import { defaultEditableTraits, equippableWeaponsOf } from '@/domain/monster';
 import { skillsForMonster } from '@/domain/skillLookup';
 import { computeBuildResistances, defaultBuildConfiguration } from '@/domain/buildSimulator';
+import { disadvantageTraits, totalDisadvantageCost } from '@/domain/traitDisadvantage';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
 import DataState from '@/components/DataState.vue';
 import MonsterIcon from '@/components/MonsterIcon.vue';
 import ResistanceGrid from '@/components/ResistanceGrid.vue';
 import StatusTable from '@/components/StatusTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DisadvantageTraits from '@/components/DisadvantageTraits.vue';
 import icon25 from '@/assets/images/icons/trait/icon-25.jpg';
 import icon50 from '@/assets/images/icons/trait/icon-50.jpg';
 import icon100 from '@/assets/images/icons/trait/icon-100.jpg';
@@ -39,6 +41,12 @@ const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(mo
 const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],
 );
+const unfavorableTraits = computed(() => {
+  const target = monster.value;
+  if (!target) return [];
+  const traits = defaultEditableTraits(target, target.サイズ特性);
+  return disadvantageTraits(target.ランク, totalDisadvantageCost(traits, target.名前));
+});
 
 const seoDescription = computed(() => {
   const target = monster.value;
@@ -163,6 +171,8 @@ const statRows = computed(() => {
             </tr>
           </tbody>
         </table>
+
+        <DisadvantageTraits :traits="unfavorableTraits" />
 
         <!-- 耐性 -->
         <ResistanceGrid title="耐性（新生配合時）" :cells="resistanceCells" class="mb-4" />
