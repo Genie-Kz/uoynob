@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PickupRef } from '@/types/pickup';
+import type { Monster } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
@@ -9,6 +10,7 @@ import { loadPickups } from '@/api/datasets';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import { groupPickupSkills } from '@/domain/pickupGrouping';
 import DataState from '@/components/DataState.vue';
+import MonsterIcon from '@/components/MonsterIcon.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
 const props = defineProps<{ pickupKey: string }>();
@@ -41,6 +43,13 @@ const seoDescription = computed(() => {
 });
 
 usePageSeo(() => entry.value?.title, seoDescription);
+
+const monsterById = computed(() => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])));
+
+function monsterOf(ref: PickupRef): Monster | null {
+  const resolved = resolveMonsterId.value(ref.id);
+  return resolved ? (monsterById.value.get(resolved) ?? null) : null;
+}
 
 function monsterRoute(ref: PickupRef) {
   const resolved = resolveMonsterId.value(ref.id);
@@ -125,7 +134,12 @@ function scrollToGroup(index: number): void {
         <!-- モンスター一覧 -->
         <div v-else-if="entry.type === 'monsters'" class="flex flex-wrap gap-1">
           <template v-for="ref in entry.items" :key="ref.id">
-            <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="tag-link app-link">
+            <router-link
+              v-if="monsterRoute(ref)"
+              :to="monsterRoute(ref)!"
+              class="tag-link app-link inline-flex items-center gap-1"
+            >
+              <MonsterIcon v-if="monsterOf(ref)" :lineage="monsterOf(ref)!.系統" :no="monsterOf(ref)!.no" />
               {{ ref.name }}
             </router-link>
             <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
@@ -158,7 +172,12 @@ function scrollToGroup(index: number): void {
             <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
             <div class="flex flex-wrap gap-1">
               <template v-for="ref in group.items" :key="ref.id">
-                <router-link v-if="monsterRoute(ref)" :to="monsterRoute(ref)!" class="tag-link app-link">
+                <router-link
+                  v-if="monsterRoute(ref)"
+                  :to="monsterRoute(ref)!"
+                  class="tag-link app-link inline-flex items-center gap-1"
+                >
+                  <MonsterIcon v-if="monsterOf(ref)" :lineage="monsterOf(ref)!.系統" :no="monsterOf(ref)!.no" />
                   {{ ref.name }}
                 </router-link>
                 <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
