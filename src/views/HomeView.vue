@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { NAV_CARDS } from '@/constants/navigation';
+import logoUrl from '@/assets/images/icons/logo/logo.png';
 
 const router = useRouter();
 const searchKeyword = ref('');
@@ -21,10 +22,12 @@ function toggleCard(cardId: string): void {
 <template>
   <div class="max-w-xl mx-auto">
     <div class="text-center my-4">
-      <p class="text-sm text-gray-500">ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP</p>
-      <p class="mt-2 text-sm text-gray-600">
-        モンスター図鑑、耐性・特性検索、スキルと特技のデータ、ビルドシミュレーターをまとめた攻略データベースです。
-      </p>
+      <img
+        :src="logoUrl"
+        alt="ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP"
+        class="mx-auto w-full max-w-[280px] h-auto"
+      />
+      <p class="mt-3 text-sm text-gray-600">イルルカSPの攻略データベース。</p>
     </div>
 
     <!-- サイト内検索（1件なら詳細、複数なら候補一覧へ遷移） -->
@@ -32,9 +35,9 @@ function toggleCard(cardId: string): void {
       <input
         v-model="searchKeyword"
         type="search"
-        placeholder="モンスター・特性・スキル・特技名で検索"
+        placeholder="サイト内を検索"
         class="min-w-0 flex-1 border rounded px-3 py-2"
-        aria-label="モンスター・特性・スキル・特技名で検索"
+        aria-label="サイト内を検索"
       />
       <button type="submit" class="btn-primary">検索</button>
     </form>
