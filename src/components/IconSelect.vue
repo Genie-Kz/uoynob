@@ -20,6 +20,8 @@ const open = ref(false);
 const selected = computed(
   () => props.options.find((option) => option.value === modelValue.value) ?? props.options[0],
 );
+/** いずれかの選択肢にアイコンがある場合のみ、無アイコンの選択肢に位置合わせの余白を出す */
+const hasAnyIcon = computed(() => props.options.some((option) => option.icon));
 
 function choose(value: string): void {
   modelValue.value = value;
@@ -65,7 +67,7 @@ function choose(value: string): void {
               alt=""
               class="inline-block size-5 max-w-none object-contain shrink-0"
             />
-            <span v-else class="inline-block size-5 shrink-0"></span>
+            <span v-else-if="hasAnyIcon" class="inline-block size-5 shrink-0"></span>
             <span>{{ option.label }}</span>
           </button>
         </li>

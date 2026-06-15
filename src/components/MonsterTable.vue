@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { Monster, MonsterRank } from '@/types/monster';
+import type { Monster } from '@/types/monster';
 import { LINEAGE_BY_NAME, MONSTER_RANKS, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { LINEAGE_ICON, LINEAGE_LABEL } from '@/constants/lineageIcons';
 import { includesKeywordWithReading } from '@/domain/textSearch';
@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const keyword = ref('');
 const selectedLineage = ref('');
-const selectedRank = ref<MonsterRank | ''>('');
+const selectedRank = ref('');
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 const lineageOptions = [
   { value: '', label: '全系統' },
@@ -27,6 +27,10 @@ const lineageOptions = [
     label: info.label,
     icon: LINEAGE_ICON[value],
   })),
+];
+const rankOptions = [
+  { value: '', label: '全ランク' },
+  ...MONSTER_RANKS.map((rank) => ({ value: rank, label: rank })),
 ];
 
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
@@ -55,14 +59,14 @@ const visibleMonsters = computed(() => {
           v-model="selectedLineage"
           :options="lineageOptions"
           aria-label="系統で絞り込み"
-          class="w-32"
+          class="w-36"
         />
-        <select v-model="selectedRank" class="w-24 border rounded px-2 py-2" aria-label="ランクで絞り込み">
-          <option value="">全ランク</option>
-          <option v-for="rank in MONSTER_RANKS" :key="rank" :value="rank">
-            {{ rank }}
-          </option>
-        </select>
+        <IconSelect
+          v-model="selectedRank"
+          :options="rankOptions"
+          aria-label="ランクで絞り込み"
+          class="w-28"
+        />
       </div>
       <input
         v-model="keyword"
