@@ -81,7 +81,7 @@ const visibleMonsters = computed(() => {
         </thead>
         <tbody>
           <tr v-for="monster in visibleMonsters" :key="monster.id" class="border-b hover:bg-gray-50">
-            <td class="px-2 py-1 border whitespace-nowrap">
+            <td class="px-3 py-2 border whitespace-nowrap">
               <MonsterIcon :lineage="monster.系統" :no="monster.no" />
               <router-link
                 :to="{ name: linkRouteName, params: { id: monster.id } }"
@@ -90,13 +90,13 @@ const visibleMonsters = computed(() => {
                 {{ monster.no }}
               </router-link>
             </td>
-            <td class="px-2 py-1 border">
+            <td class="px-3 py-2 border">
               <router-link :to="{ name: linkRouteName, params: { id: monster.id } }" class="app-link">
                 {{ monster.名前 }}
               </router-link>
             </td>
-            <td class="px-2 py-1 border">{{ monster.ランク }}</td>
-            <td class="px-2 py-1 border">
+            <td class="px-3 py-2 border">{{ monster.ランク }}</td>
+            <td class="px-3 py-2 border">
               <img
                 v-if="LINEAGE_ICON[monster.系統]"
                 :src="LINEAGE_ICON[monster.系統]"
@@ -106,7 +106,7 @@ const visibleMonsters = computed(() => {
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
             </td>
-            <td class="px-2 py-1 border text-center">
+            <td class="px-3 py-2 border text-center">
               <BodySizeIcon :size="monster.サイズ特性" />
             </td>
           </tr>

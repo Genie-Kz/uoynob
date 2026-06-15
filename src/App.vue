@@ -8,6 +8,7 @@ import { DEFAULT_DESCRIPTION, usePageSeo } from '@/composables/usePageSeo';
 
 const route = useRoute();
 const isHome = computed(() => route.name === 'home');
+const useComfortableContent = computed(() => route.name !== 'home' && route.name !== 'simulator-build');
 const pageTitle = computed(() => (typeof route.meta.title === 'string' ? route.meta.title : null));
 const pageDescription = computed(() =>
   typeof route.meta.description === 'string' ? route.meta.description : DEFAULT_DESCRIPTION,
@@ -18,16 +19,19 @@ usePageSeo(pageTitle, pageDescription);
 
 <template>
   <AppHeader />
-  <main class="max-w-7xl mx-auto px-3">
+  <main class="max-w-[1536px] mx-auto px-3">
     <router-view v-slot="{ Component, route }">
-      <div :class="{ 'xl:grid xl:grid-cols-[16rem_minmax(0,1fr)] xl:gap-6': !isHome }">
+      <div :class="{ 'xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] xl:gap-6': !isHome }">
         <aside v-if="!isHome" class="hidden xl:block">
           <div class="sticky top-3">
             <SiteNavigation />
           </div>
         </aside>
 
-        <div class="min-w-0">
+        <div
+          class="min-w-0"
+          :class="{ 'px-1 py-2 sm:px-3 lg:px-4': useComfortableContent }"
+        >
           <transition name="route-fade" mode="out-in">
             <component :is="Component" :key="route.path" />
           </transition>

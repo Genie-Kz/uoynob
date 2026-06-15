@@ -46,6 +46,12 @@
   }
 }
 
+@media (min-width: 1024px) {
+  html {
+    font-size: 18px;
+  }
+}
+
 @layer components {
   .app-link {
     /* ホバー（PC）に加え、タップ中（:active）でも下線を表示してタッチ端末でも分かるように */

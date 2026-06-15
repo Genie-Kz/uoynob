@@ -158,13 +158,13 @@ const statRows = computed(() => {
         <table class="w-full text-sm border-collapse mb-4">
           <tbody>
             <tr v-for="row in traitRows" :key="row.label" class="border-b">
-              <th class="text-left bg-gray-50 border px-2 py-1 w-1/4 align-top">
+              <th class="text-left bg-gray-50 border px-3 py-2 w-1/4 align-top">
                 <span class="inline-flex items-center gap-1">
                   <img v-if="row.icon" :src="row.icon" :alt="row.label" class="w-5 h-5" />
                   <span v-else>{{ row.label }}</span>
                 </span>
               </th>
-              <td class="border px-2 py-1 align-top">
+              <td class="border px-3 py-2 align-top">
                 <template v-if="row.values.length">
                   <div v-for="name in row.values" :key="name">
                     <router-link v-if="traitRoute(name)" :to="traitRoute(name)!" class="app-link">{{ name }}</router-link>

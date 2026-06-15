@@ -68,14 +68,14 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
           </thead>
           <tbody>
             <tr v-for="skill in visibleSkills" :key="skill.id" class="border-b hover:bg-gray-50">
-              <td class="px-2 py-1 border whitespace-nowrap">{{ skill.id }}</td>
-              <td class="px-2 py-1 border">
+              <td class="px-3 py-2 border whitespace-nowrap">{{ skill.id }}</td>
+              <td class="px-3 py-2 border">
                 <router-link :to="{ name: 'skill-detail', params: { id: skill.id } }" class="app-link">
                   {{ skill.name }}
                 </router-link>
               </td>
-              <td class="px-2 py-1 border whitespace-nowrap">{{ skill.category }}</td>
-              <td class="px-2 py-1 border">
+              <td class="px-3 py-2 border whitespace-nowrap">{{ skill.category }}</td>
+              <td class="px-3 py-2 border">
                 <span
                   v-for="badge in guardBadges(skill)"
                   :key="badge.element"
