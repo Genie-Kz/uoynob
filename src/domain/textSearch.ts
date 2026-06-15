@@ -17,7 +17,9 @@ function katakanaToHiragana(text: string): string {
  * さらにカタカナをひらがなに畳み、大文字小文字も無視する。
  */
 export function normalizeForSearch(text: string): string {
-  return katakanaToHiragana(text.normalize('NFKC')).toLowerCase();
+  return katakanaToHiragana(text.normalize('NFKC'))
+    .replace(/・/g, '')
+    .toLowerCase();
 }
 
 /** target が keyword を（全角・半角・大文字小文字を問わず）含むか */

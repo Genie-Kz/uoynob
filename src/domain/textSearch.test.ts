@@ -21,6 +21,10 @@ describe('normalizeForSearch', () => {
   it('大文字小文字を無視する', () => {
     expect(normalizeForSearch('Slime')).toBe('slime');
   });
+
+  it('中黒を無視する', () => {
+    expect(normalizeForSearch('マジェス・ドレアム')).toBe('まじぇすどれあむ');
+  });
 });
 
 describe('includesKeyword', () => {
@@ -46,6 +50,10 @@ describe('includesKeyword', () => {
 
   it('含まれない場合は false', () => {
     expect(includesKeyword('スライム', 'ドラゴン')).toBe(false);
+  });
+
+  it('中黒を省略した検索語でもヒットする', () => {
+    expect(includesKeyword('マジェス・ドレアム', 'マジェスドレアム')).toBe(true);
   });
 });
 
