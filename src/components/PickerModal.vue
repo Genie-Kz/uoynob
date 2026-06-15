@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
 import { includesKeyword } from '@/domain/textSearch';
 
@@ -19,15 +19,26 @@ const emit = defineEmits<{
 const keyword = ref('');
 /** 反転表示中の値。null は未選択。 */
 const selectedValue = ref<string | null>(null);
+const panelEl = ref<HTMLElement | null>(null);
+/**
+ * 開いた時点の高さを固定する。検索で候補数が変わってもモーダルの高さを動かさないため。
+ * 開いた直後の高さ＝（全候補の内容に応じた高さ、上限 max-h-[80vh]）なので、
+ * 候補が少ないモーダルは小さく、多いモーダルは上限まで、で安定する。
+ */
+const lockedHeight = ref<number | null>(null);
 
-// 開くたびに検索をリセットし、現在値を選択状態にする
+// 開くたびに検索をリセットし、現在値を選択状態にして、その時点の高さを固定する
 watch(
   () => props.open,
-  (isOpen) => {
-    if (isOpen) {
-      keyword.value = '';
-      selectedValue.value = props.current ?? null;
-    }
+  async (isOpen) => {
+    if (!isOpen) return;
+    keyword.value = '';
+    selectedValue.value = props.current ?? null;
+    lockedHeight.value = null;
+    await nextTick();
+    requestAnimationFrame(() => {
+      lockedHeight.value = panelEl.value?.getBoundingClientRect().height ?? null;
+    });
   },
 );
 
@@ -58,14 +69,18 @@ function confirm(): void {
       class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4"
       @click.self="emit('close')"
     >
-      <div class="modal-panel bg-white rounded shadow-lg w-full max-w-2xl mt-10 h-[80vh] flex flex-col">
+      <div
+        ref="panelEl"
+        class="modal-panel bg-white rounded shadow-lg w-full max-w-2xl mt-10 max-h-[80vh] flex flex-col"
+        :style="lockedHeight ? { height: lockedHeight + 'px' } : undefined"
+      >
         <!-- ヘッダー -->
         <div class="border-b px-4 py-2 font-bold">{{ title }}</div>
 
-        <!-- 選択肢（スクロール）。パネルは固定高さで、ここだけがスクロールするので
+        <!-- 選択肢（スクロール）。開いた時点の高さで固定するので、
              検索で件数が変わってもモーダルの高さは変化しない。 -->
         <div class="p-3 overflow-y-auto flex-1 min-h-0">
-          <div class="flex flex-wrap gap-2">
+          <div v-if="filteredItems.length" class="flex flex-wrap gap-2">
             <button
               v-for="item in filteredItems"
               :key="item.value"
@@ -81,6 +96,9 @@ function confirm(): void {
               {{ item.label }}
             </button>
           </div>
+          <p v-else class="text-gray-500 text-sm text-center py-6">
+            「{{ keyword }}」に一致する候補がありません
+          </p>
         </div>
 
         <!-- 検索欄＋操作ボタン（下部。検索欄は閉じる/選択ボタンの上） -->
