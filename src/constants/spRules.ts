@@ -25,6 +25,15 @@ export const CANNOT_BE_SP_TRAITS = new Set<string>([
   'いきなりリバース',
   'いきなりシャッフル',
   'すべての武器装備',
+  'れんぞく',
+  '会心かんぜんガード',
+  'メタルキラー',
+  'にげあし',
+  'しょうひＭＰせつやく',
+  'しょうひＭＰ半分',
+  'スカウト％アップ',
+  'スカウト％アップＳ',
+  'スカウト％アップ＋',
 ]);
 
 export function canBeSp(traitName: string): boolean {
