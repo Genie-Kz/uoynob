@@ -102,7 +102,7 @@ const visibleMonsters = computed(() => {
                 :src="LINEAGE_ICON[monster.系統]"
                 :alt="LINEAGE_LABEL[monster.系統] ?? monster.系統"
                 :title="LINEAGE_LABEL[monster.系統] ?? monster.系統"
-                class="w-6 h-6 inline-block"
+                class="inline-block size-6 max-w-none object-contain align-middle"
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
             </td>
