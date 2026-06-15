@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { canBeSp } from '@/constants/spRules';
-
 defineProps<{
   traits: string[];
   showSp?: boolean;
   spTraits?: string[];
+  spAvailableTraits?: string[];
 }>();
 
 defineEmits<{
@@ -20,7 +19,7 @@ defineEmits<{
         <span>{{ trait }}</span>
         <span v-if="showSp" class="flex items-center gap-2">
           <button
-            v-if="canBeSp(trait)"
+            v-if="spAvailableTraits?.includes(trait)"
             type="button"
             class="rounded border px-3 py-1 text-sm font-semibold"
             :class="spTraits?.includes(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"

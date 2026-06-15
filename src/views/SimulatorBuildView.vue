@@ -13,7 +13,7 @@ import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy'
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
-import { canBeSp } from '@/constants/spRules';
+import { canBeSpFromAttributes } from '@/constants/spRules';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
 import { disadvantageTraits, totalDisadvantageCost } from '@/domain/traitDisadvantage';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
@@ -104,6 +104,11 @@ const unfavorableTraits = computed(() => {
     target.ランク,
     totalDisadvantageCost(traitSlots.value, target.名前),
   );
+});
+const spAvailableTraits = computed(() => {
+  const attributeList = attributes.value ?? [];
+  return [...traitSlots.value, ...skillAddedTraits.value, ...unfavorableTraits.value]
+    .filter((trait) => trait && canBeSpFromAttributes(trait, attributeList));
 });
 
 watch(shareQuery, (query) => {
@@ -314,7 +319,7 @@ const monshouOptions = MONSHOU_LIST;
               </span>
               <span class="flex items-center gap-2">
                 <button
-                  v-if="trait && canBeSp(trait)"
+                  v-if="trait && spAvailableTraits.includes(trait)"
                   type="button"
                   class="rounded border px-3 py-1 text-sm font-semibold"
                   :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
@@ -331,6 +336,7 @@ const monshouOptions = MONSHOU_LIST;
             :traits="unfavorableTraits"
             show-sp
             :sp-traits="spTraitNames"
+            :sp-available-traits="spAvailableTraits"
             @toggle-sp="toggleSp"
           />
 
@@ -343,7 +349,7 @@ const monshouOptions = MONSHOU_LIST;
                 <template v-else>{{ trait }}</template>
               </span>
               <button
-                v-if="canBeSp(trait)"
+                v-if="spAvailableTraits.includes(trait)"
                 type="button"
                 class="rounded border px-3 py-1 text-sm font-semibold"
                 :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
