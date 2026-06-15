@@ -58,12 +58,13 @@ function confirm(): void {
       class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4"
       @click.self="emit('close')"
     >
-      <div class="modal-panel bg-white rounded shadow-lg w-full max-w-2xl mt-10 max-h-[80vh] flex flex-col">
+      <div class="modal-panel bg-white rounded shadow-lg w-full max-w-2xl mt-10 h-[80vh] flex flex-col">
         <!-- ヘッダー -->
         <div class="border-b px-4 py-2 font-bold">{{ title }}</div>
 
-        <!-- 選択肢（スクロール）。選択中は文字色・背景色を反転表示。 -->
-        <div class="p-3 overflow-y-auto flex-1">
+        <!-- 選択肢（スクロール）。パネルは固定高さで、ここだけがスクロールするので
+             検索で件数が変わってもモーダルの高さは変化しない。 -->
+        <div class="p-3 overflow-y-auto flex-1 min-h-0">
           <div class="flex flex-wrap gap-2">
             <button
               v-for="item in filteredItems"
