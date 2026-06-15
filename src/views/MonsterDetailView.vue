@@ -66,26 +66,29 @@ function splitTraits(value: string | undefined | null): string[] {
     .filter(Boolean);
 }
 
-interface TraitRow {
-  /** ラベルをアイコン画像で表すか、テキストで表すか */
+interface TraitItem {
+  /** レベル帯・サイズ帯を表すアイコン（サイズ特性・新生前特性には付かない） */
   icon?: string;
-  label: string;
-  values: string[];
+  name: string;
 }
 
-const traitRows = computed<TraitRow[]>(() => {
+const traitItems = computed<TraitItem[]>(() => {
   const target = monster.value;
   if (!target) return [];
-  return [
-    { label: 'サイズ特性', values: splitTraits(target.サイズ特性) },
-    { label: '新生前特性', values: [target.新生前特性1, target.新生前特性2].flatMap(splitTraits) },
-    { icon: icon25, label: 'Lv25', values: splitTraits(target.特性25) },
-    { icon: icon50, label: 'Lv50', values: splitTraits(target.特性50) },
-    { icon: icon100, label: 'Lv100', values: splitTraits(target.特性100) },
-    { icon: iconMega, label: 'メガ特性', values: splitTraits(target.メガ特性) },
-    { icon: iconGiga, label: 'ギガ特性', values: splitTraits(target.ギガ特性) },
-    { icon: iconSuperGiga, label: '超ギガ特性', values: splitTraits(target.超ギガ特性) },
-  ];
+  const items: TraitItem[] = [];
+  const add = (icon: string | undefined, field: string | undefined | null): void => {
+    for (const name of splitTraits(field)) items.push({ icon, name });
+  };
+  add(undefined, target.サイズ特性);
+  add(undefined, target.新生前特性1);
+  add(undefined, target.新生前特性2);
+  add(icon25, target.特性25);
+  add(icon50, target.特性50);
+  add(icon100, target.特性100);
+  add(iconMega, target.メガ特性);
+  add(iconGiga, target.ギガ特性);
+  add(iconSuperGiga, target.超ギガ特性);
+  return items;
 });
 
 const statRows = computed(() => {
@@ -154,28 +157,24 @@ const statRows = computed(() => {
         </div>
 
         <!-- 特性 -->
-        <h3 class="text-lg font-bold mb-2">特性</h3>
-        <table class="w-full text-sm border-collapse mb-4">
-          <tbody>
-            <tr v-for="row in traitRows" :key="row.label" class="border-b">
-              <th class="text-left bg-gray-50 border px-3 py-2 w-1/4 align-top">
-                <span class="inline-flex items-center gap-1">
-                  <img v-if="row.icon" :src="row.icon" :alt="row.label" class="w-5 h-5" />
-                  <span v-else>{{ row.label }}</span>
+        <div class="border rounded overflow-hidden mb-4">
+          <div class="bg-gray-50 font-bold px-3 py-2 border-b">特性</div>
+          <div class="px-2 py-2">
+            <template v-for="(item, index) in traitItems" :key="index">
+              <div class="flex items-center gap-7 py-2">
+                <span class="w-10 shrink-0 flex justify-center">
+                  <img v-if="item.icon" :src="item.icon" alt="" class="size-5 max-w-none object-contain" />
                 </span>
-              </th>
-              <td class="border px-3 py-2 align-top">
-                <template v-if="row.values.length">
-                  <div v-for="name in row.values" :key="name">
-                    <router-link v-if="traitRoute(name)" :to="traitRoute(name)!" class="app-link">{{ name }}</router-link>
-                    <template v-else>{{ name }}</template>
-                  </div>
-                </template>
-                <span v-else class="text-gray-400">-</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <span class="text-sm">
+                  <router-link v-if="traitRoute(item.name)" :to="traitRoute(item.name)!" class="app-link">{{ item.name }}</router-link>
+                  <template v-else>{{ item.name }}</template>
+                </span>
+              </div>
+              <hr v-if="index < traitItems.length - 1" class="my-1 border-gray-200" />
+            </template>
+            <p v-if="!traitItems.length" class="py-2 text-sm text-gray-400">-</p>
+          </div>
+        </div>
 
         <DisadvantageTraits :traits="unfavorableTraits" />
 
