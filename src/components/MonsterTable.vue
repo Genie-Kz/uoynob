@@ -44,25 +44,27 @@ const visibleMonsters = computed(() => {
 
 <template>
   <div>
-    <div class="flex flex-wrap gap-2 mb-3">
+    <div class="mb-3">
+      <div class="flex justify-end gap-2 mb-2">
+        <select v-model="selectedLineage" class="w-28 border rounded px-2 py-2" aria-label="系統で絞り込み">
+          <option value="">全系統</option>
+          <option v-for="option in lineageOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+        <select v-model="selectedRank" class="w-24 border rounded px-2 py-2" aria-label="ランクで絞り込み">
+          <option value="">全ランク</option>
+          <option v-for="rank in MONSTER_RANKS" :key="rank" :value="rank">
+            {{ rank }}
+          </option>
+        </select>
+      </div>
       <input
         v-model="keyword"
         type="text"
-        class="min-w-64 flex-1 border rounded px-3 py-2"
+        class="w-full border rounded px-3 py-2"
         placeholder="モンスター名で絞り込み"
       />
-      <select v-model="selectedLineage" class="w-28 border rounded px-2 py-2" aria-label="系統で絞り込み">
-        <option value="">全系統</option>
-        <option v-for="option in lineageOptions" :key="option.value" :value="option.value">
-          {{ option.label }}
-        </option>
-      </select>
-      <select v-model="selectedRank" class="w-24 border rounded px-2 py-2" aria-label="ランクで絞り込み">
-        <option value="">全ランク</option>
-        <option v-for="rank in MONSTER_RANKS" :key="rank" :value="rank">
-          {{ rank }}
-        </option>
-      </select>
     </div>
     <p class="text-sm text-gray-500 mb-2">{{ visibleMonsters.length }} 体</p>
 
