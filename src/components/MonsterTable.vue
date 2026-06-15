@@ -7,6 +7,7 @@ import { includesKeywordWithReading } from '@/domain/textSearch';
 import { loadSearchReadings } from '@/api/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 import BodySizeIcon from './BodySizeIcon.vue';
+import IconSelect from './IconSelect.vue';
 import MonsterIcon from './MonsterIcon.vue';
 
 const props = defineProps<{
@@ -19,10 +20,14 @@ const keyword = ref('');
 const selectedLineage = ref('');
 const selectedRank = ref<MonsterRank | ''>('');
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
-const lineageOptions = Object.entries(LINEAGE_BY_NAME).map(([value, info]) => ({
-  value,
-  label: info.label,
-}));
+const lineageOptions = [
+  { value: '', label: '全系統' },
+  ...Object.entries(LINEAGE_BY_NAME).map(([value, info]) => ({
+    value,
+    label: info.label,
+    icon: LINEAGE_ICON[value],
+  })),
+];
 
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
 const sortedMonsters = computed(() =>
@@ -46,12 +51,12 @@ const visibleMonsters = computed(() => {
   <div>
     <div class="mb-3">
       <div class="flex justify-end gap-2 mb-2">
-        <select v-model="selectedLineage" class="w-28 border rounded px-2 py-2" aria-label="系統で絞り込み">
-          <option value="">全系統</option>
-          <option v-for="option in lineageOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+        <IconSelect
+          v-model="selectedLineage"
+          :options="lineageOptions"
+          aria-label="系統で絞り込み"
+          class="w-32"
+        />
         <select v-model="selectedRank" class="w-24 border rounded px-2 py-2" aria-label="ランクで絞り込み">
           <option value="">全ランク</option>
           <option v-for="rank in MONSTER_RANKS" :key="rank" :value="rank">
