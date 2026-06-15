@@ -3,7 +3,9 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAbilities } from '@/composables/useAbilities';
 import { ABILITY_CATEGORY_BY_SLUG } from '@/constants/categories';
-import { includesKeyword } from '@/domain/textSearch';
+import { includesKeywordWithReading } from '@/domain/textSearch';
+import { loadSearchReadings } from '@/api/datasets';
+import { useAsyncData } from '@/composables/useAsyncData';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -15,12 +17,16 @@ const categoryName = computed(() =>
 );
 
 const keyword = ref('');
+const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 const visibleAbilities = computed(() => {
   let list = [...(abilities.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   if (categoryName.value) list = list.filter((ability) => ability.category === categoryName.value);
   const query = keyword.value.trim();
-  if (query) list = list.filter((ability) => includesKeyword(ability.name, query));
+  if (query) {
+    list = list.filter((ability) =>
+      includesKeywordWithReading(ability.name, query, searchReadings.value?.labels));
+  }
   return list;
 });
 

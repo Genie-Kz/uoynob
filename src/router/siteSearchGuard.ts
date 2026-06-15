@@ -1,5 +1,11 @@
 import type { NavigationGuard, RouteLocationRaw } from 'vue-router';
-import { loadAbilities, loadAttributes, loadMonsters, loadSkills } from '@/api/datasets';
+import {
+  loadAbilities,
+  loadAttributes,
+  loadMonsters,
+  loadSearchReadings,
+  loadSkills,
+} from '@/api/datasets';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 
 export function routeForSiteSearchHit(hit: SiteSearchHit): RouteLocationRaw {
@@ -20,13 +26,14 @@ export const redirectSingleSiteSearchResult: NavigationGuard = async (to) => {
   if (!keyword) return true;
 
   try {
-    const [monsters, attributes, skills, abilities] = await Promise.all([
+    const [monsters, attributes, skills, abilities, readings] = await Promise.all([
       loadMonsters(),
       loadAttributes(),
       loadSkills(),
       loadAbilities(),
+      loadSearchReadings(),
     ]);
-    const hits = searchSite({ monsters, attributes, skills, abilities }, keyword);
+    const hits = searchSite({ monsters, attributes, skills, abilities }, keyword, readings);
     return hits.length === 1 ? routeForSiteSearchHit(hits[0]) : true;
   } catch {
     // 読み込みエラーは検索結果画面のDataStateで表示する。

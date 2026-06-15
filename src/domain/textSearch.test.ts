@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { includesKeyword, normalizeForSearch } from './textSearch';
+import { includesKeyword, includesKeywordWithReading, normalizeForSearch } from './textSearch';
 
 describe('normalizeForSearch', () => {
   it('全角英数を半角に揃える', () => {
@@ -46,5 +46,13 @@ describe('includesKeyword', () => {
 
   it('含まれない場合は false', () => {
     expect(includesKeyword('スライム', 'ドラゴン')).toBe(false);
+  });
+});
+
+describe('includesKeywordWithReading', () => {
+  it('漢字の読みでヒットする', () => {
+    expect(includesKeywordWithReading('超ギガボディ', 'ちょう', {
+      超ギガボディ: 'ちょうギガボディ',
+    })).toBe(true);
   });
 });

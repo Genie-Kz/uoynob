@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
-import { loadAttributes } from '@/api/datasets';
+import { loadAttributes, loadSearchReadings } from '@/api/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useAbilities } from '@/composables/useAbilities';
 import { useMonsters } from '@/composables/useMonsters';
@@ -21,6 +21,11 @@ const {
   isLoading: attributesLoading,
   errorMessage: attributesError,
 } = useAsyncData(loadAttributes);
+const {
+  data: searchReadings,
+  isLoading: searchReadingsLoading,
+  errorMessage: searchReadingsError,
+} = useAsyncData(loadSearchReadings);
 
 const keyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''));
 const inputKeyword = ref(keyword.value);
@@ -29,14 +34,16 @@ const isLoading = computed(
     monstersLoading.value ||
     skillsLoading.value ||
     abilitiesLoading.value ||
-    attributesLoading.value,
+    attributesLoading.value ||
+    searchReadingsLoading.value,
 );
 const errorMessage = computed(
   () =>
     monstersError.value ??
     skillsError.value ??
     abilitiesError.value ??
-    attributesError.value,
+    attributesError.value ??
+    searchReadingsError.value,
 );
 const results = computed(() =>
   searchSite(
@@ -47,6 +54,7 @@ const results = computed(() =>
       abilities: abilities.value ?? [],
     },
     keyword.value,
+    searchReadings.value ?? undefined,
   ),
 );
 

@@ -4,7 +4,9 @@ import { useRoute } from 'vue-router';
 import type { Skill, SkillCategory } from '@/types/skill';
 import { useSkills } from '@/composables/useSkills';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
-import { includesKeyword } from '@/domain/textSearch';
+import { includesKeywordWithReading } from '@/domain/textSearch';
+import { loadSearchReadings } from '@/api/datasets';
+import { useAsyncData } from '@/composables/useAsyncData';
 import DataState from '@/components/DataState.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -20,12 +22,16 @@ const categorySlug = computed(() => (typeof route.query.category === 'string' ? 
 const categoryName = computed<SkillCategory | null>(() => CATEGORY_BY_SLUG[categorySlug.value] ?? null);
 
 const keyword = ref('');
+const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 const visibleSkills = computed(() => {
   let list = [...(skills.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   if (categoryName.value) list = list.filter((skill) => skill.category === categoryName.value);
   const query = keyword.value.trim();
-  if (query) list = list.filter((skill) => includesKeyword(skill.name, query));
+  if (query) {
+    list = list.filter((skill) =>
+      includesKeywordWithReading(skill.name, query, searchReadings.value?.labels));
+  }
   return list;
 });
 

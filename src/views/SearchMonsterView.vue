@@ -5,12 +5,15 @@ import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
-import { includesKeyword } from '@/domain/textSearch';
+import { includesKeywordWithReading } from '@/domain/textSearch';
+import { loadSearchReadings } from '@/api/datasets';
+import { useAsyncData } from '@/composables/useAsyncData';
 import DataState from '@/components/DataState.vue';
 import MonsterTable from '@/components/MonsterTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
+const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 // 各耐性の閾値（「○○↑＝その段階以上」）の選択肢
 const THRESHOLD_OPTIONS = [
@@ -42,7 +45,10 @@ const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const visibleTraitNames = computed(() => {
   const keyword = traitKeyword.value.trim();
-  return keyword ? allTraitNames.value.filter((name) => includesKeyword(name, keyword)) : allTraitNames.value;
+  return keyword
+    ? allTraitNames.value.filter((name) =>
+        includesKeywordWithReading(name, keyword, searchReadings.value?.labels))
+    : allTraitNames.value;
 });
 
 const thresholds = computed<ResistanceThreshold[]>(() =>

@@ -48,6 +48,19 @@ describe('searchSite', () => {
     ]);
   });
 
+  it('名前の読みでも検索できる', () => {
+    const readings = {
+      monster: { '002-1': 'ちょうドラゴン' },
+      attribute: {},
+      skill: {},
+      ability: {},
+      labels: {},
+    };
+    expect(searchSite(data, 'ちょう', readings)).toEqual([
+      { kind: 'monster', kindLabel: 'モンスター', id: '002-1', label: 'ドラゴン' },
+    ]);
+  });
+
   it('空白だけの検索語では候補を返さない', () => {
     expect(searchSite(data, '   ')).toEqual([]);
   });

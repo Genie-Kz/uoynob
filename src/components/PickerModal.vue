@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
-import { includesKeyword } from '@/domain/textSearch';
+import { includesKeywordWithReading } from '@/domain/textSearch';
+import { loadSearchReadings } from '@/api/datasets';
+import { useAsyncData } from '@/composables/useAsyncData';
 
 const props = defineProps<{
   open: boolean;
@@ -17,6 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const keyword = ref('');
+const { data: searchReadings } = useAsyncData(loadSearchReadings);
 /** 反転表示中の値。null は未選択。 */
 const selectedValue = ref<string | null>(null);
 const panelEl = ref<HTMLElement | null>(null);
@@ -47,8 +50,10 @@ const filteredItems = computed(() => {
   if (!query) return props.items;
   return props.items.filter(
     (item) =>
-      includesKeyword(item.label, query) ||
-      (item.searchText ? includesKeyword(item.searchText, query) : false),
+      includesKeywordWithReading(item.label, query, searchReadings.value?.labels) ||
+      (item.searchText
+        ? includesKeywordWithReading(item.searchText, query, searchReadings.value?.labels)
+        : false),
   );
 });
 

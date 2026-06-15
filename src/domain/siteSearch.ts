@@ -20,14 +20,36 @@ export interface SiteSearchData {
   abilities: Ability[];
 }
 
+export interface SiteSearchReadings {
+  monster: Record<string, string>;
+  attribute: Record<string, string>;
+  skill: Record<string, string>;
+  ability: Record<string, string>;
+  labels: Record<string, string>;
+}
+
+function matches(
+  kind: SiteSearchKind,
+  id: string,
+  label: string,
+  query: string,
+  readings?: SiteSearchReadings,
+): boolean {
+  return includesKeyword(label, query) || includesKeyword(readings?.[kind]?.[id] ?? '', query);
+}
+
 /** サイト内検索の候補を、ページ種類が分かる情報付きで返す。 */
-export function searchSite(data: SiteSearchData, keyword: string): SiteSearchHit[] {
+export function searchSite(
+  data: SiteSearchData,
+  keyword: string,
+  readings?: SiteSearchReadings,
+): SiteSearchHit[] {
   const query = keyword.trim();
   if (!query) return [];
 
   return [
     ...data.monsters
-      .filter((monster) => includesKeyword(monster.名前, query))
+      .filter((monster) => matches('monster', monster.id, monster.名前, query, readings))
       .map((monster) => ({
         kind: 'monster' as const,
         kindLabel: 'モンスター',
@@ -35,7 +57,7 @@ export function searchSite(data: SiteSearchData, keyword: string): SiteSearchHit
         label: monster.名前,
       })),
     ...data.attributes
-      .filter((attribute) => includesKeyword(attribute.name, query))
+      .filter((attribute) => matches('attribute', attribute.id, attribute.name, query, readings))
       .map((attribute) => ({
         kind: 'attribute' as const,
         kindLabel: '特性',
@@ -43,7 +65,7 @@ export function searchSite(data: SiteSearchData, keyword: string): SiteSearchHit
         label: attribute.name,
       })),
     ...data.skills
-      .filter((skill) => includesKeyword(skill.name, query))
+      .filter((skill) => matches('skill', skill.id, skill.name, query, readings))
       .map((skill) => ({
         kind: 'skill' as const,
         kindLabel: 'スキル',
@@ -51,7 +73,7 @@ export function searchSite(data: SiteSearchData, keyword: string): SiteSearchHit
         label: skill.name,
       })),
     ...data.abilities
-      .filter((ability) => includesKeyword(ability.name, query))
+      .filter((ability) => matches('ability', ability.id, ability.name, query, readings))
       .map((ability) => ({
         kind: 'ability' as const,
         kindLabel: '特技',

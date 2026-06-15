@@ -24,3 +24,23 @@ export function normalizeForSearch(text: string): string {
 export function includesKeyword(target: string, keyword: string): boolean {
   return normalizeForSearch(target).includes(normalizeForSearch(keyword));
 }
+
+export function readingForText(text: string, readings?: Record<string, string>): string {
+  if (!readings) return '';
+  const direct = readings[text.normalize('NFKC')];
+  if (direct) return direct;
+  return text
+    .split(/\s+/)
+    .map((part) => readings[part.normalize('NFKC')] ?? '')
+    .filter(Boolean)
+    .join(' ');
+}
+
+/** 表記そのもの、または静的に生成した読みのどちらかに検索語が含まれるか。 */
+export function includesKeywordWithReading(
+  target: string,
+  keyword: string,
+  readings?: Record<string, string>,
+): boolean {
+  return includesKeyword(target, keyword) || includesKeyword(readingForText(target, readings), keyword);
+}
