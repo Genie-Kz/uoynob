@@ -34,7 +34,11 @@ watch(
 const filteredItems = computed(() => {
   const query = keyword.value.trim();
   if (!query) return props.items;
-  return props.items.filter((item) => includesKeyword(item.label, query));
+  return props.items.filter(
+    (item) =>
+      includesKeyword(item.label, query) ||
+      (item.searchText ? includesKeyword(item.searchText, query) : false),
+  );
 });
 
 function selectItem(value: string): void {

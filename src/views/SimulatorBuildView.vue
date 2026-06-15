@@ -6,6 +6,7 @@ import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/composables/useBuildSimulator';
+import { useTraitLink } from '@/composables/useTraitLink';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { loadAttributes, loadWeapons } from '@/api/datasets';
 import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
@@ -35,6 +36,7 @@ const router = useRouter();
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 const { data: weapons } = useAsyncData(loadWeapons);
+const { traitRoute } = useTraitLink();
 const { data: attributes } = useAsyncData(loadAttributes);
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
@@ -183,7 +185,11 @@ function openSkillPicker(index: number): void {
     title: 'スキルを選択',
     items: [
       { label: '（空きにする）', value: '' },
-      ...(skills.value ?? []).map((skill) => ({ label: skill.name, value: skill.id })),
+      ...(skills.value ?? []).map((skill) => ({
+        label: skill.name,
+        value: skill.id,
+        searchText: skill.composition.map((part) => part.name).join(' '),
+      })),
     ],
     current: skillSlots.value[index]?.id ?? '',
   };
@@ -302,7 +308,10 @@ const monshouOptions = MONSHOU_LIST;
               <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
             </li>
             <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between gap-2 px-3 py-2">
-              <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
+              <span :class="{ 'text-gray-400': !trait }">
+                <router-link v-if="trait && traitRoute(trait)" :to="traitRoute(trait)!" class="app-link">{{ trait }}</router-link>
+                <template v-else>{{ trait || '（空き）' }}</template>
+              </span>
               <span class="flex items-center gap-2">
                 <button
                   v-if="trait && canBeSp(trait)"
@@ -329,7 +338,10 @@ const monshouOptions = MONSHOU_LIST;
           <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
           <ul class="border rounded divide-y mb-5">
             <li v-for="trait in skillAddedTraits" :key="trait" class="flex items-center justify-between gap-2 px-3 py-2">
-              <span>{{ trait }}</span>
+              <span>
+                <router-link v-if="traitRoute(trait)" :to="traitRoute(trait)!" class="app-link">{{ trait }}</router-link>
+                <template v-else>{{ trait }}</template>
+              </span>
               <button
                 v-if="canBeSp(trait)"
                 type="button"

@@ -6,6 +6,7 @@ import { usePageSeo } from '@/composables/usePageSeo';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { defaultEditableTraits, equippableWeaponsOf } from '@/domain/monster';
 import { skillsForMonster } from '@/domain/skillLookup';
+import { useTraitLink } from '@/composables/useTraitLink';
 import { computeBuildResistances, defaultBuildConfiguration } from '@/domain/buildSimulator';
 import { disadvantageTraits, totalDisadvantageCost } from '@/domain/traitDisadvantage';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
@@ -26,6 +27,7 @@ const props = defineProps<{ id: string }>();
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
+const { traitRoute } = useTraitLink();
 
 const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
 const breadcrumbItems = computed(() => [
@@ -164,7 +166,10 @@ const statRows = computed(() => {
               </th>
               <td class="border px-2 py-1 align-top">
                 <template v-if="row.values.length">
-                  <div v-for="name in row.values" :key="name">{{ name }}</div>
+                  <div v-for="name in row.values" :key="name">
+                    <router-link v-if="traitRoute(name)" :to="traitRoute(name)!" class="app-link">{{ name }}</router-link>
+                    <template v-else>{{ name }}</template>
+                  </div>
                 </template>
                 <span v-else class="text-gray-400">-</span>
               </td>
