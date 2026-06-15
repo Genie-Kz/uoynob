@@ -1,21 +1,25 @@
-import { toValue, watchEffect, type MaybeRefOrGetter } from 'vue';
+import { toValue, watchEffect, type MaybeRefOrGetter } from "vue";
 
-const SITE_NAME = 'Re:凡庸な イルルカSP';
+const SITE_NAME = "Re:凡庸な イルルカSP";
 export const DEFAULT_DESCRIPTION =
-  'ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SPの攻略データベース。モンスター図鑑、耐性・特性検索、スキル、ビルドシミュレーターを収録。';
+  "ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SPの攻略データベース。モンスター図鑑、耐性・特性検索、スキル、ビルドシミュレーターを収録。";
 
 function setMeta(selector: string, content: string): void {
-  document.querySelector<HTMLMetaElement>(selector)?.setAttribute('content', content);
+  document
+    .querySelector<HTMLMetaElement>(selector)
+    ?.setAttribute("content", content);
 }
 
 /** ページ内容に合わせてtitle・description・SNS向けメタ情報を更新する。 */
 export function usePageSeo(
   pageTitle: MaybeRefOrGetter<string | null | undefined>,
-  description: MaybeRefOrGetter<string | null | undefined> = DEFAULT_DESCRIPTION,
+  description: MaybeRefOrGetter<
+    string | null | undefined
+  > = DEFAULT_DESCRIPTION,
 ): void {
   watchEffect(() => {
     const title = toValue(pageTitle)?.trim();
-    const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME}（再現版）`;
+    const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME}`;
     const pageDescription = toValue(description)?.trim() || DEFAULT_DESCRIPTION;
 
     document.title = fullTitle;
