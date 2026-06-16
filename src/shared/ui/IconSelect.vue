@@ -134,7 +134,7 @@ watch(activeIndex, async (index) => {
             class="inline-block size-5 max-w-none object-contain shrink-0"
           />
         </slot>
-        <span class="truncate">{{ selected?.label || ' ' }}</span>
+        <span class="truncate">{{ selected?.label || ' ' }}</span>
       </span>
       <span class="text-xs text-gray-500 shrink-0" aria-hidden="true">▼</span>
     </button>
@@ -154,7 +154,7 @@ watch(activeIndex, async (index) => {
           :key="String(option.value)"
           role="option"
           :aria-selected="option.value === modelValue"
-          class="flex items-center gap-2 px-3 py-1.5 text-left text-sm cursor-pointer"
+          class="flex min-h-8 items-center gap-2 px-3 py-1.5 text-left text-sm cursor-pointer"
           :class="{
             'bg-blue-50': option.value === modelValue,
             'bg-gray-100': index === activeIndex,
@@ -173,7 +173,7 @@ watch(activeIndex, async (index) => {
             />
             <span v-else-if="hasAnyIcon" class="inline-block size-5 shrink-0"></span>
           </slot>
-          <span>{{ option.label || ' ' }}</span>
+          <span>{{ option.label || ' ' }}</span>
         </li>
       </ul>
     </template>
