@@ -1,5 +1,5 @@
 /** スキル一覧を読み込むコンポーザブル */
-import { loadSkills } from '@/api/datasets';
+import { loadSkills } from '@/shared/data/datasets';
 import { useAsyncData } from './useAsyncData';
 
 export function useSkills() {

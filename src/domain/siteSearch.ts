@@ -2,7 +2,7 @@ import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
 import type { Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
-import { includesKeyword } from './textSearch';
+import { includesKeyword } from '@/shared/search/textSearch';
 
 export type SiteSearchKind = 'monster' | 'attribute' | 'skill' | 'ability';
 

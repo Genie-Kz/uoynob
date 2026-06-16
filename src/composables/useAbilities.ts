@@ -1,5 +1,5 @@
 /** 特技一覧を読み込むコンポーザブル */
-import { loadAbilities } from '@/api/datasets';
+import { loadAbilities } from '@/shared/data/datasets';
 import { useAsyncData } from './useAsyncData';
 
 export function useAbilities() {

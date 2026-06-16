@@ -2,12 +2,12 @@
 import { computed, ref } from 'vue';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS, INDIVIDUAL_VALUE_RANGE } from '@/constants/statsRules';
-import { LINEAGE_ICON, LINEAGE_LABEL, STAT_LINEAGES } from '@/constants/lineageIcons';
+import { LINEAGE_ICON, LINEAGE_LABEL, STAT_LINEAGES } from '@/shared/icons/lineageIcons';
 import {
   INDIVIDUAL_VALUE_TEMPLATES,
   individualValuesFromTemplate,
 } from '@/domain/individualValueTemplate';
-import PickerModal from './PickerModal.vue';
+import PickerModal from '@/shared/ui/PickerModal.vue';
 
 const props = defineProps<{
   familyTree: (string | null)[];

@@ -6,12 +6,12 @@ import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { usePageSeo } from '@/composables/usePageSeo';
-import { loadPickups } from '@/api/datasets';
+import { loadPickups } from '@/shared/data/datasets';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import { groupPickupSkills } from '@/domain/pickupGrouping';
-import DataState from '@/components/DataState.vue';
-import MonsterIcon from '@/components/MonsterIcon.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const props = defineProps<{ pickupKey: string }>();
 

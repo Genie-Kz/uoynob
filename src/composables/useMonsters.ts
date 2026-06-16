@@ -1,5 +1,5 @@
 /** モンスター一覧を読み込むコンポーザブル */
-import { loadMonsters } from '@/api/datasets';
+import { loadMonsters } from '@/shared/data/datasets';
 import { useAsyncData } from './useAsyncData';
 
 export function useMonsters() {

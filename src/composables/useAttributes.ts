@@ -1,5 +1,5 @@
 /** 特性一覧を読み込むコンポーザブル */
-import { loadAttributes } from '@/api/datasets';
+import { loadAttributes } from '@/shared/data/datasets';
 import { useAsyncData } from './useAsyncData';
 
 export function useAttributes() {

@@ -5,7 +5,7 @@ import {
   loadMonsters,
   loadSearchReadings,
   loadSkills,
-} from '@/api/datasets';
+} from '@/shared/data/datasets';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 
 export function routeForSiteSearchHit(hit: SiteSearchHit): RouteLocationRaw {

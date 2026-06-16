@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
-import { includesKeywordWithReading } from '@/domain/textSearch';
-import { loadSearchReadings } from '@/api/datasets';
+import { includesKeywordWithReading } from '@/shared/search/textSearch';
+import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 
 const props = defineProps<{

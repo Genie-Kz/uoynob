@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { BodySize } from '@/types/monster';
-import { BODY_SIZE_ICON } from '@/constants/bodySizeIcons';
+import { BODY_SIZE_ICON } from '@/shared/icons/bodySizeIcons';
 
 const props = defineProps<{
   size: BodySize;

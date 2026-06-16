@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { useAbilities } from '@/composables/useAbilities';
 import { usePageSeo } from '@/composables/usePageSeo';
-import DataState from '@/components/DataState.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const props = defineProps<{ id: string }>();
 

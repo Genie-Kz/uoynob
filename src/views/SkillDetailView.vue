@@ -5,8 +5,8 @@ import { useMonsters } from '@/composables/useMonsters';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { guardAbilityToElement } from '@/domain/skillAnalysis';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
-import DataState from '@/components/DataState.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const props = defineProps<{ id: string }>();
 

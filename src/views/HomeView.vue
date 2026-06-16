@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SiteNavigation from '@/components/SiteNavigation.vue';
+import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import logoUrl from '@/assets/images/icons/logo/logo.png';
 </script>
 

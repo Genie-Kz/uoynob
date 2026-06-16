@@ -4,11 +4,11 @@ import { useRoute } from 'vue-router';
 import type { Skill, SkillCategory } from '@/types/skill';
 import { useSkills } from '@/composables/useSkills';
 import { summarizeGuardEffects } from '@/domain/skillAnalysis';
-import { includesKeywordWithReading } from '@/domain/textSearch';
-import { loadSearchReadings } from '@/api/datasets';
+import { includesKeywordWithReading } from '@/shared/search/textSearch';
+import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
-import DataState from '@/components/DataState.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { skills, isLoading, errorMessage } = useSkills();

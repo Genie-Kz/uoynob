@@ -13,7 +13,7 @@ import {
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST, STAT_KEYS } from '@/constants/statsRules';
-import { LINEAGE_DEFAULT_OPPOSITE, STAT_LINEAGES } from '@/constants/lineageIcons';
+import { LINEAGE_DEFAULT_OPPOSITE, STAT_LINEAGES } from '@/shared/icons/lineageIcons';
 import { collectAllTraitNames, defaultEditableTraits } from '@/domain/monster';
 import { computeBuildResistances } from '@/domain/buildSimulator';
 import { computeStats } from '@/domain/statsCalculator';

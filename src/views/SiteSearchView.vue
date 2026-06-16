@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
-import { loadAttributes, loadSearchReadings } from '@/api/datasets';
+import { loadAttributes, loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useAbilities } from '@/composables/useAbilities';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 import { routeForSiteSearchHit } from '@/router/siteSearchGuard';
-import DataState from '@/components/DataState.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const router = useRouter();

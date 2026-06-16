@@ -7,7 +7,7 @@ import {
   lineageInfoOf,
 } from '@/constants/monsterTaxonomy';
 import type { MonsterRank } from '@/types/monster';
-import { includesKeyword } from './textSearch';
+import { includesKeyword } from '@/shared/search/textSearch';
 
 export interface MonsterListFilter {
   rankSlug?: string;

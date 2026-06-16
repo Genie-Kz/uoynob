@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useMonsters } from '@/composables/useMonsters';
-import DataState from '@/components/DataState.vue';
-import MonsterTable from '@/components/MonsterTable.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 </script>

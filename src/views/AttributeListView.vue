@@ -3,11 +3,11 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAttributes } from '@/composables/useAttributes';
 import { ATTRIBUTE_CATEGORY_BY_SLUG } from '@/constants/categories';
-import { includesKeywordWithReading } from '@/domain/textSearch';
-import { loadSearchReadings } from '@/api/datasets';
+import { includesKeywordWithReading } from '@/shared/search/textSearch';
+import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
-import DataState from '@/components/DataState.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { attributes, isLoading, errorMessage } = useAttributes();

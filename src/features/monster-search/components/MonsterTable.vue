@@ -2,13 +2,13 @@
 import { computed, ref } from 'vue';
 import type { BodySize, Monster } from '@/types/monster';
 import { BODY_SIZES, LINEAGE_BY_NAME, MONSTER_RANKS, lineageInfoOf } from '@/constants/monsterTaxonomy';
-import { LINEAGE_ICON, LINEAGE_LABEL } from '@/constants/lineageIcons';
-import { includesKeywordWithReading } from '@/domain/textSearch';
-import { loadSearchReadings } from '@/api/datasets';
+import { LINEAGE_ICON, LINEAGE_LABEL } from '@/shared/icons/lineageIcons';
+import { includesKeywordWithReading } from '@/shared/search/textSearch';
+import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
-import BodySizeIcon from './BodySizeIcon.vue';
-import IconSelect from './IconSelect.vue';
-import MonsterIcon from './MonsterIcon.vue';
+import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
+import IconSelect from '@/shared/ui/IconSelect.vue';
+import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 
 const props = defineProps<{
   monsters: Monster[];

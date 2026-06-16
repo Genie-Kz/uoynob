@@ -3,9 +3,9 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMonsters } from '@/composables/useMonsters';
 import { filterMonsterList } from '@/domain/monsterFilter';
-import DataState from '@/components/DataState.vue';
-import MonsterTable from '@/components/MonsterTable.vue';
-import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
+import DataState from '@/shared/ui/DataState.vue';
+import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
+import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { monsters, isLoading, errorMessage } = useMonsters();

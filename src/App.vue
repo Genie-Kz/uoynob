@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import AppHeader from '@/components/AppHeader.vue';
-import AppFooter from '@/components/AppFooter.vue';
-import SiteNavigation from '@/components/SiteNavigation.vue';
+import AppHeader from '@/shared/ui/AppHeader.vue';
+import AppFooter from '@/shared/ui/AppFooter.vue';
+import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import { DEFAULT_DESCRIPTION, usePageSeo } from '@/composables/usePageSeo';
 
 const route = useRoute();
