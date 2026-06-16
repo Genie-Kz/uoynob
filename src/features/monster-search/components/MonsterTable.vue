@@ -107,13 +107,16 @@ const visibleMonsters = computed(() => {
 
     <div class="overflow-x-auto">
       <table class="w-full text-sm border-collapse">
+        <caption class="sr-only">
+          モンスター一覧（No.・名前・ランク・系統・サイズ）
+        </caption>
         <thead>
           <tr class="table-header-row">
-            <th class="px-2 py-2 border">No.</th>
-            <th class="px-2 py-2 border">モンスター</th>
-            <th class="px-2 py-2 border">ランク</th>
-            <th class="px-2 py-2 border">系統</th>
-            <th class="px-2 py-2 border">サイズ</th>
+            <th scope="col" class="px-2 py-2 border">No.</th>
+            <th scope="col" class="px-2 py-2 border">モンスター</th>
+            <th scope="col" class="px-2 py-2 border">ランク</th>
+            <th scope="col" class="px-2 py-2 border">系統</th>
+            <th scope="col" class="px-2 py-2 border">サイズ</th>
           </tr>
         </thead>
         <tbody>
@@ -146,6 +149,10 @@ const visibleMonsters = computed(() => {
                 :src="LINEAGE_ICON[monster.系統]"
                 :alt="LINEAGE_LABEL[monster.系統] ?? monster.系統"
                 :title="LINEAGE_LABEL[monster.系統] ?? monster.系統"
+                width="24"
+                height="24"
+                loading="lazy"
+                decoding="async"
                 class="inline-block size-6 max-w-none object-contain align-middle"
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
