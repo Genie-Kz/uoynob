@@ -2,6 +2,7 @@
 import type { Skill } from '@/types/skill';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS } from '@/constants/statsRules';
+import { normalizeNfkc } from '@/shared/search/normalization';
 
 /** 特性名の接頭辞 → ステータス種別 */
 const STAT_BY_PREFIX: Record<string, StatKey> = {
@@ -22,7 +23,7 @@ export function zeroStats(): StatValues {
  * パラメータ系でなければ null。
  */
 export function parseStatAttribute(name: string): { stat: StatKey; value: number } | null {
-  const normalized = name.normalize('NFKC');
+  const normalized = normalizeNfkc(name);
   const match = normalized.match(/^(.+?)\+(\d+)$/);
   if (!match) return null;
   const stat = STAT_BY_PREFIX[match[1]];

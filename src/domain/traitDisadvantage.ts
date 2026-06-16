@@ -1,4 +1,5 @@
 import type { MonsterRank } from "@/types/monster";
+import { normalizeTraitCostKey } from "@/shared/search/normalization";
 
 const EXACT_COSTS: Record<string, number> = {
   みかわしアップ: -4,
@@ -149,17 +150,9 @@ const EXACT_COSTS: Record<string, number> = {
 
 const MONTO_BRAVE_TRAITS = ["ゆうかん", "さいごのきぼう"] as const;
 
-function normalizeTraitName(name: string): string {
-  return name
-    .replace(/\s+/g, "")
-    .replace(/HP/g, "ＨＰ")
-    .replace(/MP/g, "ＭＰ")
-    .replace(/%/g, "％");
-}
-
 /** 特性単体のデメリット指数。個別値不明のモントナー特例はここでは0。 */
 export function disadvantageCostOfTrait(name: string): number {
-  const normalized = normalizeTraitName(name);
+  const normalized = normalizeTraitCostKey(name);
   const exact = EXACT_COSTS[normalized];
   if (exact !== undefined) return exact;
   if (/^AI\d(?:～\d)?回行動$/.test(normalized)) return -3;
@@ -174,7 +167,7 @@ export function totalDisadvantageCost(
   traits: string[],
   monsterName = "",
 ): number {
-  const normalizedTraits = traits.filter(Boolean).map(normalizeTraitName);
+  const normalizedTraits = traits.filter(Boolean).map(normalizeTraitCostKey);
   let total = normalizedTraits.reduce(
     (sum, trait) => sum + disadvantageCostOfTrait(trait),
     0,

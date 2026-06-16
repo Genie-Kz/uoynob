@@ -1,15 +1,12 @@
 import type { Attribute } from '@/types/attribute';
+import { normalizeNfkcCompact } from '@/shared/search/normalization';
 
 const NO_SP_DESCRIPTION = 'この特性にSP特性はありません';
 
-function normalizeText(value: string): string {
-  return value.normalize('NFKC').replace(/\s+/g, '');
-}
-
 /** 特性データのSP説明を基準にSP化できるか判定する。 */
 export function canBeSpFromAttributes(traitName: string, attributes: Attribute[]): boolean {
-  const normalizedName = normalizeText(traitName);
-  const attribute = attributes.find((candidate) => normalizeText(candidate.name) === normalizedName);
+  const normalizedName = normalizeNfkcCompact(traitName);
+  const attribute = attributes.find((candidate) => normalizeNfkcCompact(candidate.name) === normalizedName);
   if (!attribute) return false;
-  return normalizeText(attribute.descriptionSp) !== NO_SP_DESCRIPTION;
+  return normalizeNfkcCompact(attribute.descriptionSp) !== NO_SP_DESCRIPTION;
 }
