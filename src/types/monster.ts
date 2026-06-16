@@ -15,6 +15,22 @@ export type BodySize =
 export type MonsterRank = 'SS' | 'S' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 /**
+ * 一覧表示に必要な最小限のモンスター情報。
+ * monsters.json(全フィールド・約1.2MB)とは別に、一覧画面用の軽量
+ * monsters-list.json をこの形で配信する。Monster はこれを満たす上位互換。
+ */
+export interface MonsterListItem {
+  id: string;
+  no: string;
+  variant: number;
+  名前: string;
+  位階: number;
+  ランク: MonsterRank;
+  系統: string;
+  サイズ特性: BodySize;
+}
+
+/**
  * モンスター1体分のデータ。
  * 元データ(MonsterData.json)の日本語キーをそのまま採用しつつ、
  * build-data.js で id 等の派生フィールドを付与している。

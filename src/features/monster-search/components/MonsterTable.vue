@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { BodySize, Monster } from '@/types/monster';
+import type { BodySize, MonsterListItem } from '@/types/monster';
 import {
   BODY_SIZES,
   LINEAGE_BY_NAME,
@@ -16,7 +16,7 @@ import IconSelect from '@/shared/ui/IconSelect.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 
 const props = defineProps<{
-  monsters: Monster[];
+  monsters: MonsterListItem[];
   /** 行クリックの遷移先（モンスター詳細 or シミュレーター） */
   linkRouteName: 'monster-detail' | 'simulator-build';
 }>();

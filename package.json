@@ -27,7 +27,8 @@
     "data:traits-abilities": "node scripts/scrape-traits-abilities.js",
     "data:pickups": "node scripts/scrape-pickups.js",
     "data:icons": "node scripts/scrape-monster-icons.js",
-    "data:readings": "node scripts/build-search-readings.js"
+    "data:readings": "node scripts/build-search-readings.js",
+    "data:monster-list": "node scripts/build-monster-list.js"
   },
   "dependencies": {
     "vue": "^3.5.38",

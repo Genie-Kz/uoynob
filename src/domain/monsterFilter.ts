@@ -1,5 +1,5 @@
 /** モンスター一覧の絞り込みロジック（ランク／系統／サイズ／名前） */
-import type { Monster } from '@/types/monster';
+import type { MonsterListItem } from '@/types/monster';
 import {
   BODY_SIZE_NAME_BY_SLUG,
   LINEAGE_NAME_BY_SLUG,
@@ -16,13 +16,16 @@ export interface MonsterListFilter {
   nameQuery?: string;
 }
 
-export interface FilteredMonsterList {
+export interface FilteredMonsterList<T extends MonsterListItem = MonsterListItem> {
   title: string;
-  monsters: Monster[];
+  monsters: T[];
 }
 
 /** 絞り込み条件を適用し、見出しと該当モンスターを返す */
-export function filterMonsterList(all: Monster[], filter: MonsterListFilter): FilteredMonsterList {
+export function filterMonsterList<T extends MonsterListItem>(
+  all: T[],
+  filter: MonsterListFilter,
+): FilteredMonsterList<T> {
   const { rankSlug, lineageSlug, sizeSlug, nameQuery } = filter;
 
   if (rankSlug) {
@@ -71,7 +74,7 @@ export interface MonsterListControls {
 }
 
 /** No.（位階）昇順、同位階は連番（variant）昇順で並べた配列を返す（非破壊） */
-export function sortMonstersByDexOrder(monsters: Monster[]): Monster[] {
+export function sortMonstersByDexOrder<T extends MonsterListItem>(monsters: T[]): T[] {
   return [...monsters].sort((a, b) => a.位階 - b.位階 || a.variant - b.variant);
 }
 
@@ -79,11 +82,11 @@ export function sortMonstersByDexOrder(monsters: Monster[]): Monster[] {
  * 一覧テーブルのコントロールでモンスターを絞り込む（AND条件）。
  * 名前は読みがな（readings）を加味して全角/半角・かなを区別せずにヒットさせる。
  */
-export function filterMonstersByControls(
-  monsters: Monster[],
+export function filterMonstersByControls<T extends MonsterListItem>(
+  monsters: T[],
   controls: MonsterListControls,
   readings?: Record<string, string>,
-): Monster[] {
+): T[] {
   const keyword = controls.keyword?.trim() ?? '';
   return monsters.filter((monster) => {
     if (keyword && !includesKeywordWithReading(monster.名前, keyword, readings)) return false;

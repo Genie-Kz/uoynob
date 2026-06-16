@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useMonsters } from '@/composables/useMonsters';
+import { useMonsterList } from '@/composables/useMonsterList';
 import { filterMonsterList } from '@/domain/monsterFilter';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
-const { monsters, isLoading, errorMessage } = useMonsters();
+const { monsters, isLoading, errorMessage } = useMonsterList();
 
 function queryString(key: string): string | undefined {
   const value = route.query[key];

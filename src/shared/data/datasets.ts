@@ -3,7 +3,7 @@
  * 元サイトはサーバーAPIで配信していたデータを、ここでは public/data の
  * 静的JSONとして読み込み、Promiseをキャッシュして二重取得を防ぐ。
  */
-import type { Monster } from '@/types/monster';
+import type { Monster, MonsterListItem } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import type { Attribute } from '@/types/attribute';
 import type { Ability } from '@/types/ability';
@@ -14,6 +14,7 @@ import type { SiteSearchReadings } from '@/domain/siteSearch';
 const baseUrl = import.meta.env.BASE_URL;
 
 let monstersPromise: Promise<Monster[]> | null = null;
+let monsterListPromise: Promise<MonsterListItem[]> | null = null;
 let skillsPromise: Promise<Skill[]> | null = null;
 let attributesPromise: Promise<Attribute[]> | null = null;
 let abilitiesPromise: Promise<Ability[]> | null = null;
@@ -32,6 +33,12 @@ async function fetchJson<T>(relativePath: string): Promise<T> {
 export function loadMonsters(): Promise<Monster[]> {
   monstersPromise ??= fetchJson<Monster[]>('data/monsters.json');
   return monstersPromise;
+}
+
+/** 一覧画面用の軽量モンスターデータ（monsters-list.json）を読み込む */
+export function loadMonsterList(): Promise<MonsterListItem[]> {
+  monsterListPromise ??= fetchJson<MonsterListItem[]>('data/monsters-list.json');
+  return monsterListPromise;
 }
 
 export function loadSkills(): Promise<Skill[]> {
