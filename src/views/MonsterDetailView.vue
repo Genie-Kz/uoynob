@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
 import { usePageSeo } from '@/composables/usePageSeo';
-import { lineageInfoOf } from '@/constants/monsterTaxonomy';
+import { BODY_SIZE_SLUG, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { defaultEditableTraits, equippableWeaponsOf } from '@/domain/monster';
 import { skillsForMonster } from '@/domain/skillLookup';
 import { useTraitLink } from '@/composables/useTraitLink';
@@ -145,7 +145,12 @@ const statRows = computed(() => {
               >
                 {{ lineage?.label }}
               </router-link>
-              <span class="bg-gray-100 rounded px-2 py-0.5">{{ monster.サイズ特性 }}</span>
+              <router-link
+                :to="{ name: 'monster-list', query: { size: BODY_SIZE_SLUG[monster.サイズ特性] } }"
+                class="bg-gray-100 rounded px-2 py-0.5 underline decoration-dotted underline-offset-2 hover:decoration-solid active:decoration-solid"
+              >
+                {{ monster.サイズ特性 }}
+              </router-link>
             </div>
           </div>
         </div>

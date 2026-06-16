@@ -67,7 +67,7 @@
     @apply inline-flex items-center justify-center rounded border border-blue-500 bg-white px-4 py-2 text-sm text-blue-600 transition-colors duration-200 hover:bg-blue-50;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded bg-brand px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-brand-hover disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded border border-brand/30 bg-white px-4 py-2 text-sm text-brand transition-colors duration-200 hover:bg-brand/5 disabled:opacity-50;
   }
   .btn-neutral {
     @apply inline-flex items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50;
@@ -292,10 +292,11 @@ html.dark {
   background-color: #233453;
 }
 .dark .btn-primary {
-  background-color: #3b6fd4;
+  background-color: #232323;
+  color: #8ab4f8;
 }
 .dark .btn-primary:hover {
-  background-color: #3360bd;
+  background-color: #233453;
 }
 .dark .app-link {
   color: #8ab4f8;
