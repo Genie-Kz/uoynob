@@ -1,8 +1,8 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends string | number | null">
 import { computed, ref } from 'vue';
 
 interface IconOption {
-  value: string;
+  value: T;
   label: string;
   /** 任意のアイコン画像URL（無い選択肢は揃えるための余白を表示） */
   icon?: string;
@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 
 // ネイティブ <select> は <option> に画像を入れられないため、アイコン表示用に自作する
-const modelValue = defineModel<string>({ required: true });
+const modelValue = defineModel<T>({ required: true });
 
 const open = ref(false);
 const selected = computed(
@@ -23,7 +23,7 @@ const selected = computed(
 /** いずれかの選択肢にアイコンがある場合のみ、無アイコンの選択肢に位置合わせの余白を出す */
 const hasAnyIcon = computed(() => props.options.some((option) => option.icon));
 
-function choose(value: string): void {
+function choose(value: T): void {
   modelValue.value = value;
   open.value = false;
 }
@@ -54,7 +54,7 @@ function choose(value: string): void {
       <!-- 外側クリックで閉じる透明レイヤー -->
       <div class="fixed inset-0 z-40" @click="open = false"></div>
       <ul class="absolute left-0 right-0 z-50 mt-1 max-h-72 overflow-auto rounded border bg-white shadow-lg">
-        <li v-for="option in options" :key="option.value">
+        <li v-for="option in options" :key="String(option.value)">
           <button
             type="button"
             class="w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50"

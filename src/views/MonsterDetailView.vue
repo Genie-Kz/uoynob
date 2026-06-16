@@ -135,13 +135,13 @@ const statRows = computed(() => {
               <span class="bg-gray-200 rounded px-2 py-0.5">No.{{ monster.no }}</span>
               <router-link
                 :to="{ name: 'monster-list', query: { rank: monster.ランク.toLowerCase() } }"
-                class="bg-sky-200 rounded px-2 py-0.5 hover:underline"
+                class="bg-sky-200 rounded px-2 py-0.5 underline decoration-dotted underline-offset-2 hover:decoration-solid active:decoration-solid"
               >
                 ランク{{ monster.ランク }}
               </router-link>
               <router-link
                 :to="{ name: 'monster-list', query: { lineage: lineage?.slug } }"
-                class="bg-gray-100 rounded px-2 py-0.5 hover:underline"
+                class="bg-gray-100 rounded px-2 py-0.5 underline decoration-dotted underline-offset-2 hover:decoration-solid active:decoration-solid"
               >
                 {{ lineage?.label }}
               </router-link>

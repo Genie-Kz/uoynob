@@ -8,7 +8,9 @@ import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/dom
 import { includesKeywordWithReading } from '@/domain/textSearch';
 import { loadSearchReadings } from '@/api/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { BODY_SIZE_ICON } from '@/constants/bodySizeIcons';
 import DataState from '@/components/DataState.vue';
+import IconSelect from '@/components/IconSelect.vue';
 import MonsterTable from '@/components/MonsterTable.vue';
 import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 
@@ -31,7 +33,7 @@ const selectedLevelByElement = ref<Record<string, number | null>>(
 const selectedTraits = ref<string[]>([]);
 const traitKeyword = ref('');
 const searchResults = ref<Monster[] | null>(null);
-const searchBodySize = ref<BodySize | ''>('');
+const searchBodySize = ref('');
 
 const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
   { label: 'デフォルトサイズ', value: '' },
@@ -41,6 +43,17 @@ const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
   { label: 'ギガボディ', value: 'ギガボディ' },
   { label: '超ギガボディ', value: '超ギガボディ' },
 ];
+/** IconSelect用：ボディサイズ（アイコン付き） */
+const bodySizeSelectOptions = BODY_SIZE_OPTIONS.map((option) => ({
+  value: option.value as string,
+  label: option.label,
+  icon: option.value ? BODY_SIZE_ICON[option.value] : undefined,
+}));
+/** IconSelect用：耐性閾値 */
+const thresholdSelectOptions = THRESHOLD_OPTIONS.map((option) => ({
+  value: option.level,
+  label: option.label,
+}));
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const visibleTraitNames = computed(() => {
@@ -62,7 +75,7 @@ function runSearch(): void {
   const criteria = {
     thresholds: thresholds.value,
     requiredTraits: selectedTraits.value,
-    bodySize: searchBodySize.value || null,
+    bodySize: (searchBodySize.value || null) as BodySize | null,
   };
   searchResults.value = isEmptyCriteria(criteria) ? [] : searchMonsters(monsters.value ?? [], criteria);
 }
@@ -89,11 +102,12 @@ const hasCriteria = computed(
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <h3 class="font-bold mb-2">検索時のボディサイズ</h3>
-      <select v-model="searchBodySize" class="border rounded w-full sm:w-auto px-2 py-1 mb-2">
-        <option v-for="option in BODY_SIZE_OPTIONS" :key="option.label" :value="option.value">
-          {{ option.label }}
-        </option>
-      </select>
+      <IconSelect
+        v-model="searchBodySize"
+        :options="bodySizeSelectOptions"
+        aria-label="検索時のボディサイズ"
+        class="w-full sm:w-64 mb-2"
+      />
       <p class="text-sm text-gray-500 mb-4">
         デフォルトサイズでは本来のサイズ、それ以外では全モンスターを選択したサイズにしたときの耐性・特性を検索します。
       </p>
@@ -101,14 +115,14 @@ const hasCriteria = computed(
       <!-- 耐性 -->
       <h3 class="font-bold mb-2">耐性を選択</h3>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
-        <label v-for="element in RESISTANCE_ELEMENTS" :key="element" class="text-sm">
-          <span class="block text-gray-600">{{ element }}</span>
-          <select v-model="selectedLevelByElement[element]" class="border rounded w-full px-1 py-1">
-            <option v-for="option in THRESHOLD_OPTIONS" :key="option.label" :value="option.level">
-              {{ option.label }}
-            </option>
-          </select>
-        </label>
+        <div v-for="element in RESISTANCE_ELEMENTS" :key="element" class="text-sm">
+          <span class="block text-gray-600 mb-0.5">{{ element }}</span>
+          <IconSelect
+            v-model="selectedLevelByElement[element]"
+            :options="thresholdSelectOptions"
+            :aria-label="`${element}の耐性閾値`"
+          />
+        </div>
       </div>
 
       <!-- 特性 -->
@@ -133,20 +147,8 @@ const hasCriteria = computed(
       </p>
 
       <div class="mb-5 flex gap-2">
-        <button
-          type="button"
-          class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
-          @click="runSearch"
-        >
-          検索する
-        </button>
-        <button
-          type="button"
-          class="border rounded px-4 py-2 hover:bg-gray-50"
-          @click="resetAll"
-        >
-          すべてリセット
-        </button>
+        <button type="button" class="btn-primary" @click="runSearch">検索する</button>
+        <button type="button" class="btn-neutral" @click="resetAll">すべてリセット</button>
       </div>
 
       <!-- 結果 -->

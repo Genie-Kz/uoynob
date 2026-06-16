@@ -12,6 +12,10 @@
   --color-resistance-recover: #00ff00; /* 回復 */
   --color-resistance-reflect: #ff33ff; /* 反射 */
 
+  /* プライマリボタンのブランド色（落ち着いたロイヤルブルー） */
+  --color-brand: #3a52cf;
+  --color-brand-hover: #2f44b0;
+
   /* 系統ごとのアイコン色 */
   --color-lineage-slime: #1e9bd7;
   --color-lineage-dragon: #2e8b57;
@@ -63,7 +67,7 @@
     @apply inline-flex items-center justify-center rounded border border-blue-500 bg-white px-4 py-2 text-sm text-blue-600 transition-colors duration-200 hover:bg-blue-50;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded border border-blue-500 bg-blue-600 px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-blue-700 disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded bg-brand px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-brand-hover disabled:opacity-50;
   }
   .btn-neutral {
     @apply inline-flex items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-50;
