@@ -8,7 +8,7 @@ import {
   lineageInfoOf,
 } from '@/constants/monsterTaxonomy';
 import { LINEAGE_ICON, LINEAGE_LABEL } from '@/shared/icons/lineageIcons';
-import { includesKeywordWithReading } from '@/shared/search/textSearch';
+import { filterMonstersByControls, sortMonstersByDexOrder } from '@/domain/monsterFilter';
 import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
@@ -48,22 +48,20 @@ function bodySizeOptionValue(value: string | number | null): BodySize | null {
 }
 
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
-const sortedMonsters = computed(() =>
-  [...props.monsters].sort((a, b) => a.位階 - b.位階 || a.variant - b.variant),
-);
+const sortedMonsters = computed(() => sortMonstersByDexOrder(props.monsters));
 
-const visibleMonsters = computed(() => {
-  const query = keyword.value.trim();
-  return sortedMonsters.value.filter((monster) => {
-    if (query && !includesKeywordWithReading(monster.名前, query, searchReadings.value?.labels)) {
-      return false;
-    }
-    if (selectedLineage.value && monster.系統 !== selectedLineage.value) return false;
-    if (selectedRank.value && monster.ランク !== selectedRank.value) return false;
-    if (selectedBodySize.value && monster.サイズ特性 !== selectedBodySize.value) return false;
-    return true;
-  });
-});
+const visibleMonsters = computed(() =>
+  filterMonstersByControls(
+    sortedMonsters.value,
+    {
+      keyword: keyword.value,
+      lineage: selectedLineage.value,
+      rank: selectedRank.value,
+      bodySize: selectedBodySize.value,
+    },
+    searchReadings.value?.labels,
+  ),
+);
 </script>
 
 <template>

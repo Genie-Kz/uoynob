@@ -23,6 +23,13 @@ export default defineConfig({
       reporter: ['text', 'html', 'lcov'],
       include: ['src/**/*.{ts,vue}'],
       exclude: ['src/**/*.{test,spec}.ts', 'src/test/**', 'src/**/*.d.ts'],
+      // 現状値より少し低い下限。これを下回ったら CI で失敗させ、カバレッジの後退を防ぐ
+      thresholds: {
+        statements: 30,
+        branches: 22,
+        functions: 22,
+        lines: 30,
+      },
     },
   },
 });

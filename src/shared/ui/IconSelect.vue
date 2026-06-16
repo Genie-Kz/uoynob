@@ -105,7 +105,7 @@ function onKeydown(event: KeyboardEvent): void {
 watch(activeIndex, async (index) => {
   if (!open.value) return;
   await nextTick();
-  document.getElementById(optionId(index))?.scrollIntoView({ block: 'nearest' });
+  document.getElementById(optionId(index))?.scrollIntoView?.({ block: 'nearest' });
 });
 </script>
 

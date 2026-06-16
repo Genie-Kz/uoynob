@@ -7,7 +7,7 @@ import {
   lineageInfoOf,
 } from '@/constants/monsterTaxonomy';
 import type { MonsterRank } from '@/types/monster';
-import { includesKeyword } from '@/shared/search/textSearch';
+import { includesKeyword, includesKeywordWithReading } from '@/shared/search/textSearch';
 
 export interface MonsterListFilter {
   rankSlug?: string;
@@ -57,4 +57,39 @@ export function filterMonsterList(all: Monster[], filter: MonsterListFilter): Fi
   }
 
   return { title: 'モンスター一覧', monsters: all };
+}
+
+/** 一覧テーブルのコントロール（名前キーワード・系統・ランク・サイズ）による絞り込み条件 */
+export interface MonsterListControls {
+  keyword?: string;
+  /** 系統名（完全一致） */
+  lineage?: string;
+  /** ランク（完全一致） */
+  rank?: string;
+  /** サイズ特性（完全一致） */
+  bodySize?: string;
+}
+
+/** No.（位階）昇順、同位階は連番（variant）昇順で並べた配列を返す（非破壊） */
+export function sortMonstersByDexOrder(monsters: Monster[]): Monster[] {
+  return [...monsters].sort((a, b) => a.位階 - b.位階 || a.variant - b.variant);
+}
+
+/**
+ * 一覧テーブルのコントロールでモンスターを絞り込む（AND条件）。
+ * 名前は読みがな（readings）を加味して全角/半角・かなを区別せずにヒットさせる。
+ */
+export function filterMonstersByControls(
+  monsters: Monster[],
+  controls: MonsterListControls,
+  readings?: Record<string, string>,
+): Monster[] {
+  const keyword = controls.keyword?.trim() ?? '';
+  return monsters.filter((monster) => {
+    if (keyword && !includesKeywordWithReading(monster.名前, keyword, readings)) return false;
+    if (controls.lineage && monster.系統 !== controls.lineage) return false;
+    if (controls.rank && monster.ランク !== controls.rank) return false;
+    if (controls.bodySize && monster.サイズ特性 !== controls.bodySize) return false;
+    return true;
+  });
 }
