@@ -1,12 +1,12 @@
 /** 系統名 → アイコン画像URL（家系図UIなどで使用） */
-import material from '@/assets/images/icons/linage/lineage_icon_material.webp';
-import demon from '@/assets/images/icons/linage/lineage_icon_demon.webp';
-import dragon from '@/assets/images/icons/linage/lineage_icon_dragon.webp';
-import crown from '@/assets/images/icons/linage/lineage_icon_crown.webp';
-import natural from '@/assets/images/icons/linage/lineage_icon_natural.webp';
-import slime from '@/assets/images/icons/linage/lineage_icon_slime.webp';
-import beast from '@/assets/images/icons/linage/lineage_icon_beast.webp';
-import zombie from '@/assets/images/icons/linage/lineage_icon_zombie.webp';
+import material from '@/assets/images/icons/linage/lineage_icon_material_transparent.png';
+import demon from '@/assets/images/icons/linage/lineage_icon_demon_transparent.png';
+import dragon from '@/assets/images/icons/linage/lineage_icon_dragon_transparent.png';
+import crown from '@/assets/images/icons/linage/lineage_icon_crown_transparent.png';
+import natural from '@/assets/images/icons/linage/lineage_icon_natural_transparent.png';
+import slime from '@/assets/images/icons/linage/lineage_icon_slime_transparent.png';
+import beast from '@/assets/images/icons/linage/lineage_icon_beast_transparent.png';
+import zombie from '@/assets/images/icons/linage/lineage_icon_zombie_transparent.png';
 
 /** ステータス計算に使う8系統 */
 export const STAT_LINEAGES = ['物質', '悪魔', 'ドラゴン', '???', '自然', 'スライム', '魔獣', 'ゾンビ'] as const;
