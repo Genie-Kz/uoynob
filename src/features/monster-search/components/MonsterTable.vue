@@ -121,7 +121,7 @@ const visibleMonsters = computed(() =>
           <tr
             v-for="monster in visibleMonsters"
             :key="monster.id"
-            class="border-b hover:bg-gray-50"
+            class="border-b hover:bg-gray-50 [content-visibility:auto] [contain-intrinsic-size:auto_41px]"
           >
             <td class="px-3 py-2 border text-center whitespace-nowrap">
               <MonsterIcon :lineage="monster.系統" :no="monster.no" />
