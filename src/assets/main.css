@@ -87,7 +87,7 @@
   }
 
   .table-header-row {
-    @apply bg-gray-50 border-b text-left;
+    @apply bg-gray-50 border-b text-center;
   }
 }
 
@@ -316,6 +316,16 @@ html.dark {
 }
 .dark .app-link:hover {
   color: #aecbfa;
+}
+.dark .text-muted {
+  color: #9a9a9a;
+}
+.dark .surface-muted {
+  background-color: #262626;
+}
+.dark .table-header-row {
+  background-color: #262626;
+  color: #e6e6e6;
 }
 
 /* 耐性ピルはライトモードだと淡い／ネオン色で暗い背景に馴染まないため、
