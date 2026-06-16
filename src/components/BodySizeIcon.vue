@@ -22,6 +22,8 @@ const bodySizeBadgeClass = computed(() => {
   }
   return '';
 });
+
+const bodySizeImage = computed(() => BODY_SIZE_ICON[props.size] ?? null);
 </script>
 
 <template>
@@ -35,8 +37,8 @@ const bodySizeBadgeClass = computed(() => {
     {{ bodySizeLabel }}
   </span>
   <img
-    v-else
-    :src="BODY_SIZE_ICON[size]"
+    v-else-if="bodySizeImage"
+    :src="bodySizeImage"
     :alt="size"
     :title="size"
     class="inline-block size-[22px] max-w-none object-cover align-middle"

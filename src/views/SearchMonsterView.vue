@@ -8,7 +8,8 @@ import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/dom
 import { includesKeywordWithReading } from '@/domain/textSearch';
 import { loadSearchReadings } from '@/api/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
-import { BODY_SIZE_ICON } from '@/constants/bodySizeIcons';
+import { BODY_SIZES } from '@/constants/monsterTaxonomy';
+import BodySizeIcon from '@/components/BodySizeIcon.vue';
 import DataState from '@/components/DataState.vue';
 import IconSelect from '@/components/IconSelect.vue';
 import MonsterTable from '@/components/MonsterTable.vue';
@@ -19,7 +20,7 @@ const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 // 各耐性の閾値（「○○↑＝その段階以上」）の選択肢
 const THRESHOLD_OPTIONS = [
-  { label: '指定なし', level: null },
+  { label: '', level: null },
   { label: '普通↑', level: 1 },
   { label: '軽減↑', level: 2 },
   { label: '半減↑', level: 3 },
@@ -47,7 +48,6 @@ const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
 const bodySizeSelectOptions = BODY_SIZE_OPTIONS.map((option) => ({
   value: option.value as string,
   label: option.label,
-  icon: option.value ? BODY_SIZE_ICON[option.value] : undefined,
 }));
 /** IconSelect用：耐性閾値 */
 const thresholdSelectOptions = THRESHOLD_OPTIONS.map((option) => ({
@@ -90,6 +90,10 @@ function resetAll(): void {
 const hasCriteria = computed(
   () => thresholds.value.length > 0 || selectedTraits.value.length > 0,
 );
+
+function bodySizeOptionValue(value: string | number | null): BodySize | null {
+  return BODY_SIZES.find((size) => size === value) ?? null;
+}
 </script>
 
 <template>
@@ -107,7 +111,11 @@ const hasCriteria = computed(
         :options="bodySizeSelectOptions"
         aria-label="検索時のボディサイズ"
         class="w-full sm:w-64 mb-2"
-      />
+      >
+        <template #icon="{ option }">
+          <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
+        </template>
+      </IconSelect>
       <p class="text-sm text-gray-500 mb-4">
         デフォルトサイズでは本来のサイズ、それ以外では全モンスターを選択したサイズにしたときの耐性・特性を検索します。
       </p>
