@@ -11,7 +11,7 @@ describe('pickupViewModel', () => {
       [shinsho],
     );
 
-    expect(groups?.[0].iconMonster?.no).toBe('217');
+    expect(groups?.[0]?.iconMonster?.no).toBe('217');
   });
 
   it('ご当地以外の分類には神将アイコンを付けない', () => {
@@ -22,6 +22,6 @@ describe('pickupViewModel', () => {
       [shinsho],
     );
 
-    expect(groups?.[0].iconMonster).toBeNull();
+    expect(groups?.[0]?.iconMonster).toBeNull();
   });
 });

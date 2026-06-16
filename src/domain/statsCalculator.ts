@@ -31,7 +31,13 @@ import {
   STAT_KEYS,
   parentLevelBonusPercent,
 } from '@/constants/statsRules';
-import { addStats, aggregateStatBonus, skillStatBonus, skillsGrantTrait, zeroStats } from './statBonus';
+import {
+  addStats,
+  aggregateStatBonus,
+  skillStatBonus,
+  skillsGrantTrait,
+  zeroStats,
+} from './statBonus';
 
 /** ステータス計算の入力 */
 export interface StatsBuildConfig {
@@ -99,10 +105,16 @@ function computeAdditions(config: StatsBuildConfig): StatValues {
 
 /** バブル補正（ステータスごとの倍率） */
 function computeBubbleMultipliers(config: StatsBuildConfig): StatValues {
-  const hpActive = config.traits.includes(HP_BUBBLE_TRAIT) || skillsGrantTrait(config.skills, HP_BUBBLE_TRAIT);
-  const mpActive = config.traits.includes(MP_BUBBLE_TRAIT) || skillsGrantTrait(config.skills, MP_BUBBLE_TRAIT);
-  const hpTable = config.spTraits.has(HP_BUBBLE_TRAIT) ? HP_BUBBLE_SP_MULTIPLIERS : HP_BUBBLE_MULTIPLIERS;
-  const mpTable = config.spTraits.has(MP_BUBBLE_TRAIT) ? MP_BUBBLE_SP_MULTIPLIERS : MP_BUBBLE_MULTIPLIERS;
+  const hpActive =
+    config.traits.includes(HP_BUBBLE_TRAIT) || skillsGrantTrait(config.skills, HP_BUBBLE_TRAIT);
+  const mpActive =
+    config.traits.includes(MP_BUBBLE_TRAIT) || skillsGrantTrait(config.skills, MP_BUBBLE_TRAIT);
+  const hpTable = config.spTraits.has(HP_BUBBLE_TRAIT)
+    ? HP_BUBBLE_SP_MULTIPLIERS
+    : HP_BUBBLE_MULTIPLIERS;
+  const mpTable = config.spTraits.has(MP_BUBBLE_TRAIT)
+    ? MP_BUBBLE_SP_MULTIPLIERS
+    : MP_BUBBLE_MULTIPLIERS;
 
   const result: StatValues = { HP: 1, MP: 1, 攻撃力: 1, 守備力: 1, 素早さ: 1, 賢さ: 1 };
   for (const stat of STAT_KEYS) {
@@ -118,18 +130,21 @@ export function computeStats(config: StatsBuildConfig): StatValues {
 
   // メタルボディ
   const metalTrait = findTrait(traits, METAL_BODY_HP_MULTIPLIER);
-  const metalHpMultiplier = metalTrait ? METAL_BODY_HP_MULTIPLIER[metalTrait] : 1;
+  const metalHpMultiplier = metalTrait ? (METAL_BODY_HP_MULTIPLIER[metalTrait] ?? 1) : 1;
   const useMetalTables = metalTrait ? METAL_TABLE_OVERRIDE_TRAITS.includes(metalTrait) : false;
 
   // ボディサイズ倍率
-  const bodyMul = useMetalTables ? BODY_SIZE_MULTIPLIERS_METAL[bodySize] : BODY_SIZE_MULTIPLIERS[bodySize];
+  const bodyMul = useMetalTables
+    ? BODY_SIZE_MULTIPLIERS_METAL[bodySize]
+    : BODY_SIZE_MULTIPLIERS[bodySize];
 
   // AI行動回数倍率
   const aiTrait = findTrait(traits, AI_ACTION_MULTIPLIER);
   function aiMultiplier(stat: StatKey): number {
     if (!aiTrait) return 1;
-    if (useMetalTables) return METAL_FIXED_STATS.includes(stat) ? 1 : AI_ACTION_MULTIPLIER_METAL[aiTrait];
-    return AI_ACTION_MULTIPLIER[aiTrait];
+    if (useMetalTables)
+      return METAL_FIXED_STATS.includes(stat) ? 1 : (AI_ACTION_MULTIPLIER_METAL[aiTrait] ?? 1);
+    return AI_ACTION_MULTIPLIER[aiTrait] ?? 1;
   }
 
   // つねカンタ（HPのみ。SP化で無効）

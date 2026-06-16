@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { BodySize, Monster } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
-import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
+import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
@@ -22,8 +22,11 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
-const selectedLevelByElement = ref<Record<string, number | null>>(
-  Object.fromEntries(RESISTANCE_ELEMENTS.map((element) => [element, null])),
+const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(
+  Object.fromEntries(RESISTANCE_ELEMENTS.map((element) => [element, null])) as Record<
+    ResistanceElement,
+    number | null
+  >,
 );
 const selectedTraits = ref<string[]>([]);
 const traitKeyword = ref('');
@@ -35,7 +38,8 @@ const visibleTraitNames = computed(() => {
   const keyword = traitKeyword.value.trim();
   return keyword
     ? allTraitNames.value.filter((name) =>
-        includesKeywordWithReading(name, keyword, searchReadings.value?.labels))
+        includesKeywordWithReading(name, keyword, searchReadings.value?.labels),
+      )
     : allTraitNames.value;
 });
 
@@ -52,7 +56,9 @@ function runSearch(): void {
     requiredTraits: selectedTraits.value,
     bodySize: (searchBodySize.value || null) as BodySize | null,
   };
-  searchResults.value = isEmptyCriteria(criteria) ? [] : searchMonsters(monsters.value ?? [], criteria);
+  searchResults.value = isEmptyCriteria(criteria)
+    ? []
+    : searchMonsters(monsters.value ?? [], criteria);
 }
 
 function resetAll(): void {
@@ -62,14 +68,14 @@ function resetAll(): void {
   searchResults.value = null;
 }
 
-const hasCriteria = computed(
-  () => thresholds.value.length > 0 || selectedTraits.value.length > 0,
-);
+const hasCriteria = computed(() => thresholds.value.length > 0 || selectedTraits.value.length > 0);
 </script>
 
 <template>
   <div>
-    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]" />
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
+    />
     <h2 class="text-xl font-bold mb-1">モンスター検索</h2>
     <p class="text-sm text-gray-500 mb-4">
       モンスターを耐性・特性から検索します。「○○↑」は、その耐性以上（より強い）モンスターを対象にします。
@@ -84,7 +90,10 @@ const hasCriteria = computed(
         class="w-full sm:w-64 mb-2"
       >
         <template #icon="{ option }">
-          <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
+          <BodySizeIcon
+            v-if="bodySizeOptionValue(option.value)"
+            :size="bodySizeOptionValue(option.value)!"
+          />
         </template>
       </IconSelect>
       <p class="text-sm text-gray-500 mb-4">
@@ -113,11 +122,7 @@ const hasCriteria = computed(
         placeholder="特性名で絞り込み"
       />
       <div class="border rounded p-2 mb-2 max-h-60 overflow-y-auto">
-        <label
-          v-for="name in visibleTraitNames"
-          :key="name"
-          class="block text-sm py-0.5"
-        >
+        <label v-for="name in visibleTraitNames" :key="name" class="block text-sm py-0.5">
           <input v-model="selectedTraits" type="checkbox" :value="name" class="mr-1" />{{ name }}
         </label>
       </div>
@@ -132,11 +137,18 @@ const hasCriteria = computed(
 
       <!-- 結果 -->
       <h3 class="font-bold mb-2">検索結果</h3>
-      <p v-if="searchResults === null" class="text-gray-500">耐性または特性を指定して検索してください。</p>
-      <p v-else-if="!hasCriteria" class="text-amber-700">耐性または特性を1つ以上指定してください。</p>
+      <p v-if="searchResults === null" class="text-gray-500">
+        耐性または特性を指定して検索してください。
+      </p>
+      <p v-else-if="!hasCriteria" class="text-amber-700">
+        耐性または特性を1つ以上指定してください。
+      </p>
       <MonsterTable v-else :monsters="searchResults" link-route-name="monster-detail" />
     </DataState>
 
-    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]" class="mt-6" />
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
+      class="mt-6"
+    />
   </div>
 </template>

@@ -21,11 +21,7 @@
 import type { BodySize, Monster, ResistanceValue } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
-import {
-  ATTRIBUTE_BOOST_CAP_LEVEL,
-  REFLECT_LEVEL,
-  WEAKEST_LEVEL,
-} from '@/constants/resistances';
+import { ATTRIBUTE_BOOST_CAP_LEVEL, REFLECT_LEVEL, WEAKEST_LEVEL } from '@/constants/resistances';
 import {
   ALL_GUARD_TRAIT,
   GUARD_ABILITY_BOOST_STEP,
@@ -75,7 +71,7 @@ function createZeroDeltaMap(): DeltaMap {
 }
 
 function addToElements(delta: DeltaMap, elements: readonly string[], step: number): void {
-  for (const element of elements) delta[element] += step;
+  for (const element of elements) delta[element] = (delta[element] ?? 0) + step;
 }
 
 /** ボディサイズ補正（素の値＝スタンダード基準に、選択サイズの補正をそのまま加算） */
@@ -97,9 +93,10 @@ function applyTraitEffects(delta: DeltaMap, traits: string[]): void {
         addToElements(delta, METAL_BODY_AILMENT_ELEMENTS, 1);
         metalApplied = true;
       }
-    } else if (trait in KOUDOU_TRAIT_DELTA) {
-      if (!koudouApplied) {
-        addToElements(delta, KOUDOU_AILMENT_ELEMENTS, KOUDOU_TRAIT_DELTA[trait]);
+    } else {
+      const koudouDelta = KOUDOU_TRAIT_DELTA[trait];
+      if (koudouDelta !== undefined && !koudouApplied) {
+        addToElements(delta, KOUDOU_AILMENT_ELEMENTS, koudouDelta);
         koudouApplied = true;
       }
     }
@@ -111,7 +108,7 @@ function applySkillGuards(delta: DeltaMap, skills: Skill[]): void {
   for (const skill of skills) {
     for (const item of skill.composition) {
       const element = guardAbilityToElement(item.name);
-      if (element) delta[element] += GUARD_ABILITY_BOOST_STEP;
+      if (element) delta[element] = (delta[element] ?? 0) + GUARD_ABILITY_BOOST_STEP;
     }
   }
 }
@@ -156,7 +153,7 @@ export function computeBuildResistances(config: BuildConfiguration): ResistanceO
   return RESISTANCE_ELEMENTS.map((element) => {
     const baseValue = resistanceValueOf(monster, element);
     const baseLevel = resistanceLevelOf(baseValue);
-    let finalLevel = clampFinalLevel(element, baseLevel, delta[element]);
+    let finalLevel = clampFinalLevel(element, baseLevel, delta[element] ?? 0);
     if (forgeSet.has(element)) finalLevel = applyForgeStep(element, baseLevel, finalLevel);
     const finalValue = resistanceValueOfLevel(finalLevel);
     return {

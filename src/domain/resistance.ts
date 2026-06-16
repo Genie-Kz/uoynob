@@ -17,7 +17,7 @@ export function resistanceLevelOf(value: ResistanceValue): number {
 /** 段階レベル → 耐性値（範囲外は端にクランプ） */
 export function resistanceValueOfLevel(level: number): ResistanceValue {
   const clamped = Math.max(0, Math.min(RESISTANCE_VALUES_BY_LEVEL.length - 1, level));
-  return RESISTANCE_VALUES_BY_LEVEL[clamped];
+  return RESISTANCE_VALUES_BY_LEVEL[clamped]!;
 }
 
 /** 表示テキスト（普通→「-」、弱点→「弱い」など） */
@@ -44,7 +44,11 @@ function isOverInvalid(element: string, level: number): boolean {
  * 段階レベルと耐性要素から表示テキストを返す。
  * 非属性で「無効」を超えた場合は「無効+1」「無効+2」… と数値表記する。
  */
-export function resistanceDisplayForElement(element: string, level: number, isOriginallyReflect = false): string {
+export function resistanceDisplayForElement(
+  element: string,
+  level: number,
+  isOriginallyReflect = false,
+): string {
   if (isOriginallyReflect) {
     return resistanceDisplayText('反射');
   }
@@ -55,7 +59,11 @@ export function resistanceDisplayForElement(element: string, level: number, isOr
 }
 
 /** 段階レベルと耐性要素から背景色クラスを返す（無効+N は「無効」と同色） */
-export function resistanceColorForElement(element: string, level: number, isOriginallyReflect = false): string {
+export function resistanceColorForElement(
+  element: string,
+  level: number,
+  isOriginallyReflect = false,
+): string {
   if (isOriginallyReflect) {
     return resistanceColorClass('反射');
   }

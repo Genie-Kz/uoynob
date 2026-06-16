@@ -34,7 +34,7 @@ export const redirectSingleSiteSearchResult: NavigationGuard = async (to) => {
       loadSearchReadings(),
     ]);
     const hits = searchSite({ monsters, attributes, skills, abilities }, keyword, readings);
-    return hits.length === 1 ? routeForSiteSearchHit(hits[0]) : true;
+    return hits.length === 1 ? routeForSiteSearchHit(hits[0]!) : true;
   } catch {
     // 読み込みエラーは検索結果画面のDataStateで表示する。
     return true;
