@@ -47,7 +47,7 @@ function choose(value: T): void {
             class="inline-block size-5 max-w-none object-contain shrink-0"
           />
         </slot>
-        <span class="truncate">{{ selected?.label }}</span>
+        <span class="truncate">{{ selected?.label || ' ' }}</span>
       </span>
       <span class="text-xs text-gray-500 shrink-0">▼</span>
     </button>
@@ -72,7 +72,7 @@ function choose(value: T): void {
               />
               <span v-else-if="hasAnyIcon" class="inline-block size-5 shrink-0"></span>
             </slot>
-            <span>{{ option.label }}</span>
+            <span>{{ option.label || ' ' }}</span>
           </button>
         </li>
       </ul>
