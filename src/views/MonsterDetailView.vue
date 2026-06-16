@@ -16,12 +16,7 @@ import ResistanceGrid from '@/shared/ui/ResistanceGrid.vue';
 import StatusTable from '@/shared/ui/StatusTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DisadvantageTraits from '@/features/simulator/components/DisadvantageTraits.vue';
-import icon25 from '@/assets/images/icons/trait/icon-25.jpg';
-import icon50 from '@/assets/images/icons/trait/icon-50.jpg';
-import icon100 from '@/assets/images/icons/trait/icon-100.jpg';
-import iconMega from '@/assets/images/icons/trait/icon-m.jpg';
-import iconGiga from '@/assets/images/icons/trait/icon-g.png';
-import iconSuperGiga from '@/assets/images/icons/trait/icon-sg.png';
+import { TRAIT_SLOT_ICONS } from '@/shared/icons/traitIcons';
 
 const props = defineProps<{ id: string }>();
 
@@ -82,12 +77,12 @@ const traitItems = computed<TraitItem[]>(() => {
   add(undefined, target.サイズ特性);
   add(undefined, target.新生前特性1);
   add(undefined, target.新生前特性2);
-  add(icon25, target.特性25);
-  add(icon50, target.特性50);
-  add(icon100, target.特性100);
-  add(iconMega, target.メガ特性);
-  add(iconGiga, target.ギガ特性);
-  add(iconSuperGiga, target.超ギガ特性);
+  add(TRAIT_SLOT_ICONS.level25, target.特性25);
+  add(TRAIT_SLOT_ICONS.level50, target.特性50);
+  add(TRAIT_SLOT_ICONS.level100, target.特性100);
+  add(TRAIT_SLOT_ICONS.mega, target.メガ特性);
+  add(TRAIT_SLOT_ICONS.giga, target.ギガ特性);
+  add(TRAIT_SLOT_ICONS.superGiga, target.超ギガ特性);
   return items;
 });
 

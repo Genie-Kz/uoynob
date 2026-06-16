@@ -8,7 +8,11 @@ import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/dom
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
-import { BODY_SIZES } from '@/constants/monsterTaxonomy';
+import {
+  bodySizeOptionValue,
+  bodySizeSelectOptions,
+  thresholdSelectOptions,
+} from '@/features/monster-search/searchOptions';
 import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
 import DataState from '@/shared/ui/DataState.vue';
 import IconSelect from '@/shared/ui/IconSelect.vue';
@@ -18,16 +22,6 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 const { monsters, isLoading, errorMessage } = useMonsters();
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
-// 各耐性の閾値（「○○↑＝その段階以上」）の選択肢
-const THRESHOLD_OPTIONS = [
-  { label: '', level: null },
-  { label: '普通↑', level: 1 },
-  { label: '軽減↑', level: 2 },
-  { label: '半減↑', level: 3 },
-  { label: '激減↑', level: 4 },
-  { label: '無効↑', level: 5 },
-] as const;
-
 const selectedLevelByElement = ref<Record<string, number | null>>(
   Object.fromEntries(RESISTANCE_ELEMENTS.map((element) => [element, null])),
 );
@@ -35,25 +29,6 @@ const selectedTraits = ref<string[]>([]);
 const traitKeyword = ref('');
 const searchResults = ref<Monster[] | null>(null);
 const searchBodySize = ref('');
-
-const BODY_SIZE_OPTIONS: { label: string; value: BodySize | '' }[] = [
-  { label: 'デフォルトサイズ', value: '' },
-  { label: 'スモールボディ', value: 'スモールボディ' },
-  { label: 'スタンダードボディ', value: 'スタンダードボディ' },
-  { label: 'メガボディ', value: 'メガボディ' },
-  { label: 'ギガボディ', value: 'ギガボディ' },
-  { label: '超ギガボディ', value: '超ギガボディ' },
-];
-/** IconSelect用：ボディサイズ（アイコン付き） */
-const bodySizeSelectOptions = BODY_SIZE_OPTIONS.map((option) => ({
-  value: option.value as string,
-  label: option.label,
-}));
-/** IconSelect用：耐性閾値 */
-const thresholdSelectOptions = THRESHOLD_OPTIONS.map((option) => ({
-  value: option.level,
-  label: option.label,
-}));
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const visibleTraitNames = computed(() => {
@@ -90,10 +65,6 @@ function resetAll(): void {
 const hasCriteria = computed(
   () => thresholds.value.length > 0 || selectedTraits.value.length > 0,
 );
-
-function bodySizeOptionValue(value: string | number | null): BodySize | null {
-  return BODY_SIZES.find((size) => size === value) ?? null;
-}
 </script>
 
 <template>

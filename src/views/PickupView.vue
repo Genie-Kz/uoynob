@@ -9,6 +9,11 @@ import { usePageSeo } from '@/composables/usePageSeo';
 import { loadPickups } from '@/shared/data/datasets';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import { groupPickupSkills } from '@/domain/pickupGrouping';
+import {
+  createPickupSkillGroupViews,
+  pickupMonsterByRef,
+  pickupMonsterRoute,
+} from '@/features/pickup/pickupViewModel';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
@@ -28,6 +33,9 @@ const skillGroups = computed(() => {
   if (!target || target.type !== 'skills' || !skills.value) return null;
   return groupPickupSkills(props.pickupKey, target.items, skills.value);
 });
+const skillGroupViews = computed(() =>
+  createPickupSkillGroupViews(props.pickupKey, skillGroups.value, monsters.value ?? []),
+);
 
 function totalCount(): number {
   const target = entry.value;
@@ -47,18 +55,11 @@ usePageSeo(() => entry.value?.title, seoDescription);
 const monsterById = computed(() => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])));
 
 function monsterOf(ref: PickupRef): Monster | null {
-  const resolved = resolveMonsterId.value(ref.id);
-  return resolved ? (monsterById.value.get(resolved) ?? null) : null;
+  return pickupMonsterByRef(ref, resolveMonsterId.value, monsterById.value);
 }
 
 function monsterRoute(ref: PickupRef) {
-  const resolved = resolveMonsterId.value(ref.id);
-  return resolved ? { name: 'monster-detail', params: { id: resolved } } : null;
-}
-
-function groupMonster(label: string): Monster | null {
-  if (props.pickupKey !== 'skill-local') return null;
-  return (monsters.value ?? []).find((monster) => monster.名前 === label) ?? null;
+  return pickupMonsterRoute(ref, resolveMonsterId.value);
 }
 
 function groupId(index: number): string {
@@ -87,31 +88,31 @@ function scrollToGroup(index: number): void {
         <p class="text-sm text-gray-500 mb-3">{{ totalCount() }} 件</p>
 
         <!-- スキル一覧（目的別に分類） -->
-        <div v-if="entry.type === 'skills' && skillGroups">
+        <div v-if="entry.type === 'skills' && skillGroupViews">
           <nav aria-label="分類へのリンク" class="border rounded bg-gray-50 p-3 mb-5">
             <p class="text-sm font-bold mb-2">分類から探す</p>
             <div class="flex flex-wrap gap-2">
               <a
-                v-for="(group, index) in skillGroups"
+                v-for="(group, index) in skillGroupViews"
                 :key="group.label"
                 :href="`#${groupId(index)}`"
                 class="tag-link app-link bg-white inline-flex items-center gap-1"
                 @click.prevent="scrollToGroup(index)"
               >
-                <MonsterIcon v-if="groupMonster(group.label)" :lineage="groupMonster(group.label)!.系統" :no="groupMonster(group.label)!.no" />
+                <MonsterIcon v-if="group.iconMonster" :lineage="group.iconMonster.系統" :no="group.iconMonster.no" />
                 {{ group.label }}
               </a>
             </div>
           </nav>
 
           <section
-            v-for="(group, index) in skillGroups"
+            v-for="(group, index) in skillGroupViews"
             :id="groupId(index)"
             :key="group.label"
             class="mb-5 scroll-mt-3"
           >
             <h3 class="text-lg font-bold mb-2 inline-flex items-center gap-2">
-              <MonsterIcon v-if="groupMonster(group.label)" :lineage="groupMonster(group.label)!.系統" :no="groupMonster(group.label)!.no" size="lg" />
+              <MonsterIcon v-if="group.iconMonster" :lineage="group.iconMonster.系統" :no="group.iconMonster.no" size="lg" />
               {{ group.label }}
             </h3>
             <div class="flex flex-wrap gap-1">

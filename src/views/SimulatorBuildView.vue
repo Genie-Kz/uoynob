@@ -9,14 +9,23 @@ import { useBuildSimulator } from '@/features/simulator/useBuildSimulator';
 import { useTraitLink } from '@/composables/useTraitLink';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { loadAttributes, loadWeapons } from '@/shared/data/datasets';
-import { BODY_SIZES, WEAPONS, lineageInfoOf } from '@/constants/monsterTaxonomy';
+import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
-import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
-import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
+import { MONSHOU_LIST } from '@/constants/statsRules';
 import { canBeSpFromAttributes } from '@/constants/spRules';
-import { summarizeGuardEffects } from '@/domain/skillAnalysis';
 import { disadvantageTraits, totalDisadvantageCost } from '@/domain/traitDisadvantage';
 import { buildResistanceCells } from '@/presentation/resistanceCells';
+import {
+  bodySizePickerItems,
+  equippableWeaponItems,
+  equippableWeaponTypes,
+  forgePickerItems,
+  isResistanceForge,
+  skillGuardSummary,
+  skillPickerItems,
+  traitPickerItems,
+  weaponPickerItems,
+} from '@/features/simulator/simulatorViewModel';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 import ResistanceGrid from '@/shared/ui/ResistanceGrid.vue';
@@ -26,7 +35,6 @@ import StatsBar from '@/shared/ui/StatsBar.vue';
 import FamilyTreeIv from '@/features/simulator/components/FamilyTreeIv.vue';
 import DisadvantageTraits from '@/features/simulator/components/DisadvantageTraits.vue';
 import type { PickerItem } from '@/types/picker';
-import type { Skill } from '@/types/skill';
 
 const props = defineProps<{ id: string }>();
 
@@ -131,24 +139,12 @@ const activeTab = ref<'build' | 'family'>('build');
 
 /* ---- 武器 ---- */
 const weaponByNo = computed(() => new Map((weapons.value ?? []).map((w) => [w.no, w])));
-const hasAllWeaponTrait = computed(
-  () => traitSlots.value.includes('すべての武器装備') || skillAddedTraits.value.includes('すべての武器装備'),
+const equippableTypes = computed<string[]>(() =>
+  equippableWeaponTypes(monster.value, traitSlots.value, skillAddedTraits.value),
 );
-const equippableTypes = computed<string[]>(() => {
-  if (hasAllWeaponTrait.value) return [...WEAPONS];
-  if (!monster.value) return [];
-  return WEAPONS.filter((type) => monster.value?.[type] === '〇');
-});
 const equippableWeapons = computed(() =>
-  (weapons.value ?? []).filter((w) => equippableTypes.value.includes(w.type)),
+  equippableWeaponItems(weapons.value ?? [], equippableTypes.value),
 );
-
-function skillGuardSummary(skill: Skill): string {
-  return [...summarizeGuardEffects(skill)].map(([element, count]) => `${element}+${count * 2}`).join(' ');
-}
-function isResistanceForge(value: string): boolean {
-  return (RESISTANCE_ELEMENTS as readonly string[]).includes(value);
-}
 
 /* ---- 入れ替えモーダル ---- */
 type PickerMode = 'size' | 'trait' | 'skill' | 'forge' | 'weapon';
@@ -168,7 +164,7 @@ function openBodySizePicker(): void {
     mode: 'size',
     index: 0,
     title: 'ボディサイズを選択',
-    items: BODY_SIZES.map((size) => ({ label: size, value: size })),
+    items: bodySizePickerItems(),
     current: bodySize.value,
   };
 }
@@ -178,7 +174,7 @@ function openTraitPicker(index: number): void {
     mode: 'trait',
     index,
     title: '特性を選択',
-    items: [{ label: '（空きにする）', value: '' }, ...traitMaster.value.map((name) => ({ label: name, value: name }))],
+    items: traitPickerItems(traitMaster.value),
     current: traitSlots.value[index] ?? '',
   };
 }
@@ -188,14 +184,7 @@ function openSkillPicker(index: number): void {
     mode: 'skill',
     index,
     title: 'スキルを選択',
-    items: [
-      { label: '（空きにする）', value: '' },
-      ...(skills.value ?? []).map((skill) => ({
-        label: skill.name,
-        value: skill.id,
-        searchText: skill.composition.map((part) => part.name).join(' '),
-      })),
-    ],
+    items: skillPickerItems(skills.value ?? []),
     current: skillSlots.value[index]?.id ?? '',
   };
 }
@@ -205,11 +194,7 @@ function openForgePicker(index: number): void {
     mode: 'forge',
     index,
     title: '武器鍛冶を選択',
-    items: [
-      { label: '（なし）', value: '' },
-      ...RESISTANCE_ELEMENTS.map((element) => ({ label: `${element}（耐性+1）`, value: element })),
-      ...FORGE_STAT_UP_OPTIONS.map((option) => ({ label: option.label, value: option.label })),
-    ],
+    items: forgePickerItems(),
     current: forgeSlots.value[index] ?? '',
   };
 }
@@ -219,10 +204,7 @@ function openWeaponPicker(): void {
     mode: 'weapon',
     index: 0,
     title: '武器を選択',
-    items: [
-      { label: '（未装備）', value: '' },
-      ...equippableWeapons.value.map((w) => ({ label: `${w.name}〔${w.type}〕 攻+${w.攻撃力}`, value: String(w.no) })),
-    ],
+    items: weaponPickerItems(equippableWeapons.value),
     current: weapon.value ? String(weapon.value.no) : '',
   };
 }
