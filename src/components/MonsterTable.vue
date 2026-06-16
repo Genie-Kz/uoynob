@@ -64,24 +64,24 @@ const visibleMonsters = computed(() => {
 <template>
   <div>
     <div class="mb-3">
-      <div class="flex flex-wrap justify-end gap-2 mb-2">
+      <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2">
         <IconSelect
           v-model="selectedLineage"
           :options="lineageOptions"
           aria-label="系統で絞り込み"
-          class="w-32 sm:w-36"
+          class="w-[5.75rem] shrink-0 sm:w-36"
         />
         <IconSelect
           v-model="selectedRank"
           :options="rankOptions"
           aria-label="ランクで絞り込み"
-          class="w-24 sm:w-28"
+          class="w-[4.25rem] shrink-0 sm:w-28"
         />
         <IconSelect
           v-model="selectedBodySize"
           :options="bodySizeOptions"
           aria-label="ボディサイズで絞り込み"
-          class="w-36 sm:w-40"
+          class="w-[6.5rem] shrink-0 sm:w-40"
         >
           <template #icon="{ option }">
             <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
