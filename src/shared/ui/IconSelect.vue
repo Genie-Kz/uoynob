@@ -55,7 +55,9 @@ function choose(value: T): void {
     <template v-if="open">
       <!-- 外側クリックで閉じる透明レイヤー -->
       <div class="fixed inset-0 z-40" @click="open = false"></div>
-      <ul class="absolute left-0 right-0 z-50 mt-1 overflow-visible rounded border bg-white shadow-lg">
+      <ul
+        class="absolute left-0 right-0 z-50 mt-1 overflow-visible rounded border bg-white shadow-lg"
+      >
         <li v-for="option in options" :key="String(option.value)">
           <button
             type="button"

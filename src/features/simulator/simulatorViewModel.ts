@@ -12,7 +12,8 @@ export function equippableWeaponTypes(
   traits: string[],
   skillAddedTraits: string[],
 ): string[] {
-  if (traits.includes('すべての武器装備') || skillAddedTraits.includes('すべての武器装備')) return [...WEAPONS];
+  if (traits.includes('すべての武器装備') || skillAddedTraits.includes('すべての武器装備'))
+    return [...WEAPONS];
   if (!monster) return [];
   return WEAPONS.filter((type) => monster[type] === '〇');
 }
@@ -26,7 +27,10 @@ export function bodySizePickerItems(): PickerItem[] {
 }
 
 export function traitPickerItems(traitMaster: string[]): PickerItem[] {
-  return [{ label: '（空きにする）', value: '' }, ...traitMaster.map((name) => ({ label: name, value: name }))];
+  return [
+    { label: '（空きにする）', value: '' },
+    ...traitMaster.map((name) => ({ label: name, value: name })),
+  ];
 }
 
 export function skillPickerItems(skills: Skill[]): PickerItem[] {
@@ -51,12 +55,17 @@ export function forgePickerItems(): PickerItem[] {
 export function weaponPickerItems(weapons: Weapon[]): PickerItem[] {
   return [
     { label: '（未装備）', value: '' },
-    ...weapons.map((weapon) => ({ label: `${weapon.name}〔${weapon.type}〕 攻+${weapon.攻撃力}`, value: String(weapon.no) })),
+    ...weapons.map((weapon) => ({
+      label: `${weapon.name}〔${weapon.type}〕 攻+${weapon.攻撃力}`,
+      value: String(weapon.no),
+    })),
   ];
 }
 
 export function skillGuardSummary(skill: Skill): string {
-  return [...summarizeGuardEffects(skill)].map(([element, count]) => `${element}+${count * 2}`).join(' ');
+  return [...summarizeGuardEffects(skill)]
+    .map(([element, count]) => `${element}+${count * 2}`)
+    .join(' ');
 }
 
 export function isResistanceForge(value: string): boolean {

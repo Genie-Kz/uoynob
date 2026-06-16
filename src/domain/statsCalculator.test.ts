@@ -25,7 +25,14 @@ function baseConfig(monster: Monster, overrides: Partial<StatsBuildConfig> = {})
   };
 }
 
-const monster = createMonster({ HP: 100, MP: 100, 攻撃力: 100, 守備力: 100, 素早さ: 100, 賢さ: 100 });
+const monster = createMonster({
+  HP: 100,
+  MP: 100,
+  攻撃力: 100,
+  守備力: 100,
+  素早さ: 100,
+  賢さ: 100,
+});
 
 describe('computeStats - 基本', () => {
   it('素の状態は基礎値×1.2（スタンダード・特性なし）', () => {
@@ -53,7 +60,9 @@ describe('computeStats - 特性倍率', () => {
   });
 
   it('メタルボディはHPに倍率、守備力・素早さの補正を1にする', () => {
-    const s = computeStats(baseConfig(monster, { bodySize: 'メガボディ', traits: ['メタルボディ', 'AI2回行動'] }));
+    const s = computeStats(
+      baseConfig(monster, { bodySize: 'メガボディ', traits: ['メタルボディ', 'AI2回行動'] }),
+    );
     // HP: A=ceil(100*1.2*0.72(AIメタル)*1.5(メガ))=ceil(129.6)=130, B=ceil(130/3)=44, C=44, D=44 → 44
     expect(s.HP).toBe(44);
     // 守備力: メタルでボディ・AI倍率1 → A=ceil(100*1.2*1*1)=120 → 120
@@ -62,7 +71,12 @@ describe('computeStats - 特性倍率', () => {
 
   it('つねにアタックカンタはHPを0.75、SP化で無効', () => {
     expect(computeStats(baseConfig(monster, { traits: ['つねにアタックカンタ'] })).HP).toBe(90); // ceil(120*0.75)
-    const sp = computeStats(baseConfig(monster, { traits: ['つねにアタックカンタ'], spTraits: new Set(['つねにアタックカンタ']) }));
+    const sp = computeStats(
+      baseConfig(monster, {
+        traits: ['つねにアタックカンタ'],
+        spTraits: new Set(['つねにアタックカンタ']),
+      }),
+    );
     expect(sp.HP).toBe(120);
   });
 
@@ -71,7 +85,9 @@ describe('computeStats - 特性倍率', () => {
     const s = computeStats(baseConfig(monster, { skills: [buon] }));
     expect(s.HP).toBe(180); // ceil(120*1.5)
     expect(s.攻撃力).toBe(60); // ceil(120*0.5)
-    const sp = computeStats(baseConfig(monster, { skills: [buon], spTraits: new Set(['ＨＰバブル']) }));
+    const sp = computeStats(
+      baseConfig(monster, { skills: [buon], spTraits: new Set(['ＨＰバブル']) }),
+    );
     expect(sp.HP).toBe(240); // ceil(120*2)
     expect(sp.攻撃力).toBe(40); // ceil(120/3)
   });
@@ -106,7 +122,15 @@ describe('computeStats - 加算（スキル・武器・紋晶・鍛冶）', () =
   });
 
   it('武器の攻撃力が加算', () => {
-    const weapon = { no: 1, name: 'テスト剣', type: '剣', 攻撃力: 100, 守備力: 0, 素早さ: 0, 賢さ: 0 };
+    const weapon = {
+      no: 1,
+      name: 'テスト剣',
+      type: '剣',
+      攻撃力: 100,
+      守備力: 0,
+      素早さ: 0,
+      賢さ: 0,
+    };
     expect(computeStats(baseConfig(monster, { weapon })).攻撃力).toBe(220); // ceil(120+100)
   });
 
@@ -118,7 +142,9 @@ describe('computeStats - 加算（スキル・武器・紋晶・鍛冶）', () =
   });
 
   it('武器鍛冶のステータスアップが加算', () => {
-    const s = computeStats(baseConfig(monster, { forgeStatUps: [{ label: '素早さ+30', stat: '素早さ', value: 30 }] }));
+    const s = computeStats(
+      baseConfig(monster, { forgeStatUps: [{ label: '素早さ+30', stat: '素早さ', value: 30 }] }),
+    );
     expect(s.素早さ).toBe(150); // ceil(120+30)
   });
 });

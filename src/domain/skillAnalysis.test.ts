@@ -23,7 +23,11 @@ describe('guardAbilityToElement', () => {
 
 describe('summarizeGuardEffects', () => {
   it('重複するガード特性を個数として数える', () => {
-    const skill = createGuardSkill('001', 'テストスキル', ['炎ブレスガード＋', '炎ブレスガード＋', 'メラガード＋']);
+    const skill = createGuardSkill('001', 'テストスキル', [
+      '炎ブレスガード＋',
+      '炎ブレスガード＋',
+      'メラガード＋',
+    ]);
     const summary = summarizeGuardEffects(skill);
     expect(summary.get('炎')).toBe(2);
     expect(summary.get('メラ')).toBe(1);

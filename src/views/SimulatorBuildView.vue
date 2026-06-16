@@ -47,7 +47,9 @@ const { data: weapons } = useAsyncData(loadWeapons);
 const { traitRoute } = useTraitLink();
 const { data: attributes } = useAsyncData(loadAttributes);
 
-const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+const monster = computed(
+  () => monsters.value?.find((candidate) => candidate.id === props.id) ?? null,
+);
 
 const seoDescription = computed(() => {
   const target = monster.value;
@@ -108,15 +110,13 @@ const resistanceCells = computed(() => buildResistanceCells(resistanceOutcomes.v
 const unfavorableTraits = computed(() => {
   const target = monster.value;
   if (!target) return [];
-  return disadvantageTraits(
-    target.ランク,
-    totalDisadvantageCost(traitSlots.value, target.名前),
-  );
+  return disadvantageTraits(target.ランク, totalDisadvantageCost(traitSlots.value, target.名前));
 });
 const spAvailableTraits = computed(() => {
   const attributeList = attributes.value ?? [];
-  return [...traitSlots.value, ...skillAddedTraits.value, ...unfavorableTraits.value]
-    .filter((trait) => trait && canBeSpFromAttributes(trait, attributeList));
+  return [...traitSlots.value, ...skillAddedTraits.value, ...unfavorableTraits.value].filter(
+    (trait) => trait && canBeSpFromAttributes(trait, attributeList),
+  );
 });
 
 watch(shareQuery, (query) => {
@@ -149,7 +149,14 @@ const equippableWeapons = computed(() =>
 /* ---- 入れ替えモーダル ---- */
 type PickerMode = 'size' | 'trait' | 'skill' | 'forge' | 'weapon';
 
-const picker = ref<{ open: boolean; mode: PickerMode; index: number; title: string; items: PickerItem[]; current: string }>({
+const picker = ref<{
+  open: boolean;
+  mode: PickerMode;
+  index: number;
+  title: string;
+  items: PickerItem[];
+  current: string;
+}>({
   open: false,
   mode: 'trait',
   index: 0,
@@ -215,7 +222,8 @@ function handlePick(value: string): void {
   else if (mode === 'trait') setTrait(index, value);
   else if (mode === 'skill') setSkill(index, value ? (skillById.value.get(value) ?? null) : null);
   else if (mode === 'forge') setForgeElement(index, value);
-  else if (mode === 'weapon') setWeapon(value ? (weaponByNo.value.get(Number(value)) ?? null) : null);
+  else if (mode === 'weapon')
+    setWeapon(value ? (weaponByNo.value.get(Number(value)) ?? null) : null);
   picker.value.open = false;
 }
 
@@ -247,7 +255,10 @@ const monshouOptions = MONSHOU_LIST;
               <span class="bg-gray-200 rounded px-2 py-0.5">No.{{ monster.no }}</span>
               <span class="bg-sky-200 rounded px-2 py-0.5">ランク{{ monster.ランク }}</span>
               <span class="bg-gray-100 rounded px-2 py-0.5">{{ lineage?.label }}</span>
-              <router-link :to="{ name: 'monster-detail', params: { id: monster.id } }" class="app-link ml-1">
+              <router-link
+                :to="{ name: 'monster-detail', params: { id: monster.id } }"
+                class="app-link ml-1"
+              >
                 図鑑を見る
               </router-link>
             </div>
@@ -259,7 +270,11 @@ const monshouOptions = MONSHOU_LIST;
           <button
             type="button"
             class="px-4 py-2 text-sm border-b-2 -mb-px"
-            :class="activeTab === 'build' ? 'border-blue-500 text-blue-600 font-bold' : 'border-transparent text-gray-500'"
+            :class="
+              activeTab === 'build'
+                ? 'border-blue-500 text-blue-600 font-bold'
+                : 'border-transparent text-gray-500'
+            "
             @click="activeTab = 'build'"
           >
             ビルド
@@ -267,7 +282,11 @@ const monshouOptions = MONSHOU_LIST;
           <button
             type="button"
             class="px-4 py-2 text-sm border-b-2 -mb-px"
-            :class="activeTab === 'family' ? 'border-blue-500 text-blue-600 font-bold' : 'border-transparent text-gray-500'"
+            :class="
+              activeTab === 'family'
+                ? 'border-blue-500 text-blue-600 font-bold'
+                : 'border-transparent text-gray-500'
+            "
             @click="activeTab = 'family'"
           >
             ステータス・系図
@@ -292,11 +311,22 @@ const monshouOptions = MONSHOU_LIST;
           <ul class="border rounded divide-y mb-5">
             <li class="flex items-center justify-between px-3 py-2">
               <span>ボディサイズ：{{ bodySize }}</span>
-              <button type="button" class="btn-outline-primary" @click="openBodySizePicker">選択</button>
+              <button type="button" class="btn-outline-primary" @click="openBodySizePicker">
+                選択
+              </button>
             </li>
-            <li v-for="(trait, index) in traitSlots" :key="index" class="flex items-center justify-between gap-2 px-3 py-2">
+            <li
+              v-for="(trait, index) in traitSlots"
+              :key="index"
+              class="flex items-center justify-between gap-2 px-3 py-2"
+            >
               <span :class="{ 'text-gray-400': !trait }">
-                <router-link v-if="trait && traitRoute(trait)" :to="traitRoute(trait)!" class="app-link">{{ trait }}</router-link>
+                <router-link
+                  v-if="trait && traitRoute(trait)"
+                  :to="traitRoute(trait)!"
+                  class="app-link"
+                  >{{ trait }}</router-link
+                >
                 <template v-else>{{ trait || '（空き）' }}</template>
               </span>
               <span class="flex items-center gap-2">
@@ -304,12 +334,18 @@ const monshouOptions = MONSHOU_LIST;
                   v-if="trait && spAvailableTraits.includes(trait)"
                   type="button"
                   class="rounded border px-3 py-1 text-sm font-semibold"
-                  :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+                  :class="
+                    isSp(trait)
+                      ? 'border-blue-500 bg-blue-600 text-white'
+                      : 'border-gray-300 text-gray-500'
+                  "
                   @click="toggleSp(trait)"
                 >
                   SP
                 </button>
-                <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">選択</button>
+                <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">
+                  選択
+                </button>
               </span>
             </li>
           </ul>
@@ -325,16 +361,26 @@ const monshouOptions = MONSHOU_LIST;
           <!-- スキルで追加される特性 -->
           <h3 class="text-lg font-bold mb-2">スキルで追加される特性</h3>
           <ul class="border rounded divide-y mb-5">
-            <li v-for="trait in skillAddedTraits" :key="trait" class="flex items-center justify-between gap-2 px-3 py-2">
+            <li
+              v-for="trait in skillAddedTraits"
+              :key="trait"
+              class="flex items-center justify-between gap-2 px-3 py-2"
+            >
               <span>
-                <router-link v-if="traitRoute(trait)" :to="traitRoute(trait)!" class="app-link">{{ trait }}</router-link>
+                <router-link v-if="traitRoute(trait)" :to="traitRoute(trait)!" class="app-link">{{
+                  trait
+                }}</router-link>
                 <template v-else>{{ trait }}</template>
               </span>
               <button
                 v-if="spAvailableTraits.includes(trait)"
                 type="button"
                 class="rounded border px-3 py-1 text-sm font-semibold"
-                :class="isSp(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+                :class="
+                  isSp(trait)
+                    ? 'border-blue-500 bg-blue-600 text-white'
+                    : 'border-gray-300 text-gray-500'
+                "
                 @click="toggleSp(trait)"
               >
                 SP
@@ -346,18 +392,29 @@ const monshouOptions = MONSHOU_LIST;
           <!-- スキル -->
           <div class="flex items-center justify-between mb-2 pr-2">
             <h3 class="text-lg font-bold">
-              スキル <span class="text-sm text-gray-500 font-normal">{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span>
+              スキル
+              <span class="text-sm text-gray-500 font-normal"
+                >{{ SKILL_SLOT_COUNT_BY_SIZE[bodySize] }}枠</span
+              >
             </h3>
             <button type="button" class="btn-outline-primary" @click="resetSkills">リセット</button>
           </div>
           <ul class="border rounded divide-y mb-5">
-            <li v-for="(skill, index) in skillSlots" :key="index" class="flex items-center justify-between px-3 py-2">
+            <li
+              v-for="(skill, index) in skillSlots"
+              :key="index"
+              class="flex items-center justify-between px-3 py-2"
+            >
               <span v-if="skill">
                 {{ skill.name }}
-                <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{ skillGuardSummary(skill) }}</span>
+                <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{
+                  skillGuardSummary(skill)
+                }}</span>
               </span>
               <span v-else class="text-gray-400">（空き）</span>
-              <button type="button" class="btn-outline-primary" @click="openSkillPicker(index)">選択</button>
+              <button type="button" class="btn-outline-primary" @click="openSkillPicker(index)">
+                選択
+              </button>
             </li>
           </ul>
 
@@ -367,19 +424,26 @@ const monshouOptions = MONSHOU_LIST;
             <button type="button" class="btn-outline-primary" @click="resetForge">リセット</button>
           </div>
           <ul class="border rounded divide-y mb-5">
-            <li v-for="(value, index) in forgeSlots" :key="index" class="flex items-center justify-between px-3 py-2">
+            <li
+              v-for="(value, index) in forgeSlots"
+              :key="index"
+              class="flex items-center justify-between px-3 py-2"
+            >
               <span>
                 鍛冶{{ index + 1 }}：
                 <template v-if="value">
                   {{ value }}
-                  <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs">{{ isResistanceForge(value) ? '耐性+1' : 'ステータス' }}</span>
+                  <span class="bg-sky-200 rounded px-1.5 py-0.5 text-xs">{{
+                    isResistanceForge(value) ? '耐性+1' : 'ステータス'
+                  }}</span>
                 </template>
                 <span v-else class="text-gray-400">（なし）</span>
               </span>
-              <button type="button" class="btn-outline-primary" @click="openForgePicker(index)">選択</button>
+              <button type="button" class="btn-outline-primary" @click="openForgePicker(index)">
+                選択
+              </button>
             </li>
           </ul>
-
         </div>
 
         <!-- ステータス・系図タブ -->
@@ -403,18 +467,26 @@ const monshouOptions = MONSHOU_LIST;
               </template>
               <span v-else class="text-gray-400">未装備</span>
             </span>
-            <button type="button" class="btn-outline-primary" @click="openWeaponPicker">選択</button>
+            <button type="button" class="btn-outline-primary" @click="openWeaponPicker">
+              選択
+            </button>
           </div>
 
           <!-- 紋晶 -->
-          <h3 class="text-lg font-bold mb-2">紋晶<span class="text-sm text-gray-500 font-normal ml-1">（1つのみ）</span></h3>
+          <h3 class="text-lg font-bold mb-2">
+            紋晶<span class="text-sm text-gray-500 font-normal ml-1">（1つのみ）</span>
+          </h3>
           <div class="flex flex-wrap gap-2 mb-5">
             <button
               v-for="m in monshouOptions"
               :key="m.name"
               type="button"
               class="rounded border px-3 py-2 text-sm"
-              :class="monshouNames.includes(m.name) ? 'border-blue-500 bg-blue-600 text-white' : 'border-blue-500 bg-white text-blue-600 hover:bg-blue-50'"
+              :class="
+                monshouNames.includes(m.name)
+                  ? 'border-blue-500 bg-blue-600 text-white'
+                  : 'border-blue-500 bg-white text-blue-600 hover:bg-blue-50'
+              "
               @click="toggleMonshou(m.name)"
             >
               {{ m.name }}
@@ -432,7 +504,9 @@ const monshouOptions = MONSHOU_LIST;
               :value="parentLevelTotal"
               @input="onParentLevelInput"
             />
-            <span class="text-sm text-gray-500">（両親のレベル合計。最大200で全ステータス+5%）</span>
+            <span class="text-sm text-gray-500"
+              >（両親のレベル合計。最大200で全ステータス+5%）</span
+            >
           </div>
         </div>
       </div>

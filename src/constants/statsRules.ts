@@ -42,23 +42,23 @@ export const BODY_SIZE_MULTIPLIERS_METAL: Record<BodySize, StatValues> = {
 /* ---- AI行動回数倍率（全ステータス共通の値） ---- */
 export const AI_ACTION_MULTIPLIER: Record<string, number> = {
   'AI1～2回行動': 0.9,
-  'AI2回行動': 0.8,
+  AI2回行動: 0.8,
   'AI1～3回行動': 0.8,
   'AI2～3回行動': 0.7,
-  'AI3回行動': 0.65,
+  AI3回行動: 0.65,
   'AI3～4回行動': 0.62,
-  'AI4回行動': 0.6,
+  AI4回行動: 0.6,
 };
 
 /** メタルボディ装備時のAI倍率（守備力・素早さは1、その他はこの値） */
 export const AI_ACTION_MULTIPLIER_METAL: Record<string, number> = {
   'AI1～2回行動': 0.86,
-  'AI2回行動': 0.72,
+  AI2回行動: 0.72,
   'AI1～3回行動': 0.72,
   'AI2～3回行動': 0.58,
-  'AI3回行動': 0.51,
+  AI3回行動: 0.51,
   'AI3～4回行動': 0.468,
-  'AI4回行動': 0.44,
+  AI4回行動: 0.44,
 };
 
 /** メタルボディ装備時に倍率を1に固定するステータス */
@@ -73,7 +73,11 @@ export const METAL_BODY_HP_MULTIPLIER: Record<string, number> = {
 };
 
 /** 補正テーブルの差し替え（守備力・素早さを1にしAI倍率を下げる）対象のメタル特性 */
-export const METAL_TABLE_OVERRIDE_TRAITS = ['メタルボディ', 'ハードメタルボディ', '超ハードメタルボディ'];
+export const METAL_TABLE_OVERRIDE_TRAITS = [
+  'メタルボディ',
+  'ハードメタルボディ',
+  '超ハードメタルボディ',
+];
 
 /* ---- つねにアタックカンタ／マホカンタ（HPのみ。SP化で補正なし） ---- */
 export const ALWAYS_ATTACK_KANTA_HP_MULTIPLIER = 0.75;
@@ -86,7 +90,11 @@ export const HP_BUBBLE_TRAIT = 'ＨＰバブル';
 export const MP_BUBBLE_TRAIT = 'ＭＰバブル';
 /** HPバブルが影響するステータスと倍率（通常 / SP） */
 export const HP_BUBBLE_MULTIPLIERS: Partial<StatValues> = { HP: 1.5, 攻撃力: 0.5, 素早さ: 0.5 };
-export const HP_BUBBLE_SP_MULTIPLIERS: Partial<StatValues> = { HP: 2, 攻撃力: 1 / 3, 素早さ: 1 / 3 };
+export const HP_BUBBLE_SP_MULTIPLIERS: Partial<StatValues> = {
+  HP: 2,
+  攻撃力: 1 / 3,
+  素早さ: 1 / 3,
+};
 /** MPバブルが影響するステータスと倍率（通常 / SP） */
 export const MP_BUBBLE_MULTIPLIERS: Partial<StatValues> = { MP: 2, 守備力: 0.5, 賢さ: 0.5 };
 export const MP_BUBBLE_SP_MULTIPLIERS: Partial<StatValues> = { MP: 4, 守備力: 1 / 3, 賢さ: 1 / 3 };

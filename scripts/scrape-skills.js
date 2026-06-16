@@ -10,13 +10,15 @@ const OUT = path.join(scriptDir, '..', 'public', 'data', 'skills.json');
 const TOTAL = 425;
 const CONCURRENCY = 8;
 
-function pad3(n) { return String(n).padStart(3, '0'); }
+function pad3(n) {
+  return String(n).padStart(3, '0');
+}
 
 async function fetchPage(id) {
   const idp = pad3(id);
   const urls = [
     BASE + SNAP + '/https://bonyou.info/dqm2sp/skill/detail/?id=' + idp,
-    BASE + '2024/https://bonyou.info/dqm2sp/skill/detail/?id=' + idp
+    BASE + '2024/https://bonyou.info/dqm2sp/skill/detail/?id=' + idp,
   ];
   for (const u of urls) {
     try {
@@ -25,16 +27,25 @@ async function fetchPage(id) {
         const html = await r.text();
         if (html.indexOf('スキル構成') >= 0) return html;
       }
-    } catch { /* 次のURLを試す */ }
+    } catch {
+      /* 次のURLを試す */
+    }
   }
   return null;
 }
 
 function decodeEntities(s) {
-  return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
 }
-function clean(s) { return decodeEntities(s).replace(/\s+/g, ' ').trim(); }
+function clean(s) {
+  return decodeEntities(s).replace(/\s+/g, ' ').trim();
+}
 
 function parse(html, id) {
   // 名前
@@ -82,7 +93,11 @@ async function main() {
     while (next <= TOTAL) {
       const id = next++;
       const html = await fetchPage(id);
-      if (!html) { failed.push(id); process.stderr.write('!'); continue; }
+      if (!html) {
+        failed.push(id);
+        process.stderr.write('!');
+        continue;
+      }
       results[id - 1] = parse(html, id);
       if (id % 25 === 0) process.stderr.write(' ' + id + ' ');
       else process.stderr.write('.');
@@ -91,6 +106,12 @@ async function main() {
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
   const ok = results.filter(Boolean);
   fs.writeFileSync(OUT, JSON.stringify(ok), 'utf8');
-  console.error('\n--- done. ok=' + ok.length + ' failed=' + failed.length + (failed.length ? ' [' + failed.join(',') + ']' : ''));
+  console.error(
+    '\n--- done. ok=' +
+      ok.length +
+      ' failed=' +
+      failed.length +
+      (failed.length ? ' [' + failed.join(',') + ']' : ''),
+  );
 }
 main();

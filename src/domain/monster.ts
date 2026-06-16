@@ -39,7 +39,8 @@ export function defaultEditableTraits(monster: Monster, bodySize: BodySize): str
     monster.特性50,
     monster.特性100,
   ];
-  const isMegaOrLarger = bodySize === 'メガボディ' || bodySize === 'ギガボディ' || bodySize === '超ギガボディ';
+  const isMegaOrLarger =
+    bodySize === 'メガボディ' || bodySize === 'ギガボディ' || bodySize === '超ギガボディ';
   const isGigaOrLarger = bodySize === 'ギガボディ' || bodySize === '超ギガボディ';
   if (isMegaOrLarger) traits.push(monster.メガ特性);
   if (isGigaOrLarger) traits.push(monster.ギガ特性);

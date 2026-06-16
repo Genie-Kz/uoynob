@@ -59,8 +59,10 @@ describe('includesKeyword', () => {
 
 describe('includesKeywordWithReading', () => {
   it('漢字の読みでヒットする', () => {
-    expect(includesKeywordWithReading('超ギガボディ', 'ちょう', {
-      超ギガボディ: 'ちょうギガボディ',
-    })).toBe(true);
+    expect(
+      includesKeywordWithReading('超ギガボディ', 'ちょう', {
+        超ギガボディ: 'ちょうギガボディ',
+      }),
+    ).toBe(true);
   });
 });

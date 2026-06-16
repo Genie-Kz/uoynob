@@ -61,10 +61,20 @@ function isGuardAbility(name: string): boolean {
 
         <h3 class="text-lg font-bold mb-2">スキル構成</h3>
         <ul class="border rounded divide-y mb-4">
-          <li v-for="(item, index) in skill.composition" :key="index" class="px-3 py-2 flex items-center gap-2">
+          <li
+            v-for="(item, index) in skill.composition"
+            :key="index"
+            class="px-3 py-2 flex items-center gap-2"
+          >
             <span>{{ item.name }}</span>
-            <span v-if="isGuardAbility(item.name)" class="bg-sky-200 rounded px-1.5 py-0.5 text-xs">耐性+2</span>
-            <span v-else-if="item.type === 'attribute'" class="bg-gray-100 rounded px-1.5 py-0.5 text-xs">特性</span>
+            <span v-if="isGuardAbility(item.name)" class="bg-sky-200 rounded px-1.5 py-0.5 text-xs"
+              >耐性+2</span
+            >
+            <span
+              v-else-if="item.type === 'attribute'"
+              class="bg-gray-100 rounded px-1.5 py-0.5 text-xs"
+              >特性</span
+            >
           </li>
         </ul>
 

@@ -37,10 +37,7 @@ const STAT_BY_CODE: Record<string, StatKey> = {
 export function individualValuesFromTemplate(template: string): StatValues {
   const isThreeUppercaseCodes = template.length === 3 && template === template.toUpperCase();
   const values = Object.fromEntries(
-    STAT_KEYS.map((stat) => [
-      stat,
-      isThreeUppercaseCodes ? INDIVIDUAL_VALUE_RANGE[stat].min : 0,
-    ]),
+    STAT_KEYS.map((stat) => [stat, isThreeUppercaseCodes ? INDIVIDUAL_VALUE_RANGE[stat].min : 0]),
   ) as StatValues;
   for (const code of template) {
     const stat = STAT_BY_CODE[code.toLowerCase()];

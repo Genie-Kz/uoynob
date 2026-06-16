@@ -42,7 +42,9 @@ const rows = computed<ResistanceCellView[][]>(() => {
             class="flex-1 text-center py-1"
             :class="{ 'border-l border-gray-200': colIndex > 0 }"
           >
-            <span class="inline-block rounded px-4 py-0.5" :class="cell.colorClass">{{ cell.text }}</span>
+            <span class="inline-block rounded px-4 py-0.5" :class="cell.colorClass">{{
+              cell.text
+            }}</span>
           </div>
         </div>
         <!-- 行間の横線（上下に余白をとり、縦線とは繋げない） -->

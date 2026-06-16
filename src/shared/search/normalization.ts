@@ -14,9 +14,7 @@ export function normalizeNfkcCompact(text: string): string {
  * 長音記号「ー」(U+30FC) などはそのまま残す。
  */
 export function katakanaToHiragana(text: string): string {
-  return text.replace(/[ァ-ヶ]/g, (char) =>
-    String.fromCharCode(char.charCodeAt(0) - 0x60),
-  );
+  return text.replace(/[ァ-ヶ]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0x60));
 }
 
 /**
@@ -24,9 +22,7 @@ export function katakanaToHiragana(text: string): string {
  * 全角/半角、ひらがな/カタカナ、「・」の差を吸収し、大文字小文字も無視する。
  */
 export function normalizeSearchText(text: string): string {
-  return katakanaToHiragana(normalizeNfkc(text))
-    .replace(/・/g, '')
-    .toLowerCase();
+  return katakanaToHiragana(normalizeNfkc(text)).replace(/・/g, '').toLowerCase();
 }
 
 /**
@@ -34,9 +30,5 @@ export function normalizeSearchText(text: string): string {
  * 既存の挙動を保つためNFKCは使わず、必要な半角表記だけ全角へ寄せる。
  */
 export function normalizeTraitCostKey(name: string): string {
-  return name
-    .replace(/\s+/g, '')
-    .replace(/HP/g, 'ＨＰ')
-    .replace(/MP/g, 'ＭＰ')
-    .replace(/%/g, '％');
+  return name.replace(/\s+/g, '').replace(/HP/g, 'ＨＰ').replace(/MP/g, 'ＭＰ').replace(/%/g, '％');
 }

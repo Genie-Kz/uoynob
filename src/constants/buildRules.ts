@@ -29,7 +29,15 @@ export const SIZE_RESISTANCE_BONUS: Record<BodySize, number> = {
 };
 
 /** メガ／ギガ／超ギガボディが耐性を上げる対象（状態異常系） */
-export const SIZE_AILMENT_ELEMENTS = ['ザキ', 'どく', '呪い', 'こんらん', 'マインド', 'マヒ', 'ねむり'];
+export const SIZE_AILMENT_ELEMENTS = [
+  'ザキ',
+  'どく',
+  '呪い',
+  'こんらん',
+  'マインド',
+  'マヒ',
+  'ねむり',
+];
 
 /** メタル系ボディが耐性を上げる対象 */
 export const METAL_BODY_AILMENT_ELEMENTS = ['どく', '呪い', 'こんらん', 'マヒ', 'ねむり'];

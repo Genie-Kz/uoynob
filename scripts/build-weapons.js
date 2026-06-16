@@ -142,5 +142,9 @@ const weapons = TABLE.trim()
     };
   });
 
-fs.writeFileSync(path.join(scriptDir, '..', 'public', 'data', 'weapons.json'), JSON.stringify(weapons), 'utf8');
+fs.writeFileSync(
+  path.join(scriptDir, '..', 'public', 'data', 'weapons.json'),
+  JSON.stringify(weapons),
+  'utf8',
+);
 console.error(`weapons: ${weapons.length}`);

@@ -79,7 +79,9 @@ function groupByAttribute(
   skillById: Map<string, Skill>,
   attributeNames: readonly string[],
 ): PickupSkillGroup[] {
-  const buckets = new Map<string, PickupRef[]>(attributeNames.map((attributeName) => [attributeName, []]));
+  const buckets = new Map<string, PickupRef[]>(
+    attributeNames.map((attributeName) => [attributeName, []]),
+  );
   for (const item of items) {
     const skill = skillById.get(item.id);
     for (const part of skill?.composition ?? []) {

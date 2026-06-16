@@ -26,5 +26,5 @@ export function effectiveResistances(monster: Monster): Record<string, Resistanc
 
 /** モンスターの指定要素の実効耐性値を返す */
 export function effectiveResistanceValue(monster: Monster, element: string): ResistanceValue {
-  return effectiveResistances(monster)[element];
+  return effectiveResistances(monster)[element]!;
 }

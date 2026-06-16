@@ -2,7 +2,11 @@ import type { Attribute } from '@/types/attribute';
 import type { BodySize, Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import type { StatValues, Weapon } from '@/types/stats';
-import { SKILL_SLOT_COUNT_BY_SIZE, TRAIT_SLOT_COUNT_BY_SIZE, WEAPON_FORGE_SLOT_COUNT } from '@/constants/buildRules';
+import {
+  SKILL_SLOT_COUNT_BY_SIZE,
+  TRAIT_SLOT_COUNT_BY_SIZE,
+  WEAPON_FORGE_SLOT_COUNT,
+} from '@/constants/buildRules';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST, STAT_KEYS } from '@/constants/statsRules';
@@ -86,16 +90,22 @@ export function restoreBuildShareState(
   const bodySize = BODY_SIZES[sizeIndex] ?? target.サイズ特性;
 
   const traitCodes = (readQuery(query, 't') ?? '').split('-');
-  const traitSlots = Array.from({ length: TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 }, (_unused, index) => {
-    const code = traitCodes[index];
-    return code ? (context.traitMaster[Number(code)] ?? '') : '';
-  });
+  const traitSlots = Array.from(
+    { length: TRAIT_SLOT_COUNT_BY_SIZE[bodySize] - 1 },
+    (_unused, index) => {
+      const code = traitCodes[index];
+      return code ? (context.traitMaster[Number(code)] ?? '') : '';
+    },
+  );
 
   const skillIds = (readQuery(query, 'k') ?? '').split('-');
-  const skillSlots = Array.from({ length: SKILL_SLOT_COUNT_BY_SIZE[bodySize] }, (_unused, index) => {
-    const id = skillIds[index];
-    return id ? (context.skillById.get(id) ?? null) : null;
-  });
+  const skillSlots = Array.from(
+    { length: SKILL_SLOT_COUNT_BY_SIZE[bodySize] },
+    (_unused, index) => {
+      const id = skillIds[index];
+      return id ? (context.skillById.get(id) ?? null) : null;
+    },
+  );
 
   const forgeCodes = (readQuery(query, 'f') ?? '').split('-');
   const forgeSlots = Array.from({ length: WEAPON_FORGE_SLOT_COUNT }, (_unused, index) => {
@@ -171,7 +181,10 @@ export function restoreBuildShareState(
   };
 }
 
-function encodeSpTraits(spTraitNames: string[], attributeIdByName: ReadonlyMap<string, string>): string {
+function encodeSpTraits(
+  spTraitNames: string[],
+  attributeIdByName: ReadonlyMap<string, string>,
+): string {
   const ids = spTraitNames.map((name) => attributeIdByName.get(name));
   return ids.every((id): id is string => !!id) ? ids.join('-') : spTraitNames.join(',');
 }
@@ -182,7 +195,9 @@ export function encodeBuildShareQuery(
 ): BuildShareQuery {
   return {
     s: String(BODY_SIZES.indexOf(state.bodySize)),
-    t: state.traitSlots.map((name) => (name ? String(context.traitMaster.indexOf(name)) : '')).join('-'),
+    t: state.traitSlots
+      .map((name) => (name ? String(context.traitMaster.indexOf(name)) : ''))
+      .join('-'),
     k: state.skillSlots.map((skill) => (skill ? skill.id : '')).join('-'),
     f: state.forgeSlots
       .map((value) => {
@@ -192,11 +207,15 @@ export function encodeBuildShareQuery(
       .join('-'),
     i: STAT_KEYS.map((stat) => String(state.individualValues[stat])).join(IV_SEPARATOR),
     g: state.familyTree
-      .map((lineage) => (lineage ? String((STAT_LINEAGES as readonly string[]).indexOf(lineage)) : ''))
+      .map((lineage) =>
+        lineage ? String((STAT_LINEAGES as readonly string[]).indexOf(lineage)) : '',
+      )
       .join('-'),
     p: String(state.parentLevelTotal),
     w: state.weapon ? String(state.weapon.no) : '',
-    m: state.monshouNames.length ? String(MONSHOU_LIST.findIndex((entry) => entry.name === state.monshouNames[0])) : '',
+    m: state.monshouNames.length
+      ? String(MONSHOU_LIST.findIndex((entry) => entry.name === state.monshouNames[0]))
+      : '',
     x: encodeSpTraits(state.spTraitNames, context.attributeIdByName),
   };
 }

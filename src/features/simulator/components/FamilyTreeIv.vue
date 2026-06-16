@@ -126,7 +126,9 @@ function ivInputClass(stat: StatKey): string {
   <div>
     <!-- 家系図 -->
     <h3 class="text-lg font-bold mb-2">系図</h3>
-    <p class="text-sm text-gray-500 mb-2">各枠の系統を選ぶと、系統ボーナスがステータスに反映されます。</p>
+    <p class="text-sm text-gray-500 mb-2">
+      各枠の系統を選ぶと、系統ボーナスがステータスに反映されます。
+    </p>
     <div class="overflow-x-auto pb-2 mb-5">
       <div class="min-w-[640px] space-y-3">
         <!-- 曽祖父母 -->
@@ -192,12 +194,18 @@ function ivInputClass(stat: StatKey): string {
           :key="lineage"
           type="button"
           class="flex items-center gap-2 border rounded px-3 py-2 transition active:scale-95"
-          :class="lastFilled === lineage ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300' : 'hover:bg-blue-50'"
+          :class="
+            lastFilled === lineage
+              ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300'
+              : 'hover:bg-blue-50'
+          "
           @click="onFill(lineage)"
         >
           <img :src="LINEAGE_ICON[lineage]" alt="" class="w-6 h-6" />
           <span class="text-sm">{{ LINEAGE_LABEL[lineage] }}</span>
-          <span v-if="lastFilled === lineage" class="ml-auto text-blue-600 text-sm font-bold">✓設定</span>
+          <span v-if="lastFilled === lineage" class="ml-auto text-blue-600 text-sm font-bold"
+            >✓設定</span
+          >
         </button>
       </div>
     </div>

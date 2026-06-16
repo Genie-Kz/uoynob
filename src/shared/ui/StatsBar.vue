@@ -23,7 +23,9 @@ function display(stats: StatValues | null, key: StatKey): string {
 </script>
 
 <template>
-  <div class="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] backdrop-blur">
+  <div
+    class="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] backdrop-blur"
+  >
     <div class="max-w-5xl mx-auto px-3 py-2">
       <button
         type="button"

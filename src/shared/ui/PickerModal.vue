@@ -116,7 +116,12 @@ function confirm(): void {
           />
           <div class="flex justify-end gap-2">
             <button type="button" class="btn-neutral" @click="emit('close')">閉じる</button>
-            <button type="button" class="btn-primary" :disabled="selectedValue === null" @click="confirm">
+            <button
+              type="button"
+              class="btn-primary"
+              :disabled="selectedValue === null"
+              @click="confirm"
+            >
               選択
             </button>
           </div>

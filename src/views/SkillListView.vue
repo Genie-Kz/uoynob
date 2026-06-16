@@ -18,8 +18,12 @@ const CATEGORY_BY_SLUG: Record<string, SkillCategory> = {
   parameter: 'パラメータ系',
 };
 
-const categorySlug = computed(() => (typeof route.query.category === 'string' ? route.query.category : ''));
-const categoryName = computed<SkillCategory | null>(() => CATEGORY_BY_SLUG[categorySlug.value] ?? null);
+const categorySlug = computed(() =>
+  typeof route.query.category === 'string' ? route.query.category : '',
+);
+const categoryName = computed<SkillCategory | null>(
+  () => CATEGORY_BY_SLUG[categorySlug.value] ?? null,
+);
 
 const keyword = ref('');
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
@@ -30,15 +34,21 @@ const visibleSkills = computed(() => {
   const query = keyword.value.trim();
   if (query) {
     list = list.filter((skill) =>
-      includesKeywordWithReading(skill.name, query, searchReadings.value?.labels));
+      includesKeywordWithReading(skill.name, query, searchReadings.value?.labels),
+    );
   }
   return list;
 });
 
-const title = computed(() => (categoryName.value ? `${categoryName.value} のスキル` : 'スキル一覧'));
+const title = computed(() =>
+  categoryName.value ? `${categoryName.value} のスキル` : 'スキル一覧',
+);
 
 function guardBadges(skill: Skill): { element: string; step: number }[] {
-  return [...summarizeGuardEffects(skill)].map(([element, count]) => ({ element, step: count * 2 }));
+  return [...summarizeGuardEffects(skill)].map(([element, count]) => ({
+    element,
+    step: count * 2,
+  }));
 }
 </script>
 
@@ -70,7 +80,10 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
             <tr v-for="skill in visibleSkills" :key="skill.id" class="border-b hover:bg-gray-50">
               <td class="px-3 py-2 border whitespace-nowrap">{{ skill.id }}</td>
               <td class="px-3 py-2 border">
-                <router-link :to="{ name: 'skill-detail', params: { id: skill.id } }" class="app-link">
+                <router-link
+                  :to="{ name: 'skill-detail', params: { id: skill.id } }"
+                  class="app-link"
+                >
                   {{ skill.name }}
                 </router-link>
               </td>
@@ -90,6 +103,9 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
       </div>
     </DataState>
 
-    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'スキル' }]" class="mt-6" />
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'スキル' }]"
+      class="mt-6"
+    />
   </div>
 </template>

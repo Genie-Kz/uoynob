@@ -40,7 +40,8 @@ const skillGroupViews = computed(() =>
 function totalCount(): number {
   const target = entry.value;
   if (!target) return 0;
-  if (target.type === 'monster-groups') return target.groups.reduce((sum, group) => sum + group.items.length, 0);
+  if (target.type === 'monster-groups')
+    return target.groups.reduce((sum, group) => sum + group.items.length, 0);
   return target.items.length;
 }
 
@@ -52,7 +53,9 @@ const seoDescription = computed(() => {
 
 usePageSeo(() => entry.value?.title, seoDescription);
 
-const monsterById = computed(() => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])));
+const monsterById = computed(
+  () => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])),
+);
 
 function monsterOf(ref: PickupRef): Monster | null {
   return pickupMonsterByRef(ref, resolveMonsterId.value, monsterById.value);
@@ -74,7 +77,10 @@ function scrollToGroup(index: number): void {
 <template>
   <div>
     <PageBreadcrumb
-      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: entry?.title ?? 'ピックアップ' }]"
+      :items="[
+        { label: 'ホーム', to: { name: 'home' } },
+        { label: entry?.title ?? 'ピックアップ' },
+      ]"
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
@@ -99,7 +105,11 @@ function scrollToGroup(index: number): void {
                 class="tag-link app-link bg-white inline-flex items-center gap-1"
                 @click.prevent="scrollToGroup(index)"
               >
-                <MonsterIcon v-if="group.iconMonster" :lineage="group.iconMonster.系統" :no="group.iconMonster.no" />
+                <MonsterIcon
+                  v-if="group.iconMonster"
+                  :lineage="group.iconMonster.系統"
+                  :no="group.iconMonster.no"
+                />
                 {{ group.label }}
               </a>
             </div>
@@ -112,7 +122,12 @@ function scrollToGroup(index: number): void {
             class="mb-5 scroll-mt-3"
           >
             <h3 class="text-lg font-bold mb-2 inline-flex items-center gap-2">
-              <MonsterIcon v-if="group.iconMonster" :lineage="group.iconMonster.系統" :no="group.iconMonster.no" size="lg" />
+              <MonsterIcon
+                v-if="group.iconMonster"
+                :lineage="group.iconMonster.系統"
+                :no="group.iconMonster.no"
+                size="lg"
+              />
               {{ group.label }}
             </h3>
             <div class="flex flex-wrap gap-1">
@@ -149,7 +164,11 @@ function scrollToGroup(index: number): void {
               :to="monsterRoute(ref)!"
               class="tag-link app-link inline-flex items-center gap-1"
             >
-              <MonsterIcon v-if="monsterOf(ref)" :lineage="monsterOf(ref)!.系統" :no="monsterOf(ref)!.no" />
+              <MonsterIcon
+                v-if="monsterOf(ref)"
+                :lineage="monsterOf(ref)!.系統"
+                :no="monsterOf(ref)!.no"
+              />
               {{ ref.name }}
             </router-link>
             <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
@@ -187,7 +206,11 @@ function scrollToGroup(index: number): void {
                   :to="monsterRoute(ref)!"
                   class="tag-link app-link inline-flex items-center gap-1"
                 >
-                  <MonsterIcon v-if="monsterOf(ref)" :lineage="monsterOf(ref)!.系統" :no="monsterOf(ref)!.no" />
+                  <MonsterIcon
+                    v-if="monsterOf(ref)"
+                    :lineage="monsterOf(ref)!.系統"
+                    :no="monsterOf(ref)!.no"
+                  />
                   {{ ref.name }}
                 </router-link>
                 <span v-else class="tag-link text-gray-600">{{ ref.name }}</span>
@@ -200,7 +223,10 @@ function scrollToGroup(index: number): void {
     </DataState>
 
     <PageBreadcrumb
-      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: entry?.title ?? 'ピックアップ' }]"
+      :items="[
+        { label: 'ホーム', to: { name: 'home' } },
+        { label: entry?.title ?? 'ピックアップ' },
+      ]"
       class="mt-6"
     />
   </div>

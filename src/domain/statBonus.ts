@@ -26,7 +26,8 @@ export function parseStatAttribute(name: string): { stat: StatKey; value: number
   const normalized = normalizeNfkc(name);
   const match = normalized.match(/^(.+?)\+(\d+)$/);
   if (!match) return null;
-  const stat = STAT_BY_PREFIX[match[1]];
+  const prefix = match[1];
+  const stat = prefix !== undefined ? STAT_BY_PREFIX[prefix] : undefined;
   if (!stat) return null;
   return { stat, value: Number(match[2]) };
 }

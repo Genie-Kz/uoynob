@@ -1,5 +1,5 @@
-import type { MonsterRank } from "@/types/monster";
-import { normalizeTraitCostKey } from "@/shared/search/normalization";
+import type { MonsterRank } from '@/types/monster';
+import { normalizeTraitCostKey } from '@/shared/search/normalization';
 
 const EXACT_COSTS: Record<string, number> = {
   みかわしアップ: -4,
@@ -83,7 +83,7 @@ const EXACT_COSTS: Record<string, number> = {
   格闘王: 2,
   神の息吹: 2,
   神の踊り手: 1,
-  "全ガード＋": 2,
+  '全ガード＋': 2,
   暴走機関: 2,
   いきなりテンション: 1,
   いきなりバイキルト: 2,
@@ -123,9 +123,9 @@ const EXACT_COSTS: Record<string, number> = {
   にげあし: -8,
   経験値増: -8,
   ゴールド増: -8,
-  "アイテム％アップ": -8,
-  "スカウト％アップ": -8,
-  "スカウト％アップＳ": -8,
+  'アイテム％アップ': -8,
+  'スカウト％アップ': -8,
+  'スカウト％アップＳ': -8,
   にくをきらせて: 0,
   ノリノリ: 1,
   れいせい: 0,
@@ -148,7 +148,7 @@ const EXACT_COSTS: Record<string, number> = {
   ＨＰ成長力アップ小: -8,
 };
 
-const MONTO_BRAVE_TRAITS = ["ゆうかん", "さいごのきぼう"] as const;
+const MONTO_BRAVE_TRAITS = ['ゆうかん', 'さいごのきぼう'] as const;
 
 /** 特性単体のデメリット指数。個別値不明のモントナー特例はここでは0。 */
 export function disadvantageCostOfTrait(name: string): number {
@@ -156,76 +156,62 @@ export function disadvantageCostOfTrait(name: string): number {
   const exact = EXACT_COSTS[normalized];
   if (exact !== undefined) return exact;
   if (/^AI\d(?:～\d)?回行動$/.test(normalized)) return -3;
-  if (normalized.endsWith("攻撃")) return -2;
-  if (normalized.endsWith("のコツ")) return 3;
-  if (normalized.endsWith("ブレイク")) return -2;
+  if (normalized.endsWith('攻撃')) return -2;
+  if (normalized.endsWith('のコツ')) return 3;
+  if (normalized.endsWith('ブレイク')) return -2;
   return 0;
 }
 
 /** スキル由来を除いた、装備中の特性だけからデメリット指数合計を求める。 */
-export function totalDisadvantageCost(
-  traits: string[],
-  monsterName = "",
-): number {
+export function totalDisadvantageCost(traits: string[], monsterName = ''): number {
   const normalizedTraits = traits.filter(Boolean).map(normalizeTraitCostKey);
-  let total = normalizedTraits.reduce(
-    (sum, trait) => sum + disadvantageCostOfTrait(trait),
-    0,
-  );
-  const hasBravePair = MONTO_BRAVE_TRAITS.every((trait) =>
-    normalizedTraits.includes(trait),
-  );
-  if (monsterName === "モントナー(ゆうかん)" && hasBravePair) total += 2;
+  let total = normalizedTraits.reduce((sum, trait) => sum + disadvantageCostOfTrait(trait), 0);
+  const hasBravePair = MONTO_BRAVE_TRAITS.every((trait) => normalizedTraits.includes(trait));
+  if (monsterName === 'モントナー(ゆうかん)' && hasBravePair) total += 2;
   return total;
 }
 
-const DISADVANTAGES_BY_RANK: Record<
-  "low" | "c" | "mid" | "high",
-  Record<number, string[]>
-> = {
+const DISADVANTAGES_BY_RANK: Record<'low' | 'c' | 'mid' | 'high', Record<number, string[]>> = {
   low: {
-    1: ["自動ＭＰダウン"],
-    2: ["ちょうはつ"],
-    3: ["オロオロ"],
-    4: ["自動ＭＰダウン"],
-    5: ["ちょうはつ", "オロオロ"],
+    1: ['自動ＭＰダウン'],
+    2: ['ちょうはつ'],
+    3: ['オロオロ'],
+    4: ['自動ＭＰダウン'],
+    5: ['ちょうはつ', 'オロオロ'],
   },
   c: {
-    1: ["自動ＭＰダウン"],
-    2: ["ダメージ増ボディ"],
-    3: ["ヘロヘロ"],
-    4: ["自動ＭＰダウン", "ヘロヘロ"],
-    5: ["ダメージ増ボディ", "ヘロヘロ"],
+    1: ['自動ＭＰダウン'],
+    2: ['ダメージ増ボディ'],
+    3: ['ヘロヘロ'],
+    4: ['自動ＭＰダウン', 'ヘロヘロ'],
+    5: ['ダメージ増ボディ', 'ヘロヘロ'],
   },
   mid: {
-    1: ["しょうひＭＰ✕２"],
-    2: ["ダメージ増ボディ"],
-    3: ["ヘロヘロ"],
-    4: ["しょうひＭＰ✕２", "強者のよゆう"],
-    5: ["ダメージ増ボディ", "ヘロヘロ"],
+    1: ['しょうひＭＰ✕２'],
+    2: ['ダメージ増ボディ'],
+    3: ['ヘロヘロ'],
+    4: ['しょうひＭＰ✕２', '強者のよゆう'],
+    5: ['ダメージ増ボディ', 'ヘロヘロ'],
   },
   high: {
-    1: ["しょうひＭＰ✕２"],
-    2: ["アンラッキー"],
-    3: ["強者のよゆう"],
-    4: ["しょうひＭＰ✕２", "強者のよゆう"],
-    5: ["アンラッキー", "強者のよゆう"],
+    1: ['しょうひＭＰ✕２'],
+    2: ['アンラッキー'],
+    3: ['強者のよゆう'],
+    4: ['しょうひＭＰ✕２', '強者のよゆう'],
+    5: ['アンラッキー', '強者のよゆう'],
   },
 };
 
 function rankGroup(rank: MonsterRank): keyof typeof DISADVANTAGES_BY_RANK {
-  if (rank === "F" || rank === "E" || rank === "D") return "low";
-  if (rank === "C") return "c";
-  if (rank === "B" || rank === "A") return "mid";
-  return "high";
+  if (rank === 'F' || rank === 'E' || rank === 'D') return 'low';
+  if (rank === 'C') return 'c';
+  if (rank === 'B' || rank === 'A') return 'mid';
+  return 'high';
 }
 
 /** ランクと指数合計から付与される不利な特性を返す。 */
-export function disadvantageTraits(
-  rank: MonsterRank,
-  totalCost: number,
-): string[] {
+export function disadvantageTraits(rank: MonsterRank, totalCost: number): string[] {
   if (totalCost <= 0) return [];
-  if (totalCost >= 6) return ["ヘロヘロ", "強者のよゆう"];
+  if (totalCost >= 6) return ['ヘロヘロ', '強者のよゆう'];
   return DISADVANTAGES_BY_RANK[rankGroup(rank)][totalCost] ?? [];
 }

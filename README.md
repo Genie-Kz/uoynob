@@ -12,18 +12,18 @@
 
 ## 技術スタック
 
-| 種類 | 採用 |
-|---|---|
-| フレームワーク | Vue 3（`<script setup>` + Composition API） |
-| 言語 | TypeScript（strict） |
-| ビルド | Vite 8 |
-| ルーティング | Vue Router 5（ハッシュ方式。GitHub Pages のサブパス配信でも動作） |
-| CSS | Tailwind CSS 4（`@tailwindcss/vite`・`@theme` でカスタムカラー定義） |
-| テスト | Vitest 4（+ jsdom） |
-| リンター | ESLint 10（Flat Config・eslint-plugin-vue / typescript-eslint） |
-| 型チェック | vue-tsc 3 |
-| Node.js | 24.16.0（`.nvmrc`） |
-| CI/CD | GitHub Actions → GitHub Pages |
+| 種類           | 採用                                                                 |
+| -------------- | -------------------------------------------------------------------- |
+| フレームワーク | Vue 3（`<script setup>` + Composition API）                          |
+| 言語           | TypeScript（strict）                                                 |
+| ビルド         | Vite 8                                                               |
+| ルーティング   | Vue Router 5（ハッシュ方式。GitHub Pages のサブパス配信でも動作）    |
+| CSS            | Tailwind CSS 4（`@tailwindcss/vite`・`@theme` でカスタムカラー定義） |
+| テスト         | Vitest 4（+ jsdom）                                                  |
+| リンター       | ESLint 10（Flat Config・eslint-plugin-vue / typescript-eslint）      |
+| 型チェック     | vue-tsc 3                                                            |
+| Node.js        | 24.16.0（`.nvmrc`）                                                  |
+| CI/CD          | GitHub Actions → GitHub Pages                                        |
 
 ---
 
@@ -141,6 +141,7 @@ public/data/         表示用の静的JSONとモンスターアイコン
 `main` への push では **GitHub Pages へ自動デプロイ**します（Node のバージョンは `.nvmrc` を参照）。
 
 公開手順：
+
 1. リポジトリに push する
 2. **Settings → Pages → Source** を「**GitHub Actions**」に設定する
 3. `main` への push で `https://<ユーザー名>.github.io/<リポジトリ名>/` に公開されます

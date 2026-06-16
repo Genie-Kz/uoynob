@@ -34,7 +34,7 @@ export function filterMonsterList(all: Monster[], filter: MonsterListFilter): Fi
   }
 
   if (lineageSlug) {
-    const lineageName = LINEAGE_NAME_BY_SLUG[lineageSlug];
+    const lineageName = LINEAGE_NAME_BY_SLUG[lineageSlug] ?? '';
     return {
       title: `${lineageInfoOf(lineageName).label} のモンスター`,
       monsters: all.filter((monster) => monster.系統 === lineageName),

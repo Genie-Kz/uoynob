@@ -32,5 +32,7 @@ export function includesKeywordWithReading(
   keyword: string,
   readings?: Record<string, string>,
 ): boolean {
-  return includesKeyword(target, keyword) || includesKeyword(readingForText(target, readings), keyword);
+  return (
+    includesKeyword(target, keyword) || includesKeyword(readingForText(target, readings), keyword)
+  );
 }

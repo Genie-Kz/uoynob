@@ -3,7 +3,11 @@ import { createMonster } from '@/test/fixtures';
 import type { Attribute } from '@/types/attribute';
 import type { Skill } from '@/types/skill';
 import type { Weapon } from '@/types/stats';
-import { encodeBuildShareQuery, hasBuildShareParams, restoreBuildShareState } from './buildShareCodec';
+import {
+  encodeBuildShareQuery,
+  hasBuildShareParams,
+  restoreBuildShareState,
+} from './buildShareCodec';
 
 function createAttribute(id: string, name: string): Attribute {
   return {
@@ -86,9 +90,13 @@ describe('buildShareCodec', () => {
       defaultFamilyTree,
     };
 
-    expect(restoreBuildShareState({ x: '109-079' }, target, context).spTraitNames)
-      .toEqual(['ＨＰバブル', 'つねにアタックカンタ']);
-    expect(restoreBuildShareState({ x: 'ＨＰバブル,つねにアタックカンタ' }, target, context).spTraitNames)
-      .toEqual(['ＨＰバブル', 'つねにアタックカンタ']);
+    expect(restoreBuildShareState({ x: '109-079' }, target, context).spTraitNames).toEqual([
+      'ＨＰバブル',
+      'つねにアタックカンタ',
+    ]);
+    expect(
+      restoreBuildShareState({ x: 'ＨＰバブル,つねにアタックカンタ' }, target, context)
+        .spTraitNames,
+    ).toEqual(['ＨＰバブル', 'つねにアタックカンタ']);
   });
 });

@@ -24,7 +24,9 @@ const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 const { traitRoute } = useTraitLink();
 
-const monster = computed(() => monsters.value?.find((candidate) => candidate.id === props.id) ?? null);
+const monster = computed(
+  () => monsters.value?.find((candidate) => candidate.id === props.id) ?? null,
+);
 const breadcrumbItems = computed(() => [
   { label: 'ホーム', to: { name: 'home' } },
   { label: 'モンスター', to: { name: 'monster-list' } },
@@ -32,7 +34,9 @@ const breadcrumbItems = computed(() => [
 ]);
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
 const resistanceCells = computed(() =>
-  monster.value ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value))) : [],
+  monster.value
+    ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value)))
+    : [],
 );
 const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(monster.value) : []));
 const learnableSkills = computed(() =>
@@ -102,9 +106,7 @@ const statRows = computed(() => {
 
 <template>
   <div>
-    <PageBreadcrumb
-      :items="breadcrumbItems"
-    />
+    <PageBreadcrumb :items="breadcrumbItems" />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <div v-if="!monster" class="border border-yellow-300 bg-yellow-50 rounded p-3">
@@ -173,10 +175,20 @@ const statRows = computed(() => {
             <template v-for="(item, index) in traitItems" :key="index">
               <div class="flex items-center gap-7 py-2">
                 <span class="w-10 shrink-0 flex justify-center">
-                  <img v-if="item.icon" :src="item.icon" alt="" class="size-5 max-w-none object-contain" />
+                  <img
+                    v-if="item.icon"
+                    :src="item.icon"
+                    alt=""
+                    class="size-5 max-w-none object-contain"
+                  />
                 </span>
                 <span class="text-sm">
-                  <router-link v-if="traitRoute(item.name)" :to="traitRoute(item.name)!" class="app-link">{{ item.name }}</router-link>
+                  <router-link
+                    v-if="traitRoute(item.name)"
+                    :to="traitRoute(item.name)!"
+                    class="app-link"
+                    >{{ item.name }}</router-link
+                  >
                   <template v-else>{{ item.name }}</template>
                 </span>
               </div>

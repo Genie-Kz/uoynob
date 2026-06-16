@@ -39,7 +39,11 @@ export function lineageInfoOf(lineageName: string): LineageInfo {
 
 /** ボディサイズ（小→大の順） */
 export const BODY_SIZES: BodySize[] = [
-  'スモールボディ', 'スタンダードボディ', 'メガボディ', 'ギガボディ', '超ギガボディ',
+  'スモールボディ',
+  'スタンダードボディ',
+  'メガボディ',
+  'ギガボディ',
+  '超ギガボディ',
 ];
 
 /** ボディサイズ → スラッグ */
@@ -60,12 +64,26 @@ export const MONSTER_RANKS: MonsterRank[] = ['SS', 'S', 'A', 'B', 'C', 'D', 'E',
 
 /** ランク → 全角表記 */
 export const RANK_FULLWIDTH_LABEL: Record<MonsterRank, string> = {
-  SS: 'ＳＳ', S: 'Ｓ', A: 'Ａ', B: 'Ｂ', C: 'Ｃ', D: 'Ｄ', E: 'Ｅ', F: 'Ｆ',
+  SS: 'ＳＳ',
+  S: 'Ｓ',
+  A: 'Ａ',
+  B: 'Ｂ',
+  C: 'Ｃ',
+  D: 'Ｄ',
+  E: 'Ｅ',
+  F: 'Ｆ',
 };
 
 /** モンスターが持つ「特性」を取り出すフィールド一覧 */
 export const TRAIT_FIELDS = [
-  '新生前特性1', '新生前特性2', '特性25', '特性50', '特性100', 'メガ特性', 'ギガ特性', '超ギガ特性',
+  '新生前特性1',
+  '新生前特性2',
+  '特性25',
+  '特性50',
+  '特性100',
+  'メガ特性',
+  'ギガ特性',
+  '超ギガ特性',
 ] as const;
 
 /** 武器の種類 */

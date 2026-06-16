@@ -25,7 +25,9 @@ function decodeEntities(s) {
 
 /** タグを除去し空白を1つに（改行も詰める） */
 function clean(s) {
-  return decodeEntities(s.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+  return decodeEntities(s.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /** 改行を保持してタグ除去（説明文用） */
@@ -52,14 +54,21 @@ function sectionAfter(html, headerLabel) {
 function extractDescription(html, headerLabel) {
   const segment = sectionAfter(html, headerLabel);
   const spans = [...segment.matchAll(/<span[^>]*white-space:\s*pre-wrap[^>]*>([\s\S]*?)<\/span>/g)];
-  if (spans.length) return spans.map((m) => cleanMultiline(m[1])).join('\n').trim();
+  if (spans.length)
+    return spans
+      .map((m) => cleanMultiline(m[1]))
+      .join('\n')
+      .trim();
   return cleanMultiline(segment);
 }
 
 /** セクション内の monster / skill 詳細リンクを取り出す */
 function extractLinks(html, headerLabel, kind) {
   const segment = sectionAfter(html, headerLabel);
-  const re = new RegExp(`<a href="[^"]*\\/${kind}\\/detail\\/\\?id=([0-9-]+)"[^>]*>([\\s\\S]*?)<\\/a>`, 'g');
+  const re = new RegExp(
+    `<a href="[^"]*\\/${kind}\\/detail\\/\\?id=([0-9-]+)"[^>]*>([\\s\\S]*?)<\\/a>`,
+    'g',
+  );
   const out = [];
   let m;
   while ((m = re.exec(segment)) !== null) {
@@ -69,7 +78,9 @@ function extractLinks(html, headerLabel, kind) {
 }
 
 function extractName(html, kindLabel) {
-  const m = html.match(new RegExp(`<meta property="og:title" content="([^"]*?)\\s*-\\s*${kindLabel}`));
+  const m = html.match(
+    new RegExp(`<meta property="og:title" content="([^"]*?)\\s*-\\s*${kindLabel}`),
+  );
   return m ? clean(m[1]) : '';
 }
 
@@ -81,7 +92,10 @@ async function fetchPage(kind, id) {
   ];
   for (const url of urls) {
     try {
-      const response = await fetch(url, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const response = await fetch(url, {
+        redirect: 'follow',
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+      });
       if (response.ok) {
         const html = await response.text();
         if (html.includes('card-header bg-light">カテゴリー</h6>')) return html;
@@ -136,8 +150,14 @@ async function scrape(kind, total, parser, outFile) {
 
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
   const ok = results.filter(Boolean);
-  fs.writeFileSync(path.join(scriptDir, '..', 'public', 'data', outFile), JSON.stringify(ok), 'utf8');
-  console.error(`\n[${kind}] ok=${ok.length} failed=${failed.length}${failed.length ? ` [${failed.join(',')}]` : ''}`);
+  fs.writeFileSync(
+    path.join(scriptDir, '..', 'public', 'data', outFile),
+    JSON.stringify(ok),
+    'utf8',
+  );
+  console.error(
+    `\n[${kind}] ok=${ok.length} failed=${failed.length}${failed.length ? ` [${failed.join(',')}]` : ''}`,
+  );
 }
 
 await scrape('attribute', 294, parseAttribute, 'attributes.json');

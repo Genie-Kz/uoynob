@@ -18,7 +18,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/MonsterListView.vue'),
     meta: {
       title: 'モンスター図鑑',
-      description: 'イルルカSPのモンスターをランク・系統・サイズ・名前から検索できるモンスター図鑑。',
+      description:
+        'イルルカSPのモンスターをランク・系統・サイズ・名前から検索できるモンスター図鑑。',
     },
   },
   {
@@ -47,7 +48,10 @@ const routes: RouteRecordRaw[] = [
     path: '/attributes',
     name: 'attribute-list',
     component: () => import('@/views/AttributeListView.vue'),
-    meta: { title: '特性一覧', description: 'イルルカSPに登場する特性の効果とSP効果を検索できる一覧。' },
+    meta: {
+      title: '特性一覧',
+      description: 'イルルカSPに登場する特性の効果とSP効果を検索できる一覧。',
+    },
   },
   {
     path: '/attributes/:id',
@@ -60,7 +64,10 @@ const routes: RouteRecordRaw[] = [
     path: '/abilities',
     name: 'ability-list',
     component: () => import('@/views/AbilityListView.vue'),
-    meta: { title: '特技一覧', description: 'イルルカSPに登場する呪文・斬撃・体技・踊り・ブレスなどの特技一覧。' },
+    meta: {
+      title: '特技一覧',
+      description: 'イルルカSPに登場する呪文・斬撃・体技・踊り・ブレスなどの特技一覧。',
+    },
   },
   {
     path: '/abilities/:id',
@@ -73,7 +80,10 @@ const routes: RouteRecordRaw[] = [
     path: '/skills',
     name: 'skill-list',
     component: () => import('@/views/SkillListView.vue'),
-    meta: { title: 'スキル一覧', description: 'イルルカSPのスキル構成、習得特技・特性、所持モンスターを調べられる一覧。' },
+    meta: {
+      title: 'スキル一覧',
+      description: 'イルルカSPのスキル構成、習得特技・特性、所持モンスターを調べられる一覧。',
+    },
   },
   {
     path: '/skills/:id',
@@ -95,7 +105,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/SimulatorSelectView.vue'),
     meta: {
       title: 'ビルドシミュレーター',
-      description: 'イルルカSPの特性・スキル・武器鍛冶を組み替え、最終耐性とステータスを計算できるシミュレーター。',
+      description:
+        'イルルカSPの特性・スキル・武器鍛冶を組み替え、最終耐性とステータスを計算できるシミュレーター。',
     },
   },
   {
