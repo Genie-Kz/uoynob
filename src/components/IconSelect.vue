@@ -39,12 +39,14 @@ function choose(value: T): void {
       @click="open = !open"
     >
       <span class="flex items-center gap-1.5 min-w-0">
-        <img
-          v-if="selected?.icon"
-          :src="selected.icon"
-          alt=""
-          class="inline-block size-5 max-w-none object-contain shrink-0"
-        />
+        <slot name="icon" :option="selected">
+          <img
+            v-if="selected?.icon"
+            :src="selected.icon"
+            alt=""
+            class="inline-block size-5 max-w-none object-contain shrink-0"
+          />
+        </slot>
         <span class="truncate">{{ selected?.label }}</span>
       </span>
       <span class="text-xs text-gray-500 shrink-0">▼</span>
@@ -61,13 +63,15 @@ function choose(value: T): void {
             :class="{ 'bg-blue-50': option.value === modelValue }"
             @click="choose(option.value)"
           >
-            <img
-              v-if="option.icon"
-              :src="option.icon"
-              alt=""
-              class="inline-block size-5 max-w-none object-contain shrink-0"
-            />
-            <span v-else-if="hasAnyIcon" class="inline-block size-5 shrink-0"></span>
+            <slot name="icon" :option="option">
+              <img
+                v-if="option.icon"
+                :src="option.icon"
+                alt=""
+                class="inline-block size-5 max-w-none object-contain shrink-0"
+              />
+              <span v-else-if="hasAnyIcon" class="inline-block size-5 shrink-0"></span>
+            </slot>
             <span>{{ option.label }}</span>
           </button>
         </li>

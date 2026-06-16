@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { Monster } from '@/types/monster';
-import { LINEAGE_BY_NAME, MONSTER_RANKS, lineageInfoOf } from '@/constants/monsterTaxonomy';
+import type { BodySize, Monster } from '@/types/monster';
+import { BODY_SIZES, LINEAGE_BY_NAME, MONSTER_RANKS, lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { LINEAGE_ICON, LINEAGE_LABEL } from '@/constants/lineageIcons';
 import { includesKeywordWithReading } from '@/domain/textSearch';
 import { loadSearchReadings } from '@/api/datasets';
@@ -19,6 +19,7 @@ const props = defineProps<{
 const keyword = ref('');
 const selectedLineage = ref('');
 const selectedRank = ref('');
+const selectedBodySize = ref('');
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 const lineageOptions = [
   { value: '', label: '全系統' },
@@ -32,6 +33,14 @@ const rankOptions = [
   { value: '', label: '全ランク' },
   ...MONSTER_RANKS.map((rank) => ({ value: rank, label: rank })),
 ];
+const bodySizeOptions = [
+  { value: '', label: '全サイズ' },
+  ...BODY_SIZES.map((size) => ({ value: size, label: size })),
+];
+
+function bodySizeOptionValue(value: string | number | null): BodySize | null {
+  return BODY_SIZES.find((size) => size === value) ?? null;
+}
 
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
 const sortedMonsters = computed(() =>
@@ -46,6 +55,7 @@ const visibleMonsters = computed(() => {
     }
     if (selectedLineage.value && monster.系統 !== selectedLineage.value) return false;
     if (selectedRank.value && monster.ランク !== selectedRank.value) return false;
+    if (selectedBodySize.value && monster.サイズ特性 !== selectedBodySize.value) return false;
     return true;
   });
 });
@@ -54,19 +64,30 @@ const visibleMonsters = computed(() => {
 <template>
   <div>
     <div class="mb-3">
-      <div class="flex justify-end gap-2 mb-2">
+      <div class="flex flex-wrap justify-end gap-2 mb-2">
         <IconSelect
           v-model="selectedLineage"
           :options="lineageOptions"
           aria-label="系統で絞り込み"
-          class="w-36"
+          class="w-32 sm:w-36"
         />
         <IconSelect
           v-model="selectedRank"
           :options="rankOptions"
           aria-label="ランクで絞り込み"
-          class="w-28"
+          class="w-24 sm:w-28"
         />
+        <IconSelect
+          v-model="selectedBodySize"
+          :options="bodySizeOptions"
+          aria-label="ボディサイズで絞り込み"
+          class="w-36 sm:w-40"
+        >
+          <template #icon="{ option }">
+            <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
+            <span v-else class="inline-block size-[22px] shrink-0"></span>
+          </template>
+        </IconSelect>
       </div>
       <input
         v-model="keyword"
