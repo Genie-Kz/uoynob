@@ -1,6 +1,5 @@
 /** ビルドシミュレーターの状態管理コンポーザブル */
 import { computed, ref, watch, type Ref } from 'vue';
-import type { LocationQuery } from 'vue-router';
 import type { Attribute } from '@/types/attribute';
 import type { BodySize, Monster } from '@/types/monster';
 import type { Skill } from '@/types/skill';
@@ -10,37 +9,21 @@ import {
   TRAIT_SLOT_COUNT_BY_SIZE,
   WEAPON_FORGE_SLOT_COUNT,
 } from '@/constants/buildRules';
-import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
-import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST, STAT_KEYS } from '@/constants/statsRules';
-import { LINEAGE_DEFAULT_OPPOSITE, STAT_LINEAGES } from '@/shared/icons/lineageIcons';
+import { FORGE_STAT_UP_OPTIONS, MONSHOU_LIST } from '@/constants/statsRules';
+import { LINEAGE_DEFAULT_OPPOSITE } from '@/shared/icons/lineageIcons';
 import { collectAllTraitNames, defaultEditableTraits } from '@/domain/monster';
 import { computeBuildResistances } from '@/domain/buildSimulator';
 import { computeStats } from '@/domain/statsCalculator';
 import { parseStatAttribute } from '@/domain/statBonus';
 import { guardAbilityToElement } from '@/domain/skillAnalysis';
-
-/**
- * URL共有用のクエリ。ビルドタブ・系図個体値タブの全状態を復元できる。
- *   s = ボディサイズ / t = 特性 / k = スキル / f = 武器鍛冶
- *   i = 個体値 / g = 家系図 / p = 親レベル合計 / w = 武器No / m = 紋晶 / x = SP化特性ID
- */
-export interface BuildShareQuery {
-  [key: string]: string;
-  s: string;
-  t: string;
-  k: string;
-  f: string;
-  i: string;
-  g: string;
-  p: string;
-  w: string;
-  m: string;
-  x: string;
-}
-
-/** 復元判定に使う共有パラメータのキー */
-const SHARE_PARAM_KEYS = ['s', 't', 'k', 'f', 'i', 'g', 'p', 'w', 'm', 'x'] as const;
+import {
+  encodeBuildShareQuery,
+  hasBuildShareParams,
+  restoreBuildShareState,
+  type BuildShareQuery,
+  type BuildShareQueryInput,
+} from '@/domain/buildShareCodec';
 
 const FAMILY_TREE_SIZE = 14;
 /** 家系図のインデックス（重み順 [4,4,2,2,2,2,1,1,1,1,1,1,1,1] に対応） */
@@ -53,24 +36,12 @@ const OPPOSITE_LINEAGE_INDEX = SECOND_GREAT_GRANDPARENT_INDEX;
 const DEFAULT_PARENT_LEVEL_TOTAL = 200;
 const FORGE_STAT_UP_BY_LABEL = new Map(FORGE_STAT_UP_OPTIONS.map((option) => [option.label, option]));
 const RESISTANCE_ELEMENT_SET = new Set<string>(RESISTANCE_ELEMENTS);
-/** 武器鍛冶スロットのURLエンコード用：耐性要素＋ステータスアップを通し番号で表す */
-const FORGE_OPTION_VALUES: string[] = [
-  ...RESISTANCE_ELEMENTS,
-  ...FORGE_STAT_UP_OPTIONS.map((option) => option.label),
-];
-/** 個体値の区切り（負数の「-」と衝突しないよう「_」を使う） */
-const IV_SEPARATOR = '_';
 
 /** 系図の初期値：基本は自身の系統、対応系統セルだけ対応系統にする */
 function defaultFamilyTree(own: string): (string | null)[] {
   const tree = Array<string | null>(FAMILY_TREE_SIZE).fill(own);
   tree[OPPOSITE_LINEAGE_INDEX] = LINEAGE_DEFAULT_OPPOSITE[own] ?? own;
   return tree;
-}
-
-function readQuery(query: LocationQuery, key: string): string | undefined {
-  const value = query[key];
-  return typeof value === 'string' ? value : undefined;
 }
 
 function zeroIndividualValues(): StatValues {
@@ -83,7 +54,7 @@ export function useBuildSimulator(
   skills: Ref<Skill[] | null>,
   weapons: Ref<Weapon[] | null>,
   attributes: Ref<Attribute[] | null>,
-  initialQuery: LocationQuery,
+  initialQuery: BuildShareQueryInput,
 ) {
   const bodySize = ref<BodySize>('スタンダードボディ');
   const traitSlots = ref<string[]>([]);
@@ -156,80 +127,25 @@ export function useBuildSimulator(
   }
 
   /** URLクエリからビルド・系図個体値の全状態を復元 */
-  function restoreFromQuery(query: LocationQuery, target: Monster): void {
-    initializeDefaults(target);
-    const sizeIndex = Number(readQuery(query, 's'));
-    const size = BODY_SIZES[sizeIndex] ?? target.サイズ特性;
-    bodySize.value = size;
-
-    const traitCodes = (readQuery(query, 't') ?? '').split('-');
-    traitSlots.value = Array.from({ length: TRAIT_SLOT_COUNT_BY_SIZE[size] - 1 }, (_unused, index) => {
-      const code = traitCodes[index];
-      return code ? (traitMaster.value[Number(code)] ?? '') : '';
+  function restoreFromQuery(query: BuildShareQueryInput, target: Monster): void {
+    const restored = restoreBuildShareState(query, target, {
+      traitMaster: traitMaster.value,
+      skillById: skillById.value,
+      weaponByNo: new Map((weapons.value ?? []).map((entry) => [String(entry.no), entry])),
+      attributeById: attributeById.value,
+      attributeIdByName: attributeIdByName.value,
+      defaultFamilyTree,
     });
-
-    const skillIds = (readQuery(query, 'k') ?? '').split('-');
-    skillSlots.value = Array.from({ length: SKILL_SLOT_COUNT_BY_SIZE[size] }, (_unused, index) => {
-      const id = skillIds[index];
-      return id ? (skillById.value.get(id) ?? null) : null;
-    });
-
-    const forgeCodes = (readQuery(query, 'f') ?? '').split('-');
-    forgeSlots.value = Array.from({ length: WEAPON_FORGE_SLOT_COUNT }, (_unused, index) => {
-      const code = forgeCodes[index];
-      return code !== '' && code !== undefined ? (FORGE_OPTION_VALUES[Number(code)] ?? '') : '';
-    });
-
-    // ---- 系図・個体値タブ ----
-    const ivCodes = (readQuery(query, 'i') ?? '').split(IV_SEPARATOR);
-    if (readQuery(query, 'i') !== undefined) {
-      const next = zeroIndividualValues();
-      STAT_KEYS.forEach((stat, index) => {
-        const value = Number(ivCodes[index]);
-        if (Number.isFinite(value)) next[stat] = value;
-      });
-      individualValues.value = next;
-    }
-
-    const familyCodes = readQuery(query, 'g');
-    if (familyCodes !== undefined) {
-      const codes = familyCodes.split('-');
-      familyTree.value = Array.from({ length: FAMILY_TREE_SIZE }, (_unused, index) => {
-        const code = codes[index];
-        return code !== '' && code !== undefined ? (STAT_LINEAGES[Number(code)] ?? null) : null;
-      });
-    }
-
-    const parentLevel = readQuery(query, 'p');
-    if (parentLevel !== undefined && Number.isFinite(Number(parentLevel))) {
-      parentLevelTotal.value = Number(parentLevel);
-    }
-
-    const weaponNo = readQuery(query, 'w');
-    if (weaponNo) {
-      weapon.value = (weapons.value ?? []).find((w) => String(w.no) === weaponNo) ?? null;
-    }
-
-    const monshouCode = readQuery(query, 'm');
-    if (monshouCode) {
-      const m = MONSHOU_LIST[Number(monshouCode)];
-      monshouNames.value = m ? [m.name] : [];
-    }
-
-    const spCodes = readQuery(query, 'x');
-    if (spCodes !== undefined) {
-      if (!spCodes) {
-        spTraitNames.value = [];
-      } else if (/^\d+(?:-\d+)*$/.test(spCodes)) {
-        spTraitNames.value = spCodes
-          .split('-')
-          .map((id) => attributeById.value.get(id)?.name)
-          .filter((name): name is string => !!name);
-      } else {
-        // 旧形式（日本語名のカンマ区切り）も既存の共有URL用に読み込む。
-        spTraitNames.value = spCodes.split(',');
-      }
-    }
+    bodySize.value = restored.bodySize;
+    traitSlots.value = restored.traitSlots;
+    skillSlots.value = restored.skillSlots;
+    forgeSlots.value = restored.forgeSlots;
+    individualValues.value = restored.individualValues;
+    familyTree.value = restored.familyTree;
+    parentLevelTotal.value = restored.parentLevelTotal;
+    weapon.value = restored.weapon;
+    monshouNames.value = restored.monshouNames;
+    spTraitNames.value = restored.spTraitNames;
   }
 
   const hasInitialized = ref(false);
@@ -238,8 +154,7 @@ export function useBuildSimulator(
     () => {
       if (hasInitialized.value || !monster.value || !skills.value || !weapons.value || !attributes.value) return;
       hasInitialized.value = true;
-      const hasShareParams = SHARE_PARAM_KEYS.some((key) => readQuery(initialQuery, key) !== undefined);
-      if (hasShareParams) restoreFromQuery(initialQuery, monster.value);
+      if (hasBuildShareParams(initialQuery)) restoreFromQuery(initialQuery, monster.value);
       else initializeDefaults(monster.value);
     },
     { immediate: true },
@@ -356,30 +271,26 @@ export function useBuildSimulator(
     });
   });
 
-  function encodeSpTraits(): string {
-    const ids = spTraitNames.value.map((name) => attributeIdByName.value.get(name));
-    return ids.every((id): id is string => !!id) ? ids.join('-') : spTraitNames.value.join(',');
-  }
-
-  const shareQuery = computed<BuildShareQuery>(() => ({
-    s: String(BODY_SIZES.indexOf(bodySize.value)),
-    t: traitSlots.value.map((name) => (name ? String(traitMaster.value.indexOf(name)) : '')).join('-'),
-    k: skillSlots.value.map((skill) => (skill ? skill.id : '')).join('-'),
-    f: forgeSlots.value
-      .map((value) => {
-        const index = FORGE_OPTION_VALUES.indexOf(value);
-        return index >= 0 ? String(index) : '';
-      })
-      .join('-'),
-    i: STAT_KEYS.map((stat) => String(individualValues.value[stat])).join(IV_SEPARATOR),
-    g: familyTree.value
-      .map((lineage) => (lineage ? String((STAT_LINEAGES as readonly string[]).indexOf(lineage)) : ''))
-      .join('-'),
-    p: String(parentLevelTotal.value),
-    w: weapon.value ? String(weapon.value.no) : '',
-    m: monshouNames.value.length ? String(MONSHOU_LIST.findIndex((entry) => entry.name === monshouNames.value[0])) : '',
-    x: encodeSpTraits(),
-  }));
+  const shareQuery = computed<BuildShareQuery>(() =>
+    encodeBuildShareQuery(
+      {
+        bodySize: bodySize.value,
+        traitSlots: traitSlots.value,
+        skillSlots: skillSlots.value,
+        forgeSlots: forgeSlots.value,
+        individualValues: individualValues.value,
+        familyTree: familyTree.value,
+        parentLevelTotal: parentLevelTotal.value,
+        weapon: weapon.value,
+        monshouNames: monshouNames.value,
+        spTraitNames: spTraitNames.value,
+      },
+      {
+        traitMaster: traitMaster.value,
+        attributeIdByName: attributeIdByName.value,
+      },
+    ),
+  );
 
   return {
     bodySize,
