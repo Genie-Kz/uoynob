@@ -85,11 +85,11 @@ function scrollToGroup(index: number): void {
 
       <div v-else>
         <h2 class="text-xl font-bold mb-1">{{ entry.title }}</h2>
-        <p class="text-sm text-gray-500 mb-3">{{ totalCount() }} 件</p>
+        <p class="text-muted mb-3">{{ totalCount() }} 件</p>
 
         <!-- スキル一覧（目的別に分類） -->
         <div v-if="entry.type === 'skills' && skillGroupViews">
-          <nav aria-label="分類へのリンク" class="border rounded bg-gray-50 p-3 mb-5">
+          <nav aria-label="分類へのリンク" class="surface-muted p-3 mb-5">
             <p class="text-sm font-bold mb-2">分類から探す</p>
             <div class="flex flex-wrap gap-2">
               <a
@@ -158,7 +158,7 @@ function scrollToGroup(index: number): void {
 
         <!-- グループ分けされたモンスター一覧（れんぞく回数など） -->
         <div v-else>
-          <nav aria-label="分類へのリンク" class="border rounded bg-gray-50 p-3 mb-5">
+          <nav aria-label="分類へのリンク" class="surface-muted p-3 mb-5">
             <p class="text-sm font-bold mb-2">分類から探す</p>
             <div class="flex flex-wrap gap-2">
               <a

@@ -59,7 +59,7 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
       <div class="overflow-x-auto">
         <table class="w-full text-sm border-collapse">
           <thead>
-            <tr class="bg-gray-50 border-b text-left">
+            <tr class="table-header-row">
               <th class="px-2 py-2 border">No.</th>
               <th class="px-2 py-2 border">スキル</th>
               <th class="px-2 py-2 border">カテゴリー</th>

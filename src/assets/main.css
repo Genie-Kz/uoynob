@@ -77,6 +77,18 @@
   .tag-link {
     @apply inline-block rounded border px-3 py-2 text-sm;
   }
+
+  .text-muted {
+    @apply text-sm text-gray-500;
+  }
+
+  .surface-muted {
+    @apply border rounded bg-gray-50;
+  }
+
+  .table-header-row {
+    @apply bg-gray-50 border-b text-left;
+  }
 }
 
 /* ---- 画面遷移のフェード（router-view） ---- */
