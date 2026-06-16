@@ -56,6 +56,11 @@ function monsterRoute(ref: PickupRef) {
   return resolved ? { name: 'monster-detail', params: { id: resolved } } : null;
 }
 
+function groupMonster(label: string): Monster | null {
+  if (props.pickupKey !== 'skill-local') return null;
+  return (monsters.value ?? []).find((monster) => monster.名前 === label) ?? null;
+}
+
 function groupId(index: number): string {
   return `pickup-group-${index}`;
 }
@@ -90,9 +95,10 @@ function scrollToGroup(index: number): void {
                 v-for="(group, index) in skillGroups"
                 :key="group.label"
                 :href="`#${groupId(index)}`"
-                class="tag-link app-link bg-white"
+                class="tag-link app-link bg-white inline-flex items-center gap-1"
                 @click.prevent="scrollToGroup(index)"
               >
+                <MonsterIcon v-if="groupMonster(group.label)" :lineage="groupMonster(group.label)!.系統" :no="groupMonster(group.label)!.no" />
                 {{ group.label }}
               </a>
             </div>
@@ -104,7 +110,10 @@ function scrollToGroup(index: number): void {
             :key="group.label"
             class="mb-5 scroll-mt-3"
           >
-            <h3 class="text-lg font-bold mb-2">{{ group.label }}</h3>
+            <h3 class="text-lg font-bold mb-2 inline-flex items-center gap-2">
+              <MonsterIcon v-if="groupMonster(group.label)" :lineage="groupMonster(group.label)!.系統" :no="groupMonster(group.label)!.no" size="lg" />
+              {{ group.label }}
+            </h3>
             <div class="flex flex-wrap gap-1">
               <router-link
                 v-for="ref in group.items"
