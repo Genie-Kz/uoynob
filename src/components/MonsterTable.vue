@@ -69,23 +69,22 @@ const visibleMonsters = computed(() => {
           v-model="selectedLineage"
           :options="lineageOptions"
           aria-label="系統で絞り込み"
-          class="w-[5.75rem] shrink-0 sm:w-36"
+          class="w-[5.5rem] shrink-0 sm:w-36"
         />
         <IconSelect
           v-model="selectedRank"
           :options="rankOptions"
           aria-label="ランクで絞り込み"
-          class="w-[4.25rem] shrink-0 sm:w-28"
+          class="w-20 shrink-0 sm:w-28"
         />
         <IconSelect
           v-model="selectedBodySize"
           :options="bodySizeOptions"
           aria-label="ボディサイズで絞り込み"
-          class="w-[6.5rem] shrink-0 sm:w-40"
+          class="w-[6rem] shrink-0 sm:w-40"
         >
           <template #icon="{ option }">
             <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
-            <span v-else class="inline-block size-[22px] shrink-0"></span>
           </template>
         </IconSelect>
       </div>
