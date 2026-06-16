@@ -8,6 +8,8 @@ import {
 describe('traitDisadvantage', () => {
   it('固定値と汎用パターンの指数を判定する', () => {
     expect(disadvantageCostOfTrait('こうどうはやい')).toBe(2);
+    expect(disadvantageCostOfTrait('自動MP回復')).toBe(-3);
+    expect(disadvantageCostOfTrait('アイテム%アップ')).toBe(-8);
     expect(disadvantageCostOfTrait('AI3～4回行動')).toBe(-3);
     expect(disadvantageCostOfTrait('こんらん攻撃')).toBe(-2);
     expect(disadvantageCostOfTrait('どく攻撃')).toBe(-4);
