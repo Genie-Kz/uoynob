@@ -1,5 +1,6 @@
 import pluginVue from 'eslint-plugin-vue';
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 export default defineConfigWithVueTs(
@@ -24,4 +25,6 @@ export default defineConfigWithVueTs(
       globals: { ...globals.node },
     },
   },
+  // 整形は Prettier に委ね、競合する ESLint の整形ルールを無効化する（必ず最後に置く）
+  eslintConfigPrettier,
 );
