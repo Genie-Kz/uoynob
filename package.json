@@ -27,6 +27,7 @@
     "data:traits-abilities": "node scripts/scrape-traits-abilities.js",
     "data:pickups": "node scripts/scrape-pickups.js",
     "data:icons": "node scripts/scrape-monster-icons.js",
+    "data:icons-webp": "node scripts/convert-icons-webp.js",
     "data:readings": "node scripts/build-search-readings.js",
     "data:monster-list": "node scripts/build-monster-list.js"
   },
@@ -66,6 +67,7 @@
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "lint-staged": "^17.0.7",
     "prettier": "^3.8.4",
+    "sharp": "^0.35.1",
     "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",

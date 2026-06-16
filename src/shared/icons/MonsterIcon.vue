@@ -17,7 +17,9 @@ const sizeClass = computed(() =>
 );
 /** CLS を防ぐための intrinsic サイズ（px） */
 const dimension = computed(() => (props.size === 'lg' ? 48 : 24));
-const iconUrl = computed(() => `${import.meta.env.BASE_URL}data/monster-icons/${props.no}.png`);
+const iconBase = computed(() => `${import.meta.env.BASE_URL}data/monster-icons/${props.no}`);
+const iconUrl = computed(() => `${iconBase.value}.png`);
+const webpUrl = computed(() => `${iconBase.value}.webp`);
 
 // 画像が無い／読み込めない場合は系統色のプレースホルダにフォールバックする
 const failed = ref(false);
@@ -30,19 +32,21 @@ watch(
 </script>
 
 <template>
-  <img
-    v-if="!failed"
-    :src="iconUrl"
-    :alt="lineage.label"
-    :title="lineage.label"
-    :width="dimension"
-    :height="dimension"
-    loading="lazy"
-    decoding="async"
-    class="inline-block align-middle rounded object-contain"
-    :class="sizeClass"
-    @error="failed = true"
-  />
+  <picture v-if="!failed">
+    <source :srcset="webpUrl" type="image/webp" />
+    <img
+      :src="iconUrl"
+      :alt="lineage.label"
+      :title="lineage.label"
+      :width="dimension"
+      :height="dimension"
+      loading="lazy"
+      decoding="async"
+      class="inline-block align-middle rounded object-contain"
+      :class="sizeClass"
+      @error="failed = true"
+    />
+  </picture>
   <span
     v-else
     class="inline-flex items-center justify-center rounded text-white font-bold align-middle leading-none"
