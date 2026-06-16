@@ -34,7 +34,9 @@ const SECOND_GREAT_GRANDPARENT_INDEX = 7;
 /** モンスター系統に対応する系統を初期表示するセル（曽祖父母の左から2番目） */
 const OPPOSITE_LINEAGE_INDEX = SECOND_GREAT_GRANDPARENT_INDEX;
 const DEFAULT_PARENT_LEVEL_TOTAL = 200;
-const FORGE_STAT_UP_BY_LABEL = new Map(FORGE_STAT_UP_OPTIONS.map((option) => [option.label, option]));
+const FORGE_STAT_UP_BY_LABEL = new Map(
+  FORGE_STAT_UP_OPTIONS.map((option) => [option.label, option]),
+);
 const RESISTANCE_ELEMENT_SET = new Set<string>(RESISTANCE_ELEMENTS);
 
 /** 系図の初期値：基本は自身の系統、対応系統セルだけ対応系統にする */
@@ -75,11 +77,15 @@ export function useBuildSimulator(
 
   const traitMaster = computed(() => collectAllTraitNames(allMonsters.value ?? []));
   const skillById = computed(() => new Map((skills.value ?? []).map((skill) => [skill.id, skill])));
-  const attributeById = computed(() => new Map((attributes.value ?? []).map((attribute) => [attribute.id, attribute])));
+  const attributeById = computed(
+    () => new Map((attributes.value ?? []).map((attribute) => [attribute.id, attribute])),
+  );
   const attributeIdByName = computed(
     () => new Map((attributes.value ?? []).map((attribute) => [attribute.name, attribute.id])),
   );
-  const equippedSkills = computed(() => skillSlots.value.filter((skill): skill is Skill => skill !== null));
+  const equippedSkills = computed(() =>
+    skillSlots.value.filter((skill): skill is Skill => skill !== null),
+  );
 
   /**
    * スキルによって追加される特性（構成内の特性タイプを重複なく）。
@@ -152,7 +158,14 @@ export function useBuildSimulator(
   watch(
     [monster, skills, weapons, attributes],
     () => {
-      if (hasInitialized.value || !monster.value || !skills.value || !weapons.value || !attributes.value) return;
+      if (
+        hasInitialized.value ||
+        !monster.value ||
+        !skills.value ||
+        !weapons.value ||
+        !attributes.value
+      )
+        return;
       hasInitialized.value = true;
       if (hasBuildShareParams(initialQuery)) restoreFromQuery(initialQuery, monster.value);
       else initializeDefaults(monster.value);
@@ -237,7 +250,9 @@ export function useBuildSimulator(
     MONSHOU_LIST.filter((monshou) => monshouNames.value.includes(monshou.name)),
   );
   const forgeStatUps = computed<ForgeStatUp[]>(() =>
-    forgeSlots.value.map((value) => FORGE_STAT_UP_BY_LABEL.get(value)).filter((v): v is ForgeStatUp => !!v),
+    forgeSlots.value
+      .map((value) => FORGE_STAT_UP_BY_LABEL.get(value))
+      .filter((v): v is ForgeStatUp => !!v),
   );
   const forgeResistanceElements = computed(() =>
     forgeSlots.value.filter((value) => RESISTANCE_ELEMENT_SET.has(value)),

@@ -51,7 +51,9 @@ function toggleCard(cardId: string): void {
         <div class="collapsible-inner">
           <ul class="divide-y border-t">
             <li v-for="item in card.items" :key="item.label" class="px-3 py-2 hover:bg-gray-50">
-              <router-link v-if="item.to" :to="item.to" class="app-link block">{{ item.label }}</router-link>
+              <router-link v-if="item.to" :to="item.to" class="app-link block">{{
+                item.label
+              }}</router-link>
               <span
                 v-else
                 class="text-gray-400 hover:underline"

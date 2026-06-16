@@ -39,7 +39,12 @@ export const NAV_CARDS: NavCard[] = [
   {
     id: 'monster',
     title: 'モンスター',
-    items: [{ label: 'すべて', to: { name: 'monster-list' } }, ...rankItems, ...lineageItems, ...bodySizeItems],
+    items: [
+      { label: 'すべて', to: { name: 'monster-list' } },
+      ...rankItems,
+      ...lineageItems,
+      ...bodySizeItems,
+    ],
   },
   {
     id: 'attribute',
@@ -77,16 +82,40 @@ export const NAV_CARDS: NavCard[] = [
     id: 'pickup',
     title: 'ピックアップ',
     items: [
-      { label: '転生モンスター', to: { name: 'pickup', params: { pickupKey: 'monster-reincarnation' } } },
+      {
+        label: '転生モンスター',
+        to: { name: 'pickup', params: { pickupKey: 'monster-reincarnation' } },
+      },
       { label: 'ご当地スキル', to: { name: 'pickup', params: { pickupKey: 'skill-local' } } },
       { label: 'キラー系スキル', to: { name: 'pickup', params: { pickupKey: 'skill-killer' } } },
-      { label: '呪文耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-spell' } } },
-      { label: 'ブレス耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-breath' } } },
-      { label: '状態耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-condition' } } },
-      { label: '封じ耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-seal' } } },
-      { label: '弱体耐性スキル', to: { name: 'pickup', params: { pickupKey: 'skill-resistance-weaken' } } },
-      { label: 'パラメータ上昇スキル', to: { name: 'pickup', params: { pickupKey: 'skill-parameter-up' } } },
-      { label: 'れんぞく回数', to: { name: 'pickup', params: { pickupKey: 'number-of-consecutive-times' } } },
+      {
+        label: '呪文耐性スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-resistance-spell' } },
+      },
+      {
+        label: 'ブレス耐性スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-resistance-breath' } },
+      },
+      {
+        label: '状態耐性スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-resistance-condition' } },
+      },
+      {
+        label: '封じ耐性スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-resistance-seal' } },
+      },
+      {
+        label: '弱体耐性スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-resistance-weaken' } },
+      },
+      {
+        label: 'パラメータ上昇スキル',
+        to: { name: 'pickup', params: { pickupKey: 'skill-parameter-up' } },
+      },
+      {
+        label: 'れんぞく回数',
+        to: { name: 'pickup', params: { pickupKey: 'number-of-consecutive-times' } },
+      },
     ],
   },
   {

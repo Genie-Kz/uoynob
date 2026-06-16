@@ -109,7 +109,9 @@ async function main() {
     CONCURRENCY,
   );
 
-  console.log(`完了: 新規 ${done} 件 / スキップ(既存) ${skipped} 件 → ${path.relative(projectRoot, OUT_DIR)}`);
+  console.log(
+    `完了: 新規 ${done} 件 / スキップ(既存) ${skipped} 件 → ${path.relative(projectRoot, OUT_DIR)}`,
+  );
 }
 
 main().catch((error) => {

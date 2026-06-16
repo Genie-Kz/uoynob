@@ -20,48 +20,44 @@ describe('useBuildSimulator', () => {
   it.each([
     ['AI4回行動', 'AI2～3回行動'],
     ['AI3～4回行動', 'AI2回行動'],
-  ])('超ギガボディからサイズを小さくすると%sを%sへ変換する', async (originalTrait, replacedTrait) => {
-    const target = createMonster({
-      サイズ特性: '超ギガボディ',
-      新生前特性1: originalTrait,
-    });
+  ])(
+    '超ギガボディからサイズを小さくすると%sを%sへ変換する',
+    async (originalTrait, replacedTrait) => {
+      const target = createMonster({
+        サイズ特性: '超ギガボディ',
+        新生前特性1: originalTrait,
+      });
 
-    for (const bodySize of [
-      'スモールボディ',
-      'スタンダードボディ',
-      'メガボディ',
-      'ギガボディ',
-    ] as const) {
-      const simulator = useBuildSimulator(
-        ref(target),
-        ref([target]),
-        ref([]),
-        ref([]),
-        ref([]),
-        {},
-      );
+      for (const bodySize of [
+        'スモールボディ',
+        'スタンダードボディ',
+        'メガボディ',
+        'ギガボディ',
+      ] as const) {
+        const simulator = useBuildSimulator(
+          ref(target),
+          ref([target]),
+          ref([]),
+          ref([]),
+          ref([]),
+          {},
+        );
 
-      await nextTick();
-      simulator.changeBodySize(bodySize);
+        await nextTick();
+        simulator.changeBodySize(bodySize);
 
-      expect(simulator.traitSlots.value).toContain(replacedTrait);
-      expect(simulator.traitSlots.value).not.toContain(originalTrait);
-    }
-  });
+        expect(simulator.traitSlots.value).toContain(replacedTrait);
+        expect(simulator.traitSlots.value).not.toContain(originalTrait);
+      }
+    },
+  );
 
   it('超ギガボディのままならAI4回行動を維持する', async () => {
     const target = createMonster({
       サイズ特性: '超ギガボディ',
       新生前特性1: 'AI4回行動',
     });
-    const simulator = useBuildSimulator(
-      ref(target),
-      ref([target]),
-      ref([]),
-      ref([]),
-      ref([]),
-      {},
-    );
+    const simulator = useBuildSimulator(ref(target), ref([target]), ref([]), ref([]), ref([]), {});
 
     await nextTick();
 
@@ -92,7 +88,14 @@ describe('useBuildSimulator', () => {
       createAttribute('079', 'つねにアタックカンタ'),
       createAttribute('109', 'ＨＰバブル'),
     ]);
-    const simulator = useBuildSimulator(ref(target), ref([target]), ref([]), ref([]), attributes, {});
+    const simulator = useBuildSimulator(
+      ref(target),
+      ref([target]),
+      ref([]),
+      ref([]),
+      attributes,
+      {},
+    );
 
     await nextTick();
     simulator.toggleSp('ＨＰバブル');
@@ -107,14 +110,9 @@ describe('useBuildSimulator', () => {
       createAttribute('079', 'つねにアタックカンタ'),
       createAttribute('109', 'ＨＰバブル'),
     ]);
-    const simulator = useBuildSimulator(
-      ref(target),
-      ref([target]),
-      ref([]),
-      ref([]),
-      attributes,
-      { x: '109-079' },
-    );
+    const simulator = useBuildSimulator(ref(target), ref([target]), ref([]), ref([]), attributes, {
+      x: '109-079',
+    });
 
     await nextTick();
 
@@ -124,14 +122,9 @@ describe('useBuildSimulator', () => {
   it('共有URLから不利な特性のSP化状態を復元して維持する', async () => {
     const target = createMonster();
     const attributes = ref([createAttribute('094', 'ヘロヘロ')]);
-    const simulator = useBuildSimulator(
-      ref(target),
-      ref([target]),
-      ref([]),
-      ref([]),
-      attributes,
-      { x: '094' },
-    );
+    const simulator = useBuildSimulator(ref(target), ref([target]), ref([]), ref([]), attributes, {
+      x: '094',
+    });
 
     await nextTick();
 
@@ -143,14 +136,9 @@ describe('useBuildSimulator', () => {
   it('旧形式の共有URLからもSP化状態を復元する', async () => {
     const target = createMonster();
     const attributes = ref([createAttribute('079', 'つねにアタックカンタ')]);
-    const simulator = useBuildSimulator(
-      ref(target),
-      ref([target]),
-      ref([]),
-      ref([]),
-      attributes,
-      { x: 'ＨＰバブル,つねにアタックカンタ' },
-    );
+    const simulator = useBuildSimulator(ref(target), ref([target]), ref([]), ref([]), attributes, {
+      x: 'ＨＰバブル,つねにアタックカンタ',
+    });
 
     await nextTick();
 

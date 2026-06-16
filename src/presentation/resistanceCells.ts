@@ -20,7 +20,11 @@ export function buildResistanceCells(outcomes: ResistanceOutcome[]): ResistanceC
     return {
       element: outcome.element,
       text: resistanceDisplayForElement(outcome.element, outcome.finalLevel, isOriginallyReflect),
-      colorClass: resistanceColorForElement(outcome.element, outcome.finalLevel, isOriginallyReflect),
+      colorClass: resistanceColorForElement(
+        outcome.element,
+        outcome.finalLevel,
+        isOriginallyReflect,
+      ),
     };
   });
 }

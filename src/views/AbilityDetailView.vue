@@ -8,7 +8,9 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 const props = defineProps<{ id: string }>();
 
 const { abilities, isLoading, errorMessage } = useAbilities();
-const ability = computed(() => abilities.value?.find((candidate) => candidate.id === props.id) ?? null);
+const ability = computed(
+  () => abilities.value?.find((candidate) => candidate.id === props.id) ?? null,
+);
 
 const seoDescription = computed(() => {
   const target = ability.value;

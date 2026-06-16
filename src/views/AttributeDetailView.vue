@@ -12,11 +12,15 @@ const props = defineProps<{ id: string }>();
 const { attributes, isLoading, errorMessage } = useAttributes();
 const { monsters } = useMonsters();
 
-const attribute = computed(() => attributes.value?.find((candidate) => candidate.id === props.id) ?? null);
+const attribute = computed(
+  () => attributes.value?.find((candidate) => candidate.id === props.id) ?? null,
+);
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
 const hasSpDescription = computed(
-  () => !!attribute.value?.descriptionSp && !attribute.value.descriptionSp.includes('ＳＰ特性は　ありません'),
+  () =>
+    !!attribute.value?.descriptionSp &&
+    !attribute.value.descriptionSp.includes('ＳＰ特性は　ありません'),
 );
 
 const seoDescription = computed(() => {

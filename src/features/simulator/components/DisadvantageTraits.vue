@@ -15,14 +15,22 @@ defineEmits<{
   <div v-if="traits.length" class="mb-5">
     <h3 class="text-lg font-bold mb-2">不利な特性</h3>
     <ul class="border rounded divide-y">
-      <li v-for="trait in traits" :key="trait" class="flex items-center justify-between gap-2 px-3 py-2">
+      <li
+        v-for="trait in traits"
+        :key="trait"
+        class="flex items-center justify-between gap-2 px-3 py-2"
+      >
         <span>{{ trait }}</span>
         <span v-if="showSp" class="flex items-center gap-2">
           <button
             v-if="spAvailableTraits?.includes(trait)"
             type="button"
             class="rounded border px-3 py-1 text-sm font-semibold"
-            :class="spTraits?.includes(trait) ? 'border-blue-500 bg-blue-600 text-white' : 'border-gray-300 text-gray-500'"
+            :class="
+              spTraits?.includes(trait)
+                ? 'border-blue-500 bg-blue-600 text-white'
+                : 'border-gray-300 text-gray-500'
+            "
             @click="$emit('toggleSp', trait)"
           >
             SP

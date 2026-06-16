@@ -28,7 +28,12 @@ describe('aggregateStatBonus / skillStatBonus', () => {
   });
 
   it('スキル構成のパラメータ系を合算する（武闘家の例）', () => {
-    const butouka = createGuardSkill('001', '武闘家', ['最大ＨＰ＋４', '攻撃力＋８', '攻撃力＋１６', 'すばやさ＋１２']);
+    const butouka = createGuardSkill('001', '武闘家', [
+      '最大ＨＰ＋４',
+      '攻撃力＋８',
+      '攻撃力＋１６',
+      'すばやさ＋１２',
+    ]);
     const bonus = skillStatBonus(butouka);
     expect(bonus.HP).toBe(4);
     expect(bonus.攻撃力).toBe(24);

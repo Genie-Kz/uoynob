@@ -5,7 +5,10 @@ import { resistanceDisplayForElement } from './resistance';
 import { createGuardSkill, createMonster } from '@/test/fixtures';
 import type { BodySize, Monster } from '@/types/monster';
 
-function buildConfig(monster: Monster, overrides: Partial<BuildConfiguration> = {}): BuildConfiguration {
+function buildConfig(
+  monster: Monster,
+  overrides: Partial<BuildConfiguration> = {},
+): BuildConfiguration {
   return {
     monster,
     bodySize: monster.サイズ特性,
@@ -44,7 +47,9 @@ describe('computeBuildResistances - 上限ルール', () => {
   it('属性耐性はスキル等で「回復」まで上がる', () => {
     const monster = createMonster({ メラ: '無効' });
     const skill = createGuardSkill('001', 'メラ強化', ['メラガード＋']);
-    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }));
+    const results = computeBuildResistances(
+      buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }),
+    );
     // 無効(5) + 全ガード(1) + メラガード＋(2) = 8 → 属性なので回復(6)止まり（反射にはならない）
     expect(outcomeOf(results, 'メラ').finalValue).toBe('回復');
   });
@@ -52,7 +57,9 @@ describe('computeBuildResistances - 上限ルール', () => {
   it('属性以外の耐性は「無効」を超えて 無効+N まで上がる', () => {
     const monster = createMonster({ ねむり: '激減' });
     const skill = createGuardSkill('001', 'ねむり強化', ['ねむりガード＋']);
-    const results = computeBuildResistances(buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }));
+    const results = computeBuildResistances(
+      buildConfig(monster, { traits: ['全ガード＋'], skills: [skill] }),
+    );
     // 激減(4) + 全ガード(1) + ねむりガード＋(2) = 7 → 無効(5)+2
     const outcome = outcomeOf(results, 'ねむり');
     expect(outcome.finalLevel).toBe(7);
@@ -106,7 +113,9 @@ describe('computeBuildResistances - 下限・負の蓄積', () => {
 describe('computeBuildResistances - 各補正', () => {
   it('ボディサイズ補正は素の値（スタンダード基準）に選択サイズの補正をそのまま加算', () => {
     const standard = createMonster({ サイズ特性: 'スタンダードボディ', ザキ: '普通' });
-    const asMega = computeBuildResistances(buildConfig(standard, { bodySize: 'メガボディ' as BodySize }));
+    const asMega = computeBuildResistances(
+      buildConfig(standard, { bodySize: 'メガボディ' as BodySize }),
+    );
     // ザキは状態異常系。メガ(+2) → 普通(1)+2=3=半減
     expect(outcomeOf(asMega, 'ザキ').finalValue).toBe('半減');
 
@@ -122,7 +131,10 @@ describe('computeBuildResistances - 各補正', () => {
 
   it('スキルのガード＋は重複で+4になる', () => {
     const monster = createMonster({ 炎: '普通' });
-    const dosanko = createGuardSkill('001', 'どさんこソウル', ['炎ブレスガード＋', '炎ブレスガード＋']);
+    const dosanko = createGuardSkill('001', 'どさんこソウル', [
+      '炎ブレスガード＋',
+      '炎ブレスガード＋',
+    ]);
     const results = computeBuildResistances(buildConfig(monster, { skills: [dosanko] }));
     // 炎は属性。普通(1)+4=5=無効
     expect(outcomeOf(results, '炎').finalValue).toBe('無効');

@@ -30,7 +30,9 @@ function decodeEntities(s) {
     .replace(/&nbsp;/g, ' ');
 }
 function clean(s) {
-  return decodeEntities(s.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+  return decodeEntities(s.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function mainContent(html) {
@@ -40,7 +42,10 @@ function mainContent(html) {
 
 /** 指定種別の詳細リンクを抽出。id ごとに「名前らしい（数字でない）テキスト」を採用してユニーク化。 */
 function extractRefs(segment, kind) {
-  const re = new RegExp(`<a[^>]*href="[^"]*\\/${kind}\\/detail\\/\\?id=([0-9-]+)"[^>]*>([\\s\\S]*?)<\\/a>`, 'g');
+  const re = new RegExp(
+    `<a[^>]*href="[^"]*\\/${kind}\\/detail\\/\\?id=([0-9-]+)"[^>]*>([\\s\\S]*?)<\\/a>`,
+    'g',
+  );
   const byId = new Map();
   let m;
   while ((m = re.exec(segment)) !== null) {
@@ -85,17 +90,35 @@ async function main() {
     const html = await fetchHtml(pickup.key);
     const content = mainContent(html);
     if (pickup.type === 'skills') {
-      result[pickup.key] = { title: pickup.title, type: 'skills', items: extractRefs(content, 'skill') };
+      result[pickup.key] = {
+        title: pickup.title,
+        type: 'skills',
+        items: extractRefs(content, 'skill'),
+      };
     } else if (pickup.type === 'monsters') {
-      result[pickup.key] = { title: pickup.title, type: 'monsters', items: extractRefs(content, 'monster') };
+      result[pickup.key] = {
+        title: pickup.title,
+        type: 'monsters',
+        items: extractRefs(content, 'monster'),
+      };
     } else {
-      result[pickup.key] = { title: pickup.title, type: 'monster-groups', groups: extractMonsterGroups(html) };
+      result[pickup.key] = {
+        title: pickup.title,
+        type: 'monster-groups',
+        groups: extractMonsterGroups(html),
+      };
     }
     const entry = result[pickup.key];
-    const count = entry.items ? entry.items.length : entry.groups.reduce((sum, g) => sum + g.items.length, 0);
+    const count = entry.items
+      ? entry.items.length
+      : entry.groups.reduce((sum, g) => sum + g.items.length, 0);
     console.error(`[${pickup.key}] ${pickup.title}: ${count} 件`);
   }
-  fs.writeFileSync(path.join(scriptDir, '..', 'public', 'data', 'pickups.json'), JSON.stringify(result), 'utf8');
+  fs.writeFileSync(
+    path.join(scriptDir, '..', 'public', 'data', 'pickups.json'),
+    JSON.stringify(result),
+    'utf8',
+  );
   console.error('done.');
 }
 

@@ -9,7 +9,16 @@ import beast from '@/assets/images/icons/linage/lineage_icon_beast_transparent.p
 import zombie from '@/assets/images/icons/linage/lineage_icon_zombie_transparent.png';
 
 /** ステータス計算に使う8系統 */
-export const STAT_LINEAGES = ['物質', '悪魔', 'ドラゴン', '???', '自然', 'スライム', '魔獣', 'ゾンビ'] as const;
+export const STAT_LINEAGES = [
+  '物質',
+  '悪魔',
+  'ドラゴン',
+  '???',
+  '自然',
+  'スライム',
+  '魔獣',
+  'ゾンビ',
+] as const;
 
 export const LINEAGE_ICON: Record<string, string> = {
   物質: material,

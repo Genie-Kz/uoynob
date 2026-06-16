@@ -19,22 +19,21 @@ describe('traitDisadvantage', () => {
   });
 
   it('モントナー(ゆうかん)は特例の2を両方ある時だけ加算する', () => {
-    expect(totalDisadvantageCost(
-      ['ゆうかん', 'さいごのきぼう'],
-      'モントナー(ゆうかん)',
-    )).toBe(2);
+    expect(totalDisadvantageCost(['ゆうかん', 'さいごのきぼう'], 'モントナー(ゆうかん)')).toBe(2);
     expect(totalDisadvantageCost(['ゆうかん'], 'モントナー(ゆうかん)')).toBe(0);
     expect(totalDisadvantageCost(['さいごのきぼう'], 'モントナー(ゆうかん)')).toBe(0);
   });
 
   it('名もなき闇の王のスモール構成は指数6になる', () => {
-    expect(totalDisadvantageCost([
-      'AI2～3回行動',
-      '超ガードブレイク',
-      'つねにアタックカンタ',
-      '超こうどうはやい',
-      '秘めたるチカラ',
-    ])).toBe(6);
+    expect(
+      totalDisadvantageCost([
+        'AI2～3回行動',
+        '超ガードブレイク',
+        'つねにアタックカンタ',
+        '超こうどうはやい',
+        '秘めたるチカラ',
+      ]),
+    ).toBe(6);
   });
 
   it('ランクと指数に応じた不利な特性を返す', () => {

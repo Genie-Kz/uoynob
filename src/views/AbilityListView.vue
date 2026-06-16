@@ -25,7 +25,8 @@ const visibleAbilities = computed(() => {
   const query = keyword.value.trim();
   if (query) {
     list = list.filter((ability) =>
-      includesKeywordWithReading(ability.name, query, searchReadings.value?.labels));
+      includesKeywordWithReading(ability.name, query, searchReadings.value?.labels),
+    );
   }
   return list;
 });
@@ -58,21 +59,33 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
             </tr>
           </thead>
           <tbody>
-            <tr v-for="ability in visibleAbilities" :key="ability.id" class="border-b hover:bg-gray-50">
+            <tr
+              v-for="ability in visibleAbilities"
+              :key="ability.id"
+              class="border-b hover:bg-gray-50"
+            >
               <td class="px-3 py-2 border whitespace-nowrap">{{ ability.id }}</td>
               <td class="px-3 py-2 border">
-                <router-link :to="{ name: 'ability-detail', params: { id: ability.id } }" class="app-link">
+                <router-link
+                  :to="{ name: 'ability-detail', params: { id: ability.id } }"
+                  class="app-link"
+                >
                   {{ ability.name }}
                 </router-link>
               </td>
               <td class="px-3 py-2 border whitespace-nowrap">{{ ability.category }}</td>
-              <td class="px-3 py-2 border text-gray-600 whitespace-pre-wrap">{{ ability.description }}</td>
+              <td class="px-3 py-2 border text-gray-600 whitespace-pre-wrap">
+                {{ ability.description }}
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </DataState>
 
-    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特技' }]" class="mt-6" />
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特技' }]"
+      class="mt-6"
+    />
   </div>
 </template>

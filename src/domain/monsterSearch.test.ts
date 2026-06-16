@@ -33,10 +33,12 @@ describe('searchMonsters', () => {
       ザキ: '普通',
     });
 
-    expect(searchMonsters([mega], {
-      thresholds: [{ element: 'ザキ', minLevel: 3 }],
-      requiredTraits: ['メガ固有特性'],
-    })).toEqual([mega]);
+    expect(
+      searchMonsters([mega], {
+        thresholds: [{ element: 'ザキ', minLevel: 3 }],
+        requiredTraits: ['メガ固有特性'],
+      }),
+    ).toEqual([mega]);
   });
 
   it('指定サイズへ変更したときの耐性と特性で検索する', () => {
@@ -47,16 +49,20 @@ describe('searchMonsters', () => {
       ザキ: '普通',
     });
 
-    expect(searchMonsters([mega], {
-      thresholds: [{ element: 'ザキ', minLevel: 1 }],
-      requiredTraits: [],
-      bodySize: 'スタンダードボディ',
-    })).toEqual([mega]);
-    expect(searchMonsters([mega], {
-      thresholds: [],
-      requiredTraits: ['メガ固有特性'],
-      bodySize: 'スタンダードボディ',
-    })).toEqual([]);
+    expect(
+      searchMonsters([mega], {
+        thresholds: [{ element: 'ザキ', minLevel: 1 }],
+        requiredTraits: [],
+        bodySize: 'スタンダードボディ',
+      }),
+    ).toEqual([mega]);
+    expect(
+      searchMonsters([mega], {
+        thresholds: [],
+        requiredTraits: ['メガ固有特性'],
+        bodySize: 'スタンダードボディ',
+      }),
+    ).toEqual([]);
   });
 
   it.each([
@@ -74,16 +80,20 @@ describe('searchMonsters', () => {
       'メガボディ',
       'ギガボディ',
     ] as const) {
-      expect(searchMonsters([monster], {
-        thresholds: [],
-        requiredTraits: [replacedTrait],
-        bodySize,
-      })).toEqual([monster]);
-      expect(searchMonsters([monster], {
-        thresholds: [],
-        requiredTraits: [originalTrait],
-        bodySize,
-      })).toEqual([]);
+      expect(
+        searchMonsters([monster], {
+          thresholds: [],
+          requiredTraits: [replacedTrait],
+          bodySize,
+        }),
+      ).toEqual([monster]);
+      expect(
+        searchMonsters([monster], {
+          thresholds: [],
+          requiredTraits: [originalTrait],
+          bodySize,
+        }),
+      ).toEqual([]);
     }
   });
 
@@ -93,14 +103,18 @@ describe('searchMonsters', () => {
       新生前特性1: 'AI4回行動',
     });
 
-    expect(searchMonsters([monster], {
-      thresholds: [],
-      requiredTraits: ['AI4回行動'],
-    })).toEqual([monster]);
+    expect(
+      searchMonsters([monster], {
+        thresholds: [],
+        requiredTraits: ['AI4回行動'],
+      }),
+    ).toEqual([monster]);
   });
 
   it('条件が空かどうかを判定できる', () => {
     expect(isEmptyCriteria({ thresholds: [], requiredTraits: [] })).toBe(true);
-    expect(isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] })).toBe(false);
+    expect(
+      isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] }),
+    ).toBe(false);
   });
 });

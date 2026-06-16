@@ -13,7 +13,9 @@ const route = useRoute();
 const { attributes, isLoading, errorMessage } = useAttributes();
 
 const categoryName = computed(() =>
-  typeof route.query.cat === 'string' ? (ATTRIBUTE_CATEGORY_BY_SLUG[route.query.cat] ?? null) : null,
+  typeof route.query.cat === 'string'
+    ? (ATTRIBUTE_CATEGORY_BY_SLUG[route.query.cat] ?? null)
+    : null,
 );
 
 const keyword = ref('');
@@ -21,11 +23,13 @@ const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 const visibleAttributes = computed(() => {
   let list = [...(attributes.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
-  if (categoryName.value) list = list.filter((attribute) => attribute.category === categoryName.value);
+  if (categoryName.value)
+    list = list.filter((attribute) => attribute.category === categoryName.value);
   const query = keyword.value.trim();
   if (query) {
     list = list.filter((attribute) =>
-      includesKeywordWithReading(attribute.name, query, searchReadings.value?.labels));
+      includesKeywordWithReading(attribute.name, query, searchReadings.value?.labels),
+    );
   }
   return list;
 });
@@ -58,10 +62,17 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
             </tr>
           </thead>
           <tbody>
-            <tr v-for="attribute in visibleAttributes" :key="attribute.id" class="border-b hover:bg-gray-50">
+            <tr
+              v-for="attribute in visibleAttributes"
+              :key="attribute.id"
+              class="border-b hover:bg-gray-50"
+            >
               <td class="px-3 py-2 border whitespace-nowrap">{{ attribute.id }}</td>
               <td class="px-3 py-2 border">
-                <router-link :to="{ name: 'attribute-detail', params: { id: attribute.id } }" class="app-link">
+                <router-link
+                  :to="{ name: 'attribute-detail', params: { id: attribute.id } }"
+                  class="app-link"
+                >
                   {{ attribute.name }}
                 </router-link>
               </td>
@@ -73,6 +84,9 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
       </div>
     </DataState>
 
-    <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特性' }]" class="mt-6" />
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特性' }]"
+      class="mt-6"
+    />
   </div>
 </template>

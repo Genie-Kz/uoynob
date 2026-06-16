@@ -30,25 +30,25 @@ export function searchMonsters(monsters: Monster[], criteria: MonsterSearchCrite
   return monsters.filter((monster) => {
     const searchSize = bodySize ?? monster.サイズ特性;
     const traits = defaultEditableTraits(monster, searchSize).filter(Boolean);
-    const resistanceByElement = bodySize === null
-      ? null
-      : Object.fromEntries(
-          computeBuildResistances({
-            monster,
-            bodySize: searchSize,
-            traits,
-            skills: [],
-            forgeElements: [],
-          }).map((outcome) => [outcome.element, outcome.finalValue]),
-        );
+    const resistanceByElement =
+      bodySize === null
+        ? null
+        : Object.fromEntries(
+            computeBuildResistances({
+              monster,
+              bodySize: searchSize,
+              traits,
+              skills: [],
+              forgeElements: [],
+            }).map((outcome) => [outcome.element, outcome.finalValue]),
+          );
 
-    const meetsResistances = thresholds.every(
-      (threshold) => {
-        const resistance = resistanceByElement?.[threshold.element]
-          ?? effectiveResistanceValue(monster, threshold.element);
-        return resistanceLevelOf(resistance) >= threshold.minLevel;
-      },
-    );
+    const meetsResistances = thresholds.every((threshold) => {
+      const resistance =
+        resistanceByElement?.[threshold.element] ??
+        effectiveResistanceValue(monster, threshold.element);
+      return resistanceLevelOf(resistance) >= threshold.minLevel;
+    });
     if (!meetsResistances) return false;
 
     return requiredTraits.every((trait) => traits.includes(trait));

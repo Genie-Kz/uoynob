@@ -19,7 +19,9 @@ test.beforeEach(({ page }) => {
 test.describe('app smoke', () => {
   test('トップページが表示できる', async ({ page }) => {
     await page.goto('/#/');
-    await expect(page.getByAltText('ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP')).toBeVisible();
+    await expect(
+      page.getByAltText('ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SP'),
+    ).toBeVisible();
     await expect(page.getByText('イルルカSPの攻略データベース。')).toBeVisible();
     await expectNoConsoleErrors(page);
   });
@@ -51,14 +53,16 @@ test.describe('app smoke', () => {
     await expect(page.locator('thead th')).toHaveCount(5);
     await expect(page.locator('tbody tr')).not.toHaveCount(0);
 
-    const headerAlignments = await page.locator('thead th').evaluateAll((cells) =>
-      cells.map((cell) => getComputedStyle(cell).textAlign),
-    );
+    const headerAlignments = await page
+      .locator('thead th')
+      .evaluateAll((cells) => cells.map((cell) => getComputedStyle(cell).textAlign));
     expect(headerAlignments).toEqual(['center', 'center', 'center', 'center', 'center']);
 
-    const firstRowAlignments = await page.locator('tbody tr').first().locator('td').evaluateAll((cells) =>
-      cells.map((cell) => getComputedStyle(cell).textAlign),
-    );
+    const firstRowAlignments = await page
+      .locator('tbody tr')
+      .first()
+      .locator('td')
+      .evaluateAll((cells) => cells.map((cell) => getComputedStyle(cell).textAlign));
     expect(firstRowAlignments).toEqual(['center', 'start', 'center', 'center', 'center']);
     await expectNoConsoleErrors(page);
   });

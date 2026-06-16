@@ -8,7 +8,9 @@ import { DEFAULT_DESCRIPTION, usePageSeo } from '@/composables/usePageSeo';
 
 const route = useRoute();
 const isHome = computed(() => route.name === 'home');
-const useComfortableContent = computed(() => route.name !== 'home' && route.name !== 'simulator-build');
+const useComfortableContent = computed(
+  () => route.name !== 'home' && route.name !== 'simulator-build',
+);
 const pageTitle = computed(() => (typeof route.meta.title === 'string' ? route.meta.title : null));
 const pageDescription = computed(() =>
   typeof route.meta.description === 'string' ? route.meta.description : DEFAULT_DESCRIPTION,
@@ -28,10 +30,7 @@ usePageSeo(pageTitle, pageDescription);
           </div>
         </aside>
 
-        <div
-          class="min-w-0"
-          :class="{ 'px-1 py-2 sm:px-3 lg:px-4': useComfortableContent }"
-        >
+        <div class="min-w-0" :class="{ 'px-1 py-2 sm:px-3 lg:px-4': useComfortableContent }">
           <transition name="route-fade" mode="out-in">
             <component :is="Component" :key="route.path" />
           </transition>

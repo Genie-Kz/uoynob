@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { BodySize, Monster } from '@/types/monster';
-import { BODY_SIZES, LINEAGE_BY_NAME, MONSTER_RANKS, lineageInfoOf } from '@/constants/monsterTaxonomy';
+import {
+  BODY_SIZES,
+  LINEAGE_BY_NAME,
+  MONSTER_RANKS,
+  lineageInfoOf,
+} from '@/constants/monsterTaxonomy';
 import { LINEAGE_ICON, LINEAGE_LABEL } from '@/shared/icons/lineageIcons';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
@@ -84,7 +89,10 @@ const visibleMonsters = computed(() => {
           class="w-32 shrink-0 max-[360px]:w-[6rem] sm:w-40"
         >
           <template #icon="{ option }">
-            <BodySizeIcon v-if="bodySizeOptionValue(option.value)" :size="bodySizeOptionValue(option.value)!" />
+            <BodySizeIcon
+              v-if="bodySizeOptionValue(option.value)"
+              :size="bodySizeOptionValue(option.value)!"
+            />
           </template>
         </IconSelect>
       </div>
@@ -109,7 +117,11 @@ const visibleMonsters = computed(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="monster in visibleMonsters" :key="monster.id" class="border-b hover:bg-gray-50">
+          <tr
+            v-for="monster in visibleMonsters"
+            :key="monster.id"
+            class="border-b hover:bg-gray-50"
+          >
             <td class="px-3 py-2 border text-center whitespace-nowrap">
               <MonsterIcon :lineage="monster.系統" :no="monster.no" />
               <router-link
@@ -120,7 +132,10 @@ const visibleMonsters = computed(() => {
               </router-link>
             </td>
             <td class="px-3 py-2 border">
-              <router-link :to="{ name: linkRouteName, params: { id: monster.id } }" class="app-link">
+              <router-link
+                :to="{ name: linkRouteName, params: { id: monster.id } }"
+                class="app-link"
+              >
                 {{ monster.名前 }}
               </router-link>
             </td>
