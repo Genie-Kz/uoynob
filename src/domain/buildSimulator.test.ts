@@ -89,6 +89,15 @@ describe('computeBuildResistances - 上限ルール', () => {
     expect(outcome.finalValue).toBe('回復');
   });
 
+  it('超こうどうはやいは状態異常系を5段階下げる', () => {
+    const monster = createMonster({ ねむり: '反射', マインド: '回復', メラ: '反射' });
+    const results = computeBuildResistances(buildConfig(monster, { traits: ['超こうどうはやい'] }));
+    expect(outcomeOf(results, 'ねむり').finalLevel).toBe(2); // 反射(7) -5 = 軽減(2)
+    expect(outcomeOf(results, 'ねむり').finalValue).toBe('軽減');
+    expect(outcomeOf(results, 'マインド').finalValue).toBe('普通'); // 回復(6) -5 = 普通(1)
+    expect(outcomeOf(results, 'メラ').finalValue).toBe('反射'); // 属性耐性は対象外
+  });
+
   it('非属性で元々「回復」のものは 無効+1 と表記される', () => {
     const monster = createMonster({ ねむり: '回復' });
     const results = computeBuildResistances(buildConfig(monster));

@@ -58,7 +58,7 @@ export const LIGHT_METAL_BODY_TRAIT = 'ライトメタルボディ';
 export const KOUDOU_TRAIT_DELTA: Record<string, number> = {
   こうどうおそい: 2,
   こうどうはやい: -2,
-  超こうどうはやい: -4,
+  超こうどうはやい: -5,
 };
 
 /** スキルの「〇〇ガード＋」1つあたりの耐性上昇段階 */
