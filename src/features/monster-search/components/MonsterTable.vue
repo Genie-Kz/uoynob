@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { BodySize, MonsterListItem } from '@/types/monster';
 import {
   BODY_SIZES,
@@ -26,6 +26,10 @@ const keyword = ref('');
 const selectedLineage = ref('');
 const selectedRank = ref('');
 const selectedBodySize = ref('');
+const filterPanelRef = ref<HTMLElement | null>(null);
+const stickyFiltersExpanded = ref(false);
+const isScrolledPastFilters = ref(false);
+let scrollFrame = 0;
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 const lineageOptions = [
   { value: '', label: '全系統' },
@@ -46,6 +50,13 @@ const bodySizeOptions = [
 
 function bodySizeOptionValue(value: string | number | null): BodySize | null {
   return BODY_SIZES.find((size) => size === value) ?? null;
+}
+
+function selectedLabel(
+  options: Array<{ value: string | number | null; label: string }>,
+  value: string,
+): string {
+  return options.find((option) => option.value === value)?.label ?? '';
 }
 
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
@@ -74,11 +85,58 @@ const tableCaption = computed(() => {
   if (showsBodySize.value) columns.push('サイズ');
   return `モンスター一覧（${columns.join('・')}）`;
 });
+
+const activeFilterLabels = computed(() => {
+  const labels: string[] = [];
+  if (selectedLineage.value) labels.push(selectedLabel(lineageOptions, selectedLineage.value));
+  if (selectedRank.value) labels.push(selectedLabel(rankOptions, selectedRank.value));
+  if (selectedBodySize.value) labels.push(selectedLabel(bodySizeOptions, selectedBodySize.value));
+  if (keyword.value.trim()) labels.push(`名称: ${keyword.value.trim()}`);
+  return labels;
+});
+
+const filterSummary = computed(() =>
+  activeFilterLabels.value.length ? activeFilterLabels.value.join(' / ') : '全条件',
+);
+
+function resetFilters(): void {
+  selectedLineage.value = '';
+  selectedRank.value = '';
+  selectedBodySize.value = '';
+  keyword.value = '';
+}
+
+function updateStickyFilterVisibility(): void {
+  const panel = filterPanelRef.value;
+  if (!panel) return;
+  isScrolledPastFilters.value = panel.getBoundingClientRect().bottom < 0;
+  if (!isScrolledPastFilters.value) stickyFiltersExpanded.value = false;
+}
+
+function scheduleStickyFilterUpdate(): void {
+  if (scrollFrame) return;
+  scrollFrame = window.requestAnimationFrame(() => {
+    scrollFrame = 0;
+    updateStickyFilterVisibility();
+  });
+}
+
+onMounted(() => {
+  updateStickyFilterVisibility();
+  window.addEventListener('scroll', scheduleStickyFilterUpdate, { passive: true });
+  window.addEventListener('resize', scheduleStickyFilterUpdate);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', scheduleStickyFilterUpdate);
+  window.removeEventListener('resize', scheduleStickyFilterUpdate);
+  if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
+});
 </script>
 
 <template>
   <div>
-    <div class="mb-3">
+    <div ref="filterPanelRef" class="mb-3">
       <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2">
         <IconSelect
           v-model="selectedLineage"
@@ -113,6 +171,72 @@ const tableCaption = computed(() => {
         placeholder="モンスター名で絞り込み"
       />
     </div>
+
+    <div
+      v-if="isScrolledPastFilters"
+      class="sticky top-0 z-30 -mx-1 mb-3 rounded border bg-white/95 p-2 shadow-sm backdrop-blur"
+    >
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="btn-neutral shrink-0 !px-3 !py-2"
+          :aria-expanded="stickyFiltersExpanded"
+          @click="stickyFiltersExpanded = !stickyFiltersExpanded"
+        >
+          絞り込み
+        </button>
+        <p class="min-w-0 flex-1 truncate text-sm text-gray-600">
+          {{ filterSummary }}
+        </p>
+        <button
+          v-if="activeFilterLabels.length"
+          type="button"
+          class="btn-neutral shrink-0 !px-3 !py-2"
+          @click="resetFilters"
+        >
+          解除
+        </button>
+      </div>
+
+      <div class="collapsible mt-2" :class="{ 'is-open': stickyFiltersExpanded }">
+        <div class="collapsible-inner">
+          <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2 pt-1">
+            <IconSelect
+              v-model="selectedLineage"
+              :options="lineageOptions"
+              aria-label="系統で絞り込み"
+              class="w-28 shrink-0 max-[360px]:w-[5.5rem] sm:w-36"
+            />
+            <IconSelect
+              v-model="selectedRank"
+              :options="rankOptions"
+              aria-label="ランクで絞り込み"
+              class="w-24 shrink-0 max-[360px]:w-20 sm:w-28"
+            />
+            <IconSelect
+              v-model="selectedBodySize"
+              :options="bodySizeOptions"
+              aria-label="ボディサイズで絞り込み"
+              class="w-32 shrink-0 max-[360px]:w-[6rem] sm:w-40"
+            >
+              <template #icon="{ option }">
+                <BodySizeIcon
+                  v-if="bodySizeOptionValue(option.value)"
+                  :size="bodySizeOptionValue(option.value)!"
+                />
+              </template>
+            </IconSelect>
+          </div>
+          <input
+            v-model="keyword"
+            type="text"
+            class="w-full border rounded px-3 py-2"
+            placeholder="モンスター名で絞り込み"
+          />
+        </div>
+      </div>
+    </div>
+
     <p class="text-sm text-gray-500 mb-2">{{ visibleMonsters.length }} 体</p>
 
     <div class="overflow-x-auto">
