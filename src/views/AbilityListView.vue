@@ -32,6 +32,7 @@ const visibleAbilities = computed(() => {
 });
 
 const title = computed(() => (categoryName.value ? `${categoryName.value} の特技` : '特技一覧'));
+const showsCategory = computed(() => categoryName.value === null);
 </script>
 
 <template>
@@ -54,7 +55,7 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
             <tr class="table-header-row">
               <th class="px-2 py-2 border">No.</th>
               <th class="px-2 py-2 border">特技</th>
-              <th class="px-2 py-2 border">カテゴリー</th>
+              <th v-if="showsCategory" class="px-2 py-2 border">カテゴリー</th>
               <th class="px-2 py-2 border">効果</th>
             </tr>
           </thead>
@@ -73,7 +74,9 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
                   {{ ability.name }}
                 </router-link>
               </td>
-              <td class="px-3 py-2 border whitespace-nowrap">{{ ability.category }}</td>
+              <td v-if="showsCategory" class="px-3 py-2 border whitespace-nowrap">
+                {{ ability.category }}
+              </td>
               <td class="px-3 py-2 border text-gray-600 whitespace-pre-wrap">
                 {{ ability.description }}
               </td>

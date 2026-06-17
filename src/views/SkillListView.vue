@@ -72,7 +72,6 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
             <tr class="table-header-row">
               <th class="px-2 py-2 border">No.</th>
               <th class="px-2 py-2 border">スキル</th>
-              <th class="px-2 py-2 border">カテゴリー</th>
               <th class="px-2 py-2 border">耐性アップ</th>
             </tr>
           </thead>
@@ -87,7 +86,6 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
                   {{ skill.name }}
                 </router-link>
               </td>
-              <td class="px-3 py-2 border whitespace-nowrap">{{ skill.category }}</td>
               <td class="px-3 py-2 border">
                 <span
                   v-for="badge in guardBadges(skill)"

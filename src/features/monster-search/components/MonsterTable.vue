@@ -19,6 +19,7 @@ const props = defineProps<{
   monsters: MonsterListItem[];
   /** 行クリックの遷移先（モンスター詳細 or シミュレーター） */
   linkRouteName: 'monster-detail' | 'simulator-build';
+  hiddenColumns?: Array<'rank' | 'lineage' | 'bodySize'>;
 }>();
 
 const keyword = ref('');
@@ -62,6 +63,17 @@ const visibleMonsters = computed(() =>
     searchReadings.value?.labels,
   ),
 );
+
+const showsRank = computed(() => !props.hiddenColumns?.includes('rank'));
+const showsLineage = computed(() => !props.hiddenColumns?.includes('lineage'));
+const showsBodySize = computed(() => !props.hiddenColumns?.includes('bodySize'));
+const tableCaption = computed(() => {
+  const columns = ['No.', '名前'];
+  if (showsRank.value) columns.push('ランク');
+  if (showsLineage.value) columns.push('系統');
+  if (showsBodySize.value) columns.push('サイズ');
+  return `モンスター一覧（${columns.join('・')}）`;
+});
 </script>
 
 <template>
@@ -106,15 +118,17 @@ const visibleMonsters = computed(() =>
     <div class="overflow-x-auto">
       <table class="w-full text-sm border-collapse">
         <caption class="sr-only">
-          モンスター一覧（No.・名前・ランク・系統・サイズ）
+          {{
+            tableCaption
+          }}
         </caption>
         <thead>
           <tr class="table-header-row">
             <th scope="col" class="px-2 py-2 border">No.</th>
             <th scope="col" class="px-2 py-2 border">モンスター</th>
-            <th scope="col" class="px-2 py-2 border">ランク</th>
-            <th scope="col" class="px-2 py-2 border">系統</th>
-            <th scope="col" class="px-2 py-2 border">サイズ</th>
+            <th v-if="showsRank" scope="col" class="px-2 py-2 border">ランク</th>
+            <th v-if="showsLineage" scope="col" class="px-2 py-2 border">系統</th>
+            <th v-if="showsBodySize" scope="col" class="px-2 py-2 border">サイズ</th>
           </tr>
         </thead>
         <tbody>
@@ -140,8 +154,8 @@ const visibleMonsters = computed(() =>
                 {{ monster.名前 }}
               </router-link>
             </td>
-            <td class="px-3 py-2 border text-center">{{ monster.ランク }}</td>
-            <td class="px-3 py-2 border text-center">
+            <td v-if="showsRank" class="px-3 py-2 border text-center">{{ monster.ランク }}</td>
+            <td v-if="showsLineage" class="px-3 py-2 border text-center">
               <img
                 v-if="LINEAGE_ICON[monster.系統]"
                 :src="LINEAGE_ICON[monster.系統]"
@@ -155,7 +169,7 @@ const visibleMonsters = computed(() =>
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
             </td>
-            <td class="px-3 py-2 border text-center">
+            <td v-if="showsBodySize" class="px-3 py-2 border text-center">
               <BodySizeIcon :size="monster.サイズ特性" />
             </td>
           </tr>
