@@ -5,9 +5,7 @@ import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
-import { includesKeywordWithReading } from '@/shared/search/textSearch';
-import { loadSearchReadings } from '@/shared/data/datasets';
-import { useAsyncData } from '@/composables/useAsyncData';
+import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
 import {
   bodySizeOptionValue,
   bodySizeSelectOptions,
@@ -16,11 +14,12 @@ import {
 import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
 import DataState from '@/shared/ui/DataState.vue';
 import IconSelect from '@/shared/ui/IconSelect.vue';
-import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
+import FilterModal from '@/shared/ui/FilterModal.vue';
+import PickerModal from '@/shared/ui/PickerModal.vue';
+import SearchResultTable from '@/features/monster-search/components/SearchResultTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
-const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
 const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(
   Object.fromEntries(RESISTANCE_ELEMENTS.map((element) => [element, null])) as Record<
@@ -28,20 +27,17 @@ const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(
     number | null
   >,
 );
-const selectedTraits = ref<string[]>([]);
-const traitKeyword = ref('');
-const searchResults = ref<Monster[] | null>(null);
+// 特性スロット（初期3行）。空文字は未選択。
+const traitSlots = ref<string[]>(['', '', '']);
 const searchBodySize = ref('');
+const searchResults = ref<Monster[] | null>(null);
+
+const resistanceModalOpen = ref(false);
+const traitModalOpen = ref(false);
+const traitPicker = ref<{ open: boolean; index: number }>({ open: false, index: 0 });
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
-const visibleTraitNames = computed(() => {
-  const keyword = traitKeyword.value.trim();
-  return keyword
-    ? allTraitNames.value.filter((name) =>
-        includesKeywordWithReading(name, keyword, searchReadings.value?.labels),
-      )
-    : allTraitNames.value;
-});
+const traitOptions = computed(() => traitPickerItems(allTraitNames.value));
 
 const thresholds = computed<ResistanceThreshold[]>(() =>
   RESISTANCE_ELEMENTS.flatMap((element) => {
@@ -49,26 +45,57 @@ const thresholds = computed<ResistanceThreshold[]>(() =>
     return level === null ? [] : [{ element, minLevel: level }];
   }),
 );
+// スロットから重複・空を除いた検索対象の特性。
+const requiredTraits = computed(() => [
+  ...new Set(traitSlots.value.map((name) => name.trim()).filter(Boolean)),
+]);
+
+// 条件が1つでも指定されていれば検索可能。どちらも空なら検索ボタンを非活性にする。
+const canSearch = computed(() => thresholds.value.length > 0 || requiredTraits.value.length > 0);
+
+function thresholdLabel(level: number | null): string {
+  return thresholdSelectOptions.find((option) => option.value === level)?.label ?? '';
+}
+const resistanceSummary = computed(() => {
+  const parts = RESISTANCE_ELEMENTS.flatMap((element) => {
+    const level = selectedLevelByElement.value[element];
+    return level === null ? [] : [`${element} ${thresholdLabel(level)}`];
+  });
+  return parts.length ? parts.join('、') : '未設定';
+});
+const traitSummary = computed(() =>
+  requiredTraits.value.length ? requiredTraits.value.join('、') : '未設定',
+);
 
 function runSearch(): void {
   const criteria = {
     thresholds: thresholds.value,
-    requiredTraits: selectedTraits.value,
+    requiredTraits: requiredTraits.value,
     bodySize: (searchBodySize.value || null) as BodySize | null,
   };
   searchResults.value = isEmptyCriteria(criteria)
     ? []
     : searchMonsters(monsters.value ?? [], criteria);
+  resistanceModalOpen.value = false;
+  traitModalOpen.value = false;
 }
 
-function resetAll(): void {
+function clearResistance(): void {
   for (const element of RESISTANCE_ELEMENTS) selectedLevelByElement.value[element] = null;
-  selectedTraits.value = [];
-  searchBodySize.value = '';
-  searchResults.value = null;
 }
-
-const hasCriteria = computed(() => thresholds.value.length > 0 || selectedTraits.value.length > 0);
+function clearTraits(): void {
+  traitSlots.value = ['', '', ''];
+}
+function addTraitSlot(): void {
+  traitSlots.value.push('');
+}
+function openTraitPicker(index: number): void {
+  traitPicker.value = { open: true, index };
+}
+function handleTraitPick(value: string): void {
+  traitSlots.value[traitPicker.value.index] = value;
+  traitPicker.value.open = false;
+}
 </script>
 
 <template>
@@ -100,9 +127,54 @@ const hasCriteria = computed(() => thresholds.value.length > 0 || selectedTraits
         デフォルトサイズでは本来のサイズ、それ以外では全モンスターを選択したサイズにしたときの耐性・特性を検索します。
       </p>
 
-      <!-- 耐性 -->
-      <h3 class="font-bold mb-2">耐性を選択</h3>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
+      <!-- 耐性・特性の設定（モーダルを開く） -->
+      <div class="grid gap-3 sm:grid-cols-2 mb-4">
+        <div class="border rounded p-3">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-bold">耐性</h3>
+            <button type="button" class="btn-outline-primary" @click="resistanceModalOpen = true">
+              設定
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 break-words">{{ resistanceSummary }}</p>
+        </div>
+        <div class="border rounded p-3">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-bold">特性</h3>
+            <button type="button" class="btn-outline-primary" @click="traitModalOpen = true">
+              設定
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 break-words">{{ traitSummary }}</p>
+        </div>
+      </div>
+
+      <!-- 結果 -->
+      <h3 class="font-bold mb-2">検索結果</h3>
+      <p v-if="searchResults === null" class="text-gray-500">
+        「耐性」または「特性」を設定し、モーダル内の検索ボタンを押してください。
+      </p>
+      <p v-else-if="!searchResults.length" class="text-gray-500">
+        条件に合うモンスターはいません。
+      </p>
+      <SearchResultTable v-else :monsters="searchResults" />
+    </DataState>
+
+    <PageBreadcrumb
+      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
+      class="mt-6"
+    />
+
+    <!-- 耐性モーダル -->
+    <FilterModal
+      :open="resistanceModalOpen"
+      title="耐性を選択"
+      :can-search="canSearch"
+      @clear="clearResistance"
+      @close="resistanceModalOpen = false"
+      @search="runSearch"
+    >
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
         <div v-for="element in RESISTANCE_ELEMENTS" :key="element" class="text-sm">
           <span class="block text-gray-600 mb-0.5">{{ element }}</span>
           <IconSelect
@@ -112,43 +184,42 @@ const hasCriteria = computed(() => thresholds.value.length > 0 || selectedTraits
           />
         </div>
       </div>
+    </FilterModal>
 
-      <!-- 特性 -->
-      <h3 class="font-bold mb-2">特性を選択</h3>
-      <input
-        v-model="traitKeyword"
-        type="text"
-        class="border rounded w-full px-2 py-1 mb-2"
-        placeholder="特性名で絞り込み"
-      />
-      <div class="border rounded p-2 mb-2 max-h-60 overflow-y-auto">
-        <label v-for="name in visibleTraitNames" :key="name" class="block text-sm py-0.5">
-          <input v-model="selectedTraits" type="checkbox" :value="name" class="mr-1" />{{ name }}
-        </label>
+    <!-- 特性モーダル -->
+    <FilterModal
+      :open="traitModalOpen"
+      title="特性を選択"
+      :can-search="canSearch"
+      @clear="clearTraits"
+      @close="traitModalOpen = false"
+      @search="runSearch"
+    >
+      <ul class="border rounded divide-y">
+        <li
+          v-for="(trait, index) in traitSlots"
+          :key="index"
+          class="flex items-center justify-between gap-2 px-3 py-2"
+        >
+          <span :class="{ 'text-gray-400': !trait }">{{ trait || '（空き）' }}</span>
+          <button type="button" class="btn-outline-primary" @click="openTraitPicker(index)">
+            選択
+          </button>
+        </li>
+      </ul>
+      <div class="mt-3">
+        <button type="button" class="btn-neutral" @click="addTraitSlot">スロットを追加</button>
       </div>
-      <p v-if="selectedTraits.length" class="text-sm text-gray-600 mb-3">
-        選択中: {{ selectedTraits.join('、') }}
-      </p>
+    </FilterModal>
 
-      <div class="mb-5 flex gap-2">
-        <button type="button" class="btn-primary" @click="runSearch">検索する</button>
-        <button type="button" class="btn-neutral" @click="resetAll">すべてリセット</button>
-      </div>
-
-      <!-- 結果 -->
-      <h3 class="font-bold mb-2">検索結果</h3>
-      <p v-if="searchResults === null" class="text-gray-500">
-        耐性または特性を指定して検索してください。
-      </p>
-      <p v-else-if="!hasCriteria" class="text-amber-700">
-        耐性または特性を1つ以上指定してください。
-      </p>
-      <MonsterTable v-else :monsters="searchResults" link-route-name="monster-detail" />
-    </DataState>
-
-    <PageBreadcrumb
-      :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
-      class="mt-6"
+    <!-- 特性スロットの選択ピッカー（特性モーダルの上に重ねて表示） -->
+    <PickerModal
+      :open="traitPicker.open"
+      title="特性を選択"
+      :items="traitOptions"
+      :current="traitSlots[traitPicker.index] ?? ''"
+      @select="handleTraitPick"
+      @close="traitPicker.open = false"
     />
   </div>
 </template>

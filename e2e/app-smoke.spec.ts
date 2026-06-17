@@ -36,7 +36,7 @@ test.describe('app smoke', () => {
   test('モンスター検索が表示できる', async ({ page }) => {
     await page.goto('/#/search');
     await expect(page.getByRole('heading', { name: 'モンスター検索' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '検索する' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '検索結果' })).toBeVisible();
     await expectNoConsoleErrors(page);
   });
 
