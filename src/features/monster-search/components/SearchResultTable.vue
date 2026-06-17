@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { Monster } from '@/types/monster';
 import type { StatKey } from '@/types/stats';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
@@ -14,23 +14,33 @@ const props = defineProps<{
   monsters: Monster[];
 }>();
 
-// 並び替えキー。'' は既定（図鑑＝位階順）。それ以外は各ステータス。
-const sortKey = ref<'' | StatKey>('');
-const sortDescending = ref(true);
+// 並び替え状態は親が保持する（ページ遷移をまたいで維持するため）。
+// '' は既定（図鑑＝位階順）。それ以外は各ステータス。
+const sortKey = defineModel<'' | StatKey>('sortKey', { required: true });
+const sortDescending = defineModel<boolean>('sortDescending', { required: true });
 
 const sortKeyOptions = [
   { value: '', label: '既定（No.順）' },
   ...STAT_KEYS.map((key) => ({ value: key, label: key })),
 ];
 
+// セレクトでキーを変えたときは、そのキーに自然な方向を既定にする
+// （ステータスは大きい順、No.順は小さい順）。トグルで反転もできる。
+const sortKeyProxy = computed<'' | StatKey>({
+  get: () => sortKey.value,
+  set: (value) => {
+    sortKey.value = value;
+    sortDescending.value = value !== '';
+  },
+});
+
 const sortedMonsters = computed<Monster[]>(() => {
-  if (sortKey.value === '') return sortMonstersByDexOrder(props.monsters);
+  const byDex = sortMonstersByDexOrder(props.monsters);
+  if (sortKey.value === '') return sortDescending.value ? byDex.reverse() : byDex;
   const key = sortKey.value;
   const direction = sortDescending.value ? -1 : 1;
   // ステータスは数値。同値は位階順で安定させてから並べ替える。
-  return sortMonstersByDexOrder(props.monsters).sort(
-    (a, b) => (Number(a[key]) - Number(b[key])) * direction,
-  );
+  return byDex.sort((a, b) => (Number(a[key]) - Number(b[key])) * direction);
 });
 </script>
 
@@ -39,7 +49,7 @@ const sortedMonsters = computed<Monster[]>(() => {
     <div class="mb-3 flex flex-wrap items-center justify-end gap-2">
       <span class="text-sm text-gray-600">並び替え</span>
       <IconSelect
-        v-model="sortKey"
+        v-model="sortKeyProxy"
         :options="sortKeyOptions"
         aria-label="並び替えるステータス"
         class="w-40"
@@ -47,8 +57,7 @@ const sortedMonsters = computed<Monster[]>(() => {
       <button
         type="button"
         class="btn-neutral !px-3 !py-2"
-        :disabled="sortKey === ''"
-        :aria-label="sortDescending ? '降順（大きい順）' : '昇順（小さい順）'"
+        :aria-label="sortDescending ? '大きい順' : '小さい順'"
         @click="sortDescending = !sortDescending"
       >
         {{ sortDescending ? '大きい順 ▼' : '小さい順 ▲' }}

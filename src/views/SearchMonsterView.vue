@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { BodySize, Monster } from '@/types/monster';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import type { BodySize } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
-import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
+import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
 import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
+import { useMonsterSearchState } from '@/features/monster-search/useMonsterSearchState';
 import {
   bodySizeOptionValue,
   bodySizeSelectOptions,
@@ -22,22 +23,23 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 
-const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(
-  Object.fromEntries(RESISTANCE_ELEMENTS.map((element) => [element, null])) as Record<
-    ResistanceElement,
-    number | null
-  >,
-);
-// 特性スロット（初期3行）。空文字は未選択。
-const traitSlots = ref<string[]>(['', '', '']);
-// 本来のサイズ特性での絞り込み（空文字＝指定なし）。検索時のボディサイズ（変換）とは別。
-const requiredOriginalBodySize = ref<string>('');
+// ページ遷移をまたいで保持する検索状態（詳細ページから戻っても維持される）。
+const {
+  selectedLevelByElement,
+  traitSlots,
+  requiredOriginalBodySize,
+  searchBodySize,
+  searchResults,
+  sortKey,
+  sortDescending,
+  scrollY,
+  resetResistance,
+} = useMonsterSearchState();
+
 const originalBodySizeOptions = [
   { value: '', label: '指定なし' },
   ...BODY_SIZES.map((size) => ({ value: size, label: size })),
 ];
-const searchBodySize = ref('');
-const searchResults = ref<Monster[] | null>(null);
 
 const resistanceModalOpen = ref(false);
 const traitModalOpen = ref(false);
@@ -97,7 +99,7 @@ function runSearch(): void {
 }
 
 function clearResistance(): void {
-  for (const element of RESISTANCE_ELEMENTS) selectedLevelByElement.value[element] = null;
+  resetResistance();
 }
 function clearTraits(): void {
   traitSlots.value = ['', '', ''];
@@ -113,6 +115,28 @@ function handleTraitPick(value: string): void {
   traitSlots.value[traitPicker.value.index] = value;
   traitPicker.value.open = false;
 }
+
+// 詳細ページへ離れるときにスクロール位置を保存し、戻ったときに復元する。
+onBeforeUnmount(() => {
+  scrollY.value = window.scrollY;
+});
+
+onMounted(() => {
+  // 検索結果がある状態（＝詳細から戻ってきた）ときだけ位置を復元する。
+  if (!searchResults.value || scrollY.value <= 0) return;
+  const target = scrollY.value;
+  const restore = () => requestAnimationFrame(() => window.scrollTo(0, target));
+  if (!isLoading.value) {
+    void nextTick(restore);
+    return;
+  }
+  // データ読み込み中なら、結果が描画されてから復元する。
+  const stop = watch(isLoading, (loading) => {
+    if (loading) return;
+    stop();
+    void nextTick(restore);
+  });
+});
 </script>
 
 <template>
@@ -174,13 +198,22 @@ function handleTraitPick(value: string): void {
       <p v-else-if="!searchResults.length" class="text-gray-500">
         条件に合うモンスターはいません。
       </p>
-      <SearchResultTable v-else :monsters="searchResults" />
+      <SearchResultTable
+        v-else
+        v-model:sort-key="sortKey"
+        v-model:sort-descending="sortDescending"
+        :monsters="searchResults"
+      />
     </DataState>
 
     <PageBreadcrumb
       :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
       class="mt-6"
     />
+
+    <!-- スマホでは下部のサイト内検索（紛らわしい「検索」ボタン）が初期表示に入らないよう、
+         本文の下に余白を取ってスクロールするまで見えないようにする。 -->
+    <div class="h-[70vh] sm:hidden" aria-hidden="true"></div>
 
     <!-- 耐性モーダル -->
     <FilterModal
