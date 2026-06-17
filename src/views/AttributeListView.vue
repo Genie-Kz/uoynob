@@ -35,7 +35,6 @@ const visibleAttributes = computed(() => {
 });
 
 const title = computed(() => (categoryName.value ? `${categoryName.value} の特性` : '特性一覧'));
-const showsCategory = computed(() => categoryName.value === null);
 </script>
 
 <template>
@@ -58,7 +57,6 @@ const showsCategory = computed(() => categoryName.value === null);
             <tr class="table-header-row">
               <th class="px-2 py-2 border">No.</th>
               <th class="px-2 py-2 border">特性</th>
-              <th v-if="showsCategory" class="px-2 py-2 border">カテゴリー</th>
               <th class="px-2 py-2 border">効果</th>
             </tr>
           </thead>
@@ -76,9 +74,6 @@ const showsCategory = computed(() => categoryName.value === null);
                 >
                   {{ attribute.name }}
                 </router-link>
-              </td>
-              <td v-if="showsCategory" class="px-3 py-2 border whitespace-nowrap">
-                {{ attribute.category }}
               </td>
               <td class="px-3 py-2 border text-gray-600">{{ attribute.description }}</td>
             </tr>
