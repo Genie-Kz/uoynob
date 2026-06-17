@@ -1,0 +1,14 @@
+# テキストは LF に正規化し、作業ツリーでも LF で揃える（OS の autocrlf 設定に依存しない）。
+* text=auto eol=lf
+
+# バイナリは改行変換の対象外にする。
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
