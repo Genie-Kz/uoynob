@@ -14,7 +14,12 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'favicon-48x48.png',
+        'apple-touch-icon.png',
+      ],
       manifest: {
         name: 'Re:凡庸な イルルカSP',
         short_name: '凡庸なイルルカSP',
