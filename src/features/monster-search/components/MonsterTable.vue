@@ -95,9 +95,7 @@ const activeFilterLabels = computed(() => {
   return labels;
 });
 
-const filterSummary = computed(() =>
-  activeFilterLabels.value.length ? activeFilterLabels.value.join(' / ') : '全条件',
-);
+const filterSummary = computed(() => activeFilterLabels.value.join(' / '));
 
 function resetFilters(): void {
   selectedLineage.value = '';
@@ -185,9 +183,10 @@ onBeforeUnmount(() => {
         >
           絞り込み
         </button>
-        <p class="min-w-0 flex-1 truncate text-sm text-gray-600">
+        <p v-if="activeFilterLabels.length" class="min-w-0 flex-1 truncate text-sm text-gray-600">
           {{ filterSummary }}
         </p>
+        <span v-else class="min-w-0 flex-1" aria-hidden="true"></span>
         <button
           v-if="activeFilterLabels.length"
           type="button"
@@ -198,26 +197,28 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <div class="collapsible mt-2" :class="{ 'is-open': stickyFiltersExpanded }">
-        <div class="collapsible-inner">
-          <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2 pt-1">
+      <div v-if="stickyFiltersExpanded" class="mt-2">
+        <div>
+          <div
+            class="grid grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)_minmax(0,1.08fr)] gap-1 sm:flex sm:flex-nowrap sm:justify-end sm:gap-2 mb-2 pt-1"
+          >
             <IconSelect
               v-model="selectedLineage"
               :options="lineageOptions"
               aria-label="系統で絞り込み"
-              class="w-28 shrink-0 max-[360px]:w-[5.5rem] sm:w-36"
+              class="min-w-0 sm:w-36 sm:shrink-0"
             />
             <IconSelect
               v-model="selectedRank"
               :options="rankOptions"
               aria-label="ランクで絞り込み"
-              class="w-24 shrink-0 max-[360px]:w-20 sm:w-28"
+              class="min-w-0 sm:w-28 sm:shrink-0"
             />
             <IconSelect
               v-model="selectedBodySize"
               :options="bodySizeOptions"
               aria-label="ボディサイズで絞り込み"
-              class="w-32 shrink-0 max-[360px]:w-[6rem] sm:w-40"
+              class="min-w-0 sm:w-40 sm:shrink-0"
             >
               <template #icon="{ option }">
                 <BodySizeIcon
