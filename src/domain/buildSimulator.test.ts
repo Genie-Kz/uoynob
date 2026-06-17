@@ -66,12 +66,27 @@ describe('computeBuildResistances - 上限ルール', () => {
     expect(resistanceDisplayForElement('ねむり', outcome.finalLevel)).toBe('無効+2');
   });
 
-  it('元々反射の耐性は下がらず常に反射のまま（例: JOKERのねむり）', () => {
+  it('元々反射の耐性も下降補正で下がる（例: JOKERのねむり）', () => {
     const monster = createMonster({ ねむり: '反射' });
-    // こうどうはやい は ねむり を -2 するが、反射は不変
+    // こうどうはやい は ねむり を -2 するため、反射(7) → 無効(5)
     const results = computeBuildResistances(buildConfig(monster, { traits: ['こうどうはやい'] }));
-    expect(outcomeOf(results, 'ねむり').finalValue).toBe('反射');
-    expect(outcomeOf(results, 'ねむり').changed).toBe(false);
+    const outcome = outcomeOf(results, 'ねむり');
+    expect(outcome.finalLevel).toBe(5);
+    expect(outcome.finalValue).toBe('無効');
+    expect(outcome.changed).toBe(true);
+    expect(outcome.raised).toBe(false);
+    expect(resistanceDisplayForElement('ねむり', outcome.finalLevel, true)).toBe('無効');
+  });
+
+  it('下降した反射耐性への武器鍛冶は確定後の段階から1だけ上げる', () => {
+    const monster = createMonster({ ねむり: '反射' });
+    // 反射(7) + こうどうはやい(-2) = 無効(5)、そこから鍛冶+1で回復(6)
+    const results = computeBuildResistances(
+      buildConfig(monster, { traits: ['こうどうはやい'], forgeElements: ['ねむり'] }),
+    );
+    const outcome = outcomeOf(results, 'ねむり');
+    expect(outcome.finalLevel).toBe(6);
+    expect(outcome.finalValue).toBe('回復');
   });
 
   it('非属性で元々「回復」のものは 無効+1 と表記される', () => {

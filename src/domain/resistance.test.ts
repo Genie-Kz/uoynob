@@ -53,6 +53,11 @@ describe('resistance helpers', () => {
     expect(resistanceColorForElement('ねむり', 7, true)).toBe('bg-resistance-reflect');
   });
 
+  it('元から反射でも下降した状態異常耐性は最終段階どおりに表示する', () => {
+    expect(resistanceDisplayForElement('ねむり', 5, true)).toBe('無効');
+    expect(resistanceColorForElement('ねむり', 5, true)).toBe('bg-resistance-invalid');
+  });
+
   it('強化でレベル7になった状態異常耐性は無効+2として表示する', () => {
     expect(resistanceDisplayForElement('ねむり', 7)).toBe('無効+2');
     expect(resistanceColorForElement('ねむり', 7)).toBe('bg-resistance-invalid');

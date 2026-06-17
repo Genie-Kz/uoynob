@@ -3,6 +3,7 @@ import type { ResistanceValue } from '@/types/monster';
 import {
   ATTRIBUTE_RESISTANCE_ELEMENTS,
   NON_ATTRIBUTE_BOOST_CAP_LEVEL,
+  REFLECT_LEVEL,
   RESISTANCE_COLOR_CLASS,
   RESISTANCE_DISPLAY_TEXT,
   RESISTANCE_LEVEL,
@@ -49,7 +50,7 @@ export function resistanceDisplayForElement(
   level: number,
   isOriginallyReflect = false,
 ): string {
-  if (isOriginallyReflect) {
+  if (isOriginallyReflect && level === REFLECT_LEVEL) {
     return resistanceDisplayText('反射');
   }
   if (isOverInvalid(element, level)) {
@@ -64,7 +65,7 @@ export function resistanceColorForElement(
   level: number,
   isOriginallyReflect = false,
 ): string {
-  if (isOriginallyReflect) {
+  if (isOriginallyReflect && level === REFLECT_LEVEL) {
     return resistanceColorClass('反射');
   }
   if (isOverInvalid(element, level)) {

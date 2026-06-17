@@ -13,7 +13,7 @@
  *   2. 元の段階 + delta を、上限・下限ルールでクランプして最終段階を決める
  *
  * 上限・下限ルール（仕様）:
- *   - 反射は元々持つモンスターのみ。反射耐性は下がらない（常に反射のまま）。
+ *   - 反射表記は元々持つモンスターのみ。下降補正を受けると反射から下がる。
  *   - スキル等による上昇上限は、属性耐性なら「回復」、それ以外は「無効」。
  *   - ただし元の耐性が上限より高い場合（例: 非属性で元々回復）はその段階を維持する。
  *   - 下限は「弱点」。弱点を下回る分は内部的に蓄積され、それを上回るまで弱点のまま。
@@ -21,7 +21,7 @@
 import type { BodySize, Monster, ResistanceValue } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
-import { ATTRIBUTE_BOOST_CAP_LEVEL, REFLECT_LEVEL, WEAKEST_LEVEL } from '@/constants/resistances';
+import { ATTRIBUTE_BOOST_CAP_LEVEL, WEAKEST_LEVEL } from '@/constants/resistances';
 import {
   ALL_GUARD_TRAIT,
   GUARD_ABILITY_BOOST_STEP,
@@ -123,9 +123,6 @@ function upperCapLevelOf(element: string, baseLevel: number): number {
 
 /** 最終段階を上限・下限ルールでクランプして算出（武器鍛冶を除く増減を反映） */
 function clampFinalLevel(element: string, baseLevel: number, delta: number): number {
-  // 反射は元々持つ場合のみ。下がらず常に反射のまま。
-  if (baseLevel === REFLECT_LEVEL) return REFLECT_LEVEL;
-
   const rawLevel = baseLevel + delta;
   return Math.max(WEAKEST_LEVEL, Math.min(upperCapLevelOf(element, baseLevel), rawLevel));
 }
@@ -135,7 +132,6 @@ function clampFinalLevel(element: string, baseLevel: number, delta: number): num
  * 弱点によるマイナス耐性の蓄積とは無関係に、確定後の段階から一段階引き上げる。
  */
 function applyForgeStep(element: string, baseLevel: number, level: number): number {
-  if (baseLevel === REFLECT_LEVEL) return REFLECT_LEVEL;
   return Math.min(upperCapLevelOf(element, baseLevel), level + WEAPON_FORGE_BOOST_STEP);
 }
 
