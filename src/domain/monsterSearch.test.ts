@@ -111,10 +111,38 @@ describe('searchMonsters', () => {
     ).toEqual([monster]);
   });
 
+  it('本来のサイズ特性で絞り込む（変換用 bodySize とは独立）', () => {
+    const mega = createMonster({ 名前: 'メガ', サイズ特性: 'メガボディ' });
+    const standard = createMonster({ 名前: 'スタン', サイズ特性: 'スタンダードボディ' });
+
+    // 元々メガボディのモンスターだけに絞る
+    expect(
+      searchMonsters([mega, standard], {
+        thresholds: [],
+        requiredTraits: [],
+        originalBodySize: 'メガボディ',
+      }).map((m) => m.名前),
+    ).toEqual(['メガ']);
+
+    // 変換用 bodySize を指定しても、絞り込みは「本来のサイズ」で判定する
+    expect(
+      searchMonsters([mega, standard], {
+        thresholds: [],
+        requiredTraits: [],
+        bodySize: 'スタンダードボディ',
+        originalBodySize: 'メガボディ',
+      }).map((m) => m.名前),
+    ).toEqual(['メガ']);
+  });
+
   it('条件が空かどうかを判定できる', () => {
     expect(isEmptyCriteria({ thresholds: [], requiredTraits: [] })).toBe(true);
     expect(
       isEmptyCriteria({ thresholds: [{ element: '炎', minLevel: 3 }], requiredTraits: [] }),
+    ).toBe(false);
+    // 本来のサイズ特性の指定も条件として扱う
+    expect(
+      isEmptyCriteria({ thresholds: [], requiredTraits: [], originalBodySize: 'メガボディ' }),
     ).toBe(false);
   });
 });

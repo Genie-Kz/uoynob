@@ -17,17 +17,29 @@ export interface MonsterSearchCriteria {
   requiredTraits: string[];
   /** 未指定ならモンスター本来のサイズ、指定時はそのサイズに変更した状態で検索する */
   bodySize?: BodySize | null;
+  /**
+   * モンスター本来のサイズ特性での絞り込み条件。
+   * bodySize（変換）とは別物で、こちらは元々のサイズ特性が一致するモンスターだけに絞る。
+   */
+  originalBodySize?: BodySize | null;
 }
 
 /** 検索条件が空かどうか（空のときは全件表示を避けるために使う） */
 export function isEmptyCriteria(criteria: MonsterSearchCriteria): boolean {
-  return criteria.thresholds.length === 0 && criteria.requiredTraits.length === 0;
+  return (
+    criteria.thresholds.length === 0 &&
+    criteria.requiredTraits.length === 0 &&
+    !criteria.originalBodySize
+  );
 }
 
 /** 条件に合致するモンスターを返す（AND条件） */
 export function searchMonsters(monsters: Monster[], criteria: MonsterSearchCriteria): Monster[] {
-  const { thresholds, requiredTraits, bodySize = null } = criteria;
+  const { thresholds, requiredTraits, bodySize = null, originalBodySize = null } = criteria;
   return monsters.filter((monster) => {
+    // 本来のサイズ特性での絞り込み（指定時のみ）。変換用の bodySize とは独立して効く。
+    if (originalBodySize !== null && monster.サイズ特性 !== originalBodySize) return false;
+
     const searchSize = bodySize ?? monster.サイズ特性;
     const traits = defaultEditableTraits(monster, searchSize).filter(Boolean);
     const resistanceByElement =

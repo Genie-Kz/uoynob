@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { BodySize, Monster } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS, type ResistanceElement } from '@/constants/resistances';
+import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
 import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
@@ -29,6 +30,12 @@ const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(
 );
 // 特性スロット（初期3行）。空文字は未選択。
 const traitSlots = ref<string[]>(['', '', '']);
+// 本来のサイズ特性での絞り込み（空文字＝指定なし）。検索時のボディサイズ（変換）とは別。
+const requiredOriginalBodySize = ref<string>('');
+const originalBodySizeOptions = [
+  { value: '', label: '指定なし' },
+  ...BODY_SIZES.map((size) => ({ value: size, label: size })),
+];
 const searchBodySize = ref('');
 const searchResults = ref<Monster[] | null>(null);
 
@@ -50,8 +57,13 @@ const requiredTraits = computed(() => [
   ...new Set(traitSlots.value.map((name) => name.trim()).filter(Boolean)),
 ]);
 
-// 条件が1つでも指定されていれば検索可能。どちらも空なら検索ボタンを非活性にする。
-const canSearch = computed(() => thresholds.value.length > 0 || requiredTraits.value.length > 0);
+// 条件が1つでも指定されていれば検索可能。すべて空なら検索ボタンを非活性にする。
+const canSearch = computed(
+  () =>
+    thresholds.value.length > 0 ||
+    requiredTraits.value.length > 0 ||
+    requiredOriginalBodySize.value !== '',
+);
 
 function thresholdLabel(level: number | null): string {
   return thresholdSelectOptions.find((option) => option.value === level)?.label ?? '';
@@ -63,15 +75,19 @@ const resistanceSummary = computed(() => {
   });
   return parts.length ? parts.join('、') : '未設定';
 });
-const traitSummary = computed(() =>
-  requiredTraits.value.length ? requiredTraits.value.join('、') : '未設定',
-);
+const traitSummary = computed(() => {
+  const parts: string[] = [];
+  if (requiredOriginalBodySize.value) parts.push(`サイズ特性: ${requiredOriginalBodySize.value}`);
+  if (requiredTraits.value.length) parts.push(requiredTraits.value.join('、'));
+  return parts.length ? parts.join(' / ') : '未設定';
+});
 
 function runSearch(): void {
   const criteria = {
     thresholds: thresholds.value,
     requiredTraits: requiredTraits.value,
     bodySize: (searchBodySize.value || null) as BodySize | null,
+    originalBodySize: (requiredOriginalBodySize.value || null) as BodySize | null,
   };
   searchResults.value = isEmptyCriteria(criteria)
     ? []
@@ -85,6 +101,7 @@ function clearResistance(): void {
 }
 function clearTraits(): void {
   traitSlots.value = ['', '', ''];
+  requiredOriginalBodySize.value = '';
 }
 function addTraitSlot(): void {
   traitSlots.value.push('');
@@ -195,6 +212,24 @@ function handleTraitPick(value: string): void {
       @close="traitModalOpen = false"
       @search="runSearch"
     >
+      <div class="mb-3">
+        <span class="block text-sm font-bold mb-1">ボディサイズ特性（本来のサイズ）</span>
+        <IconSelect
+          v-model="requiredOriginalBodySize"
+          :options="originalBodySizeOptions"
+          aria-label="本来のボディサイズ特性で絞り込み"
+          class="w-full sm:w-64"
+        >
+          <template #icon="{ option }">
+            <BodySizeIcon
+              v-if="bodySizeOptionValue(option.value)"
+              :size="bodySizeOptionValue(option.value)!"
+            />
+          </template>
+        </IconSelect>
+      </div>
+
+      <span class="block text-sm font-bold mb-1">特性</span>
       <ul class="border rounded divide-y">
         <li
           v-for="(trait, index) in traitSlots"
