@@ -75,9 +75,21 @@ const visibleMonsters = computed(() =>
   ),
 );
 
+// ランク・系統・サイズ別ページでは、対応するフィルタと表の列を隠す（条件が固定されているため）。
 const showsRank = computed(() => !props.hiddenColumns?.includes('rank'));
 const showsLineage = computed(() => !props.hiddenColumns?.includes('lineage'));
 const showsBodySize = computed(() => !props.hiddenColumns?.includes('bodySize'));
+
+// 固定パネル（モバイル）のグリッド列数は、表示中のフィルタ数に合わせて詰める。
+const visibleFilterCount = computed(
+  () => [showsLineage.value, showsRank.value, showsBodySize.value].filter(Boolean).length,
+);
+const stickyFilterGridClass = computed(() => {
+  if (visibleFilterCount.value >= 3)
+    return 'grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)_minmax(0,1.08fr)]';
+  if (visibleFilterCount.value === 2) return 'grid-cols-2';
+  return 'grid-cols-1';
+});
 const tableCaption = computed(() => {
   const columns = ['No.', '名前'];
   if (showsRank.value) columns.push('ランク');
@@ -137,18 +149,21 @@ onBeforeUnmount(() => {
     <div ref="filterPanelRef" class="mb-3">
       <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2">
         <IconSelect
+          v-if="showsLineage"
           v-model="selectedLineage"
           :options="lineageOptions"
           aria-label="系統で絞り込み"
           class="w-28 shrink-0 max-[360px]:w-[5.5rem] sm:w-36"
         />
         <IconSelect
+          v-if="showsRank"
           v-model="selectedRank"
           :options="rankOptions"
           aria-label="ランクで絞り込み"
           class="w-24 shrink-0 max-[360px]:w-20 sm:w-28"
         />
         <IconSelect
+          v-if="showsBodySize"
           v-model="selectedBodySize"
           :options="bodySizeOptions"
           aria-label="ボディサイズで絞り込み"
@@ -200,21 +215,25 @@ onBeforeUnmount(() => {
       <div v-if="stickyFiltersExpanded" class="mt-2">
         <div>
           <div
-            class="grid grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)_minmax(0,1.08fr)] gap-1 sm:flex sm:flex-nowrap sm:justify-end sm:gap-2 mb-2 pt-1"
+            class="grid gap-1 sm:flex sm:flex-nowrap sm:justify-end sm:gap-2 mb-2 pt-1"
+            :class="stickyFilterGridClass"
           >
             <IconSelect
+              v-if="showsLineage"
               v-model="selectedLineage"
               :options="lineageOptions"
               aria-label="系統で絞り込み"
               class="min-w-0 sm:w-36 sm:shrink-0"
             />
             <IconSelect
+              v-if="showsRank"
               v-model="selectedRank"
               :options="rankOptions"
               aria-label="ランクで絞り込み"
               class="min-w-0 sm:w-28 sm:shrink-0"
             />
             <IconSelect
+              v-if="showsBodySize"
               v-model="selectedBodySize"
               :options="bodySizeOptions"
               aria-label="ボディサイズで絞り込み"
