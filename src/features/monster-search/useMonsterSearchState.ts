@@ -44,5 +44,16 @@ export function useMonsterSearchState() {
     resetResistance(): void {
       selectedLevelByElement.value = emptyLevels();
     },
+    // 検索状態をすべて初期化する（モンスター詳細以外から来たときに使う）。
+    resetAll(): void {
+      selectedLevelByElement.value = emptyLevels();
+      traitSlots.value = ['', '', ''];
+      requiredOriginalBodySize.value = '';
+      searchBodySize.value = '';
+      searchResults.value = null;
+      sortKey.value = '';
+      sortDescending.value = false;
+      scrollY.value = 0;
+    },
   };
 }

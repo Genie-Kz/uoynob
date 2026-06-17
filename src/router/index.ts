@@ -1,5 +1,14 @@
-import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
+import {
+  createRouter,
+  createWebHashHistory,
+  type RouteRecordName,
+  type RouteRecordRaw,
+} from 'vue-router';
+import { ref } from 'vue';
 import { redirectSingleSiteSearchResult } from './siteSearchGuard';
+
+/** 直前に表示していたルート名。画面側で「どこから来たか」による分岐に使う。 */
+export const previousRouteName = ref<RouteRecordName | null | undefined>(undefined);
 
 /**
  * ルート定義。各ビューは遅延読み込み。
@@ -138,3 +147,8 @@ export const router = createRouter({
 });
 
 router.beforeEach(redirectSingleSiteSearchResult);
+
+// 遷移のたびに直前のルート名を記録する（遷移先コンポーネントの setup より前に確定する）。
+router.beforeEach((_to, from) => {
+  previousRouteName.value = from.name;
+});

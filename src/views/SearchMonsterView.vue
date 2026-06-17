@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { previousRouteName } from '@/router';
 import type { BodySize } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
@@ -34,7 +35,12 @@ const {
   sortDescending,
   scrollY,
   resetResistance,
+  resetAll,
 } = useMonsterSearchState();
+
+// モンスター詳細から来たときだけ検索状態を復元し、それ以外の経路から来たときは
+// 初期化された状態で表示する。（setup 時点で直前ルートが確定している）
+if (previousRouteName.value !== 'monster-detail') resetAll();
 
 const originalBodySizeOptions = [
   { value: '', label: '指定なし' },
