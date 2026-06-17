@@ -17,11 +17,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest run --project unit",
+    "test:coverage": "vitest run --project unit --coverage",
     "test:e2e": "playwright test",
+    "test:storybook": "vitest run --project storybook",
     "test:all": "npm run test && npm run test:e2e",
-    "test:watch": "vitest",
+    "test:watch": "vitest --project unit",
     "prepare": "simple-git-hooks",
     "data:monsters": "node scripts/build-data.js",
     "data:skills": "node scripts/scrape-skills.js",
@@ -30,7 +31,9 @@
     "data:icons": "node scripts/scrape-monster-icons.js",
     "data:icons-webp": "node scripts/convert-icons-webp.js",
     "data:readings": "node scripts/build-search-readings.js",
-    "data:monster-list": "node scripts/build-monster-list.js"
+    "data:monster-list": "node scripts/build-monster-list.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "vue": "^3.5.38",
@@ -56,7 +59,7 @@
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^25.9.3",
     "@vitejs/plugin-vue": "^6.0.7",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.8",
     "@vue/eslint-config-typescript": "^14.8.0",
     "@vue/test-utils": "^2.4.11",
     "eslint": "^10.4.1",
@@ -75,6 +78,16 @@
     "vite": "^8.0.16",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.8",
-    "vue-tsc": "^3.3.4"
+    "vue-tsc": "^3.3.4",
+    "storybook": "^10.4.6",
+    "@storybook/vue3-vite": "^10.4.6",
+    "@chromatic-com/storybook": "^5.2.1",
+    "@storybook/addon-vitest": "^10.4.6",
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-docs": "^10.4.6",
+    "@storybook/addon-onboarding": "^10.4.6",
+    "eslint-plugin-storybook": "^10.4.6",
+    "playwright": "^1.61.0",
+    "@vitest/browser-playwright": "^4.1.8"
   }
 }

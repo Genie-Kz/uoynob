@@ -7,6 +7,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // GitHub Pages のサブパス配信に対応するため base は相対パス。
 // ルーティングはハッシュ方式なので、どのリポジトリ名でもそのまま動作する。
+import path from 'node:path';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
+const dirname =
+  typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   base: './',
   plugins: [
@@ -31,9 +38,22 @@ export default defineConfig({
         start_url: './',
         scope: './',
         icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
         ],
       },
       workbox: {
@@ -47,7 +67,10 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'monster-icons',
-              expiration: { maxEntries: 1000, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
             },
           },
           {
@@ -55,7 +78,12 @@ export default defineConfig({
             urlPattern: ({ url }) =>
               url.pathname.includes('/data/') && url.pathname.endsWith('.json'),
             handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'game-data', expiration: { maxEntries: 20 } },
+            options: {
+              cacheName: 'game-data',
+              expiration: {
+                maxEntries: 20,
+              },
+            },
           },
         ],
       },
@@ -67,9 +95,6 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'jsdom',
-    globals: true,
-    include: ['src/**/*.{test,spec}.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
@@ -83,5 +108,39 @@ export default defineConfig({
         lines: 30,
       },
     },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          globals: true,
+          include: ['src/**/*.{test,spec}.ts'],
+        },
+      },
+      {
+        extends: true,
+        plugins: [
+          // The plugin will run tests for the stories defined in your Storybook config
+          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+          storybookTest({
+            configDir: path.join(dirname, '.storybook'),
+          }),
+        ],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [
+              {
+                browser: 'chromium',
+              },
+            ],
+          },
+        },
+      },
+    ],
   },
 });

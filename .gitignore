@@ -9,3 +9,6 @@ dist-ssr
 coverage
 playwright-report
 test-results
+
+*storybook.log
+storybook-static

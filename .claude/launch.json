@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--port", "4178", "--strictPort"],
       "port": 4178
+    },
+    {
+      "name": "storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "storybook", "--", "-p", "6007", "--no-open", "--ci"],
+      "port": 6007
     }
   ]
 }

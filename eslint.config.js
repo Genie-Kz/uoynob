@@ -1,3 +1,4 @@
+import storybook from 'eslint-plugin-storybook';
 import pluginVue from 'eslint-plugin-vue';
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
 import eslintConfigPrettier from 'eslint-config-prettier';
@@ -17,6 +18,8 @@ export default defineConfigWithVueTs(
   },
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
+  // Storybook 推奨ルール（*.stories.* と .storybook を対象にする）
+  storybook.configs['flat/recommended'],
   {
     // Node 環境で動くビルドスクリプト・設定ファイル（CommonJS含む）
     name: 'app/node-scripts',
