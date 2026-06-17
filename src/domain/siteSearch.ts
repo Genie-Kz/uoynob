@@ -1,6 +1,6 @@
 import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
-import type { Monster } from '@/types/monster';
+import type { MonsterListItem } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { includesKeyword } from '@/shared/search/textSearch';
 
@@ -14,7 +14,7 @@ export interface SiteSearchHit {
 }
 
 export interface SiteSearchData {
-  monsters: Monster[];
+  monsters: MonsterListItem[];
   attributes: Attribute[];
   skills: Skill[];
   abilities: Ability[];

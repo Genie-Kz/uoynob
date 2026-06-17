@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useAttributes } from '@/composables/useAttributes';
-import { useMonsters } from '@/composables/useMonsters';
+import { useMonsterList } from '@/composables/useMonsterList';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/shared/ui/DataState.vue';
@@ -10,7 +10,7 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 const props = defineProps<{ id: string }>();
 
 const { attributes, isLoading, errorMessage } = useAttributes();
-const { monsters } = useMonsters();
+const { monsters } = useMonsterList();
 
 const attribute = computed(
   () => attributes.value?.find((candidate) => candidate.id === props.id) ?? null,

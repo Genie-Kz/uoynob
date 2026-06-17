@@ -2,7 +2,7 @@ import type { NavigationGuard, RouteLocationRaw } from 'vue-router';
 import {
   loadAbilities,
   loadAttributes,
-  loadMonsters,
+  loadMonsterList,
   loadSearchReadings,
   loadSkills,
 } from '@/shared/data/datasets';
@@ -27,7 +27,7 @@ export const redirectSingleSiteSearchResult: NavigationGuard = async (to) => {
 
   try {
     const [monsters, attributes, skills, abilities, readings] = await Promise.all([
-      loadMonsters(),
+      loadMonsterList(),
       loadAttributes(),
       loadSkills(),
       loadAbilities(),

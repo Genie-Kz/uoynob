@@ -1,5 +1,5 @@
 /** スキルとモンスターの相互参照ロジック */
-import type { Monster } from '@/types/monster';
+import type { Monster, MonsterListItem } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 
 /** あるモンスター（種族）が習得するスキルを逆引きする */
@@ -14,7 +14,7 @@ export function skillsForMonster(skills: Skill[], monster: Monster): Skill[] {
  * 図鑑の完全idへ解決する関数を作る。解決できない場合は null。
  */
 export function createMonsterIdResolver(
-  monsters: Monster[],
+  monsters: Pick<MonsterListItem, 'id' | 'no'>[],
 ): (skillMonsterId: string) => string | null {
   const fullIdSet = new Set(monsters.map((monster) => monster.id));
   const firstVariantIdByNo = new Map<string, string>();

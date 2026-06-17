@@ -4,7 +4,7 @@ import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
 import { loadAttributes, loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { useAbilities } from '@/composables/useAbilities';
-import { useMonsters } from '@/composables/useMonsters';
+import { useMonsterList } from '@/composables/useMonsterList';
 import { useSkills } from '@/composables/useSkills';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 import { routeForSiteSearchHit } from '@/router/siteSearchGuard';
@@ -13,7 +13,7 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { monsters, isLoading: monstersLoading, errorMessage: monstersError } = useMonsters();
+const { monsters, isLoading: monstersLoading, errorMessage: monstersError } = useMonsterList();
 const { skills, isLoading: skillsLoading, errorMessage: skillsError } = useSkills();
 const { abilities, isLoading: abilitiesLoading, errorMessage: abilitiesError } = useAbilities();
 const {

@@ -3,10 +3,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { toMonsterListItem } from './monster-list-fields.js';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const SRC = process.argv[2] || 'D:/Downloads/MonsterData.json';
 const OUT = path.join(scriptDir, '..', 'public', 'data', 'monsters.json');
+const LIST_OUT = path.join(scriptDir, '..', 'public', 'data', 'monsters-list.json');
 
 const raw = JSON.parse(fs.readFileSync(SRC, 'utf8'));
 
@@ -30,8 +32,10 @@ const out = raw.map((m) => {
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(out), 'utf8');
+fs.writeFileSync(LIST_OUT, JSON.stringify(out.map(toMonsterListItem)), 'utf8');
 
 console.log('monsters:', out.length);
+console.log('monsters-list:', out.length);
 console.log('sample:', JSON.stringify(out[0]).slice(0, 200));
 console.log('last:', out[out.length - 1].id, out[out.length - 1].base);
 console.log('max variant per 位階 (001):', counters[1]);

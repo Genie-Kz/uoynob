@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PickupRef } from '@/types/pickup';
-import type { Monster } from '@/types/monster';
-import { useMonsters } from '@/composables/useMonsters';
+import type { MonsterListItem } from '@/types/monster';
+import { useMonsterList } from '@/composables/useMonsterList';
 import { useSkills } from '@/composables/useSkills';
 import { useAsyncData } from '@/composables/useAsyncData';
 import { usePageSeo } from '@/composables/usePageSeo';
@@ -21,7 +21,7 @@ import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 const props = defineProps<{ pickupKey: string }>();
 
 const { data: pickups, isLoading, errorMessage } = useAsyncData(loadPickups);
-const { monsters } = useMonsters();
+const { monsters } = useMonsterList();
 const { skills } = useSkills();
 
 const entry = computed(() => pickups.value?.[props.pickupKey] ?? null);
@@ -57,7 +57,7 @@ const monsterById = computed(
   () => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])),
 );
 
-function monsterOf(ref: PickupRef): Monster | null {
+function monsterOf(ref: PickupRef): MonsterListItem | null {
   return pickupMonsterByRef(ref, resolveMonsterId.value, monsterById.value);
 }
 
