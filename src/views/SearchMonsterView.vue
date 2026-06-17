@@ -44,6 +44,8 @@ const originalBodySizeOptions = [
 const resistanceModalOpen = ref(false);
 const traitModalOpen = ref(false);
 const traitPicker = ref<{ open: boolean; index: number }>({ open: false, index: 0 });
+// スクロール位置を復元し終えるまでは本文を隠し、ちらつき（上→保存位置への飛び）を防ぐ。
+const restoring = ref(false);
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const traitOptions = computed(() => traitPickerItems(allTraitNames.value));
@@ -125,22 +127,32 @@ onMounted(() => {
   // 検索結果がある状態（＝詳細から戻ってきた）ときだけ位置を復元する。
   if (!searchResults.value || scrollY.value <= 0) return;
   const target = scrollY.value;
-  const restore = () => requestAnimationFrame(() => window.scrollTo(0, target));
+  // 復元位置に合わせるまで本文を隠しておき、合わせ終えてから表示する。
+  restoring.value = true;
+  const reveal = () =>
+    void nextTick(() => {
+      window.scrollTo(0, target);
+      restoring.value = false;
+    });
   if (!isLoading.value) {
-    void nextTick(restore);
-    return;
+    reveal();
+  } else {
+    // データ読み込み中なら、結果が描画されてから復元する。
+    const stop = watch(isLoading, (loading) => {
+      if (loading) return;
+      stop();
+      reveal();
+    });
   }
-  // データ読み込み中なら、結果が描画されてから復元する。
-  const stop = watch(isLoading, (loading) => {
-    if (loading) return;
-    stop();
-    void nextTick(restore);
-  });
+  // 念のため、何があっても一定時間後には必ず表示を戻す。
+  window.setTimeout(() => {
+    restoring.value = false;
+  }, 1000);
 });
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb
       :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
     />
