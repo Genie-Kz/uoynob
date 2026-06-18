@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, toRef, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { useScrollLock } from '@/composables/useScrollLock';
 
 const props = defineProps<{
   open: boolean;
@@ -12,6 +13,9 @@ const props = defineProps<{
   /** 現在選択中の値（開いたときに反転表示する） */
   current?: string;
 }>();
+
+// 表示中は背景のスクロールを止める。
+useScrollLock(toRef(props, 'open'));
 
 const emit = defineEmits<{
   select: [value: string];
@@ -84,7 +88,7 @@ function confirm(): void {
 
         <!-- 選択肢（スクロール）。開いた時点の高さで固定するので、
              検索で件数が変わってもモーダルの高さは変化しない。 -->
-        <div class="p-3 overflow-y-auto flex-1 min-h-0">
+        <div class="p-3 overflow-y-auto overscroll-contain flex-1 min-h-0">
           <div v-if="filteredItems.length" class="flex flex-wrap gap-2">
             <button
               v-for="item in filteredItems"

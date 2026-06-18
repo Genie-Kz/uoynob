@@ -1,5 +1,8 @@
 <script setup lang="ts">
-defineProps<{
+import { toRef } from 'vue';
+import { useScrollLock } from '@/composables/useScrollLock';
+
+const props = defineProps<{
   open: boolean;
   title: string;
   /** 検索ボタンの活性状態。false のときは薄く非活性表示にする。 */
@@ -11,6 +14,9 @@ const emit = defineEmits<{
   close: [];
   search: [];
 }>();
+
+// 表示中は背景のスクロールを止める。
+useScrollLock(toRef(props, 'open'));
 </script>
 
 <template>
@@ -26,8 +32,8 @@ const emit = defineEmits<{
         <!-- ヘッダー -->
         <div class="border-b px-4 py-2 font-bold">{{ title }}</div>
 
-        <!-- 本体（スクロール） -->
-        <div class="p-3 overflow-y-auto flex-1 min-h-0">
+        <!-- 本体（スクロール）。overscroll-contain で背景へのスクロール波及を防ぐ。 -->
+        <div class="p-3 overflow-y-auto overscroll-contain flex-1 min-h-0">
           <slot />
         </div>
 

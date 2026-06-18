@@ -37,13 +37,34 @@ const selected = computed(() => props.options[selectedIndex.value] ?? props.opti
 /** いずれかの選択肢にアイコンがある場合のみ、無アイコンの選択肢に位置合わせの余白を出す */
 const hasAnyIcon = computed(() => props.options.some((option) => option.icon));
 
+/**
+ * トリガーをクリップする最も近いスクロール祖先の矩形を返す（無ければ null）。
+ * モーダル本体（overflow-y-auto）の中では、ビューポートではなくこの矩形が
+ * 実際に見切れる境界になるため、上下どちらに開くかの判定に使う。
+ */
+function nearestClipRect(el: HTMLElement): DOMRect | null {
+  let node = el.parentElement;
+  while (node) {
+    const overflowY = getComputedStyle(node).overflowY;
+    if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden') {
+      return node.getBoundingClientRect();
+    }
+    node = node.parentElement;
+  }
+  return null;
+}
+
 function openList(): void {
   if (open.value) return;
-  // トリガーの位置から、下に開くか上に開くかを決める。
-  const rect = triggerRef.value?.getBoundingClientRect();
-  if (rect) {
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
+  // トリガーの位置と、実際にクリップされる境界から、下に開くか上に開くかを決める。
+  const el = triggerRef.value;
+  if (el) {
+    const rect = el.getBoundingClientRect();
+    const clip = nearestClipRect(el);
+    const topBound = clip ? clip.top : 0;
+    const bottomBound = clip ? clip.bottom : window.innerHeight;
+    const spaceBelow = bottomBound - rect.bottom;
+    const spaceAbove = rect.top - topBound;
     const needed = Math.min(MAX_LIST_HEIGHT, props.options.length * 34 + 8);
     dropUp.value = spaceBelow < needed && spaceAbove > spaceBelow;
   } else {
