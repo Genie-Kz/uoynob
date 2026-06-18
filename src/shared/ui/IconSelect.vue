@@ -172,7 +172,9 @@ watch(activeIndex, async (index) => {
         </slot>
         <span class="truncate">{{ selected?.label || ' ' }}</span>
       </span>
-      <span class="text-xs text-gray-500 shrink-0" aria-hidden="true">▼</span>
+      <span class="text-xs text-gray-500 shrink-0" aria-hidden="true">{{
+        open && dropUp ? '▲' : '▼'
+      }}</span>
     </button>
 
     <template v-if="open">
