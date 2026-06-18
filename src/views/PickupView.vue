@@ -14,6 +14,7 @@ import {
   pickupMonsterByRef,
   pickupMonsterRoute,
 } from '@/features/pickup/pickupViewModel';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
@@ -23,6 +24,8 @@ const props = defineProps<{ pickupKey: string }>();
 const { data: pickups, isLoading, errorMessage } = useAsyncData(loadPickups);
 const { monsters } = useMonsterList();
 const { skills } = useSkills();
+// 詳細から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 
 const entry = computed(() => pickups.value?.[props.pickupKey] ?? null);
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
@@ -75,7 +78,7 @@ function scrollToGroup(index: number): void {
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb
       :items="[
         { label: 'ホーム', to: { name: 'home' } },

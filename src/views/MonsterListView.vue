@@ -8,12 +8,15 @@ import {
   LINEAGE_NAME_BY_SLUG,
   MONSTER_RANKS,
 } from '@/constants/monsterTaxonomy';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { monsters, isLoading, errorMessage } = useMonsterList();
+// 詳細から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 
 function queryString(key: string): string | undefined {
   const value = route.query[key];
@@ -44,7 +47,7 @@ const hiddenColumns = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター' }]" />
     <h2 class="text-xl font-bold mb-3">{{ result.title }}</h2>
 

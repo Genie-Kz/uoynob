@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useMonsterList } from '@/composables/useMonsterList';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsterList();
+// ビルドシミュレーター（詳細）から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb
       :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'ビルドシミュレーター' }]"
     />

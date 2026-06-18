@@ -6,11 +6,14 @@ import { ATTRIBUTE_CATEGORY_BY_SLUG } from '@/constants/categories';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { attributes, isLoading, errorMessage } = useAttributes();
+// 詳細から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 
 const categoryName = computed(() =>
   typeof route.query.cat === 'string'
@@ -38,7 +41,7 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特性' }]" />
     <h2 class="text-xl font-bold mb-3">{{ title }}</h2>
 

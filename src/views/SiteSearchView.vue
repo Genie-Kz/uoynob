@@ -8,6 +8,7 @@ import { useMonsterList } from '@/composables/useMonsterList';
 import { useSkills } from '@/composables/useSkills';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 import { routeForSiteSearchHit } from '@/router/siteSearchGuard';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
@@ -26,6 +27,9 @@ const {
   isLoading: searchReadingsLoading,
   errorMessage: searchReadingsError,
 } = useAsyncData(loadSearchReadings);
+
+// 詳細から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 
 const keyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''));
 const inputKeyword = ref(keyword.value);
@@ -74,7 +78,7 @@ function submitSearch(): void {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto">
+  <div class="max-w-2xl mx-auto" :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '検索結果' }]" />
     <h2 class="text-xl font-bold mb-3">検索結果</h2>
 

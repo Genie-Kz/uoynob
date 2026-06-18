@@ -6,11 +6,14 @@ import { ABILITY_CATEGORY_BY_SLUG } from '@/constants/categories';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
 import { useAsyncData } from '@/composables/useAsyncData';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
 const route = useRoute();
 const { abilities, isLoading, errorMessage } = useAbilities();
+// 詳細から戻ったときにスクロール位置を復元する。
+const { restoring } = useScrollRestore();
 
 const categoryName = computed(() =>
   typeof route.query.cat === 'string' ? (ABILITY_CATEGORY_BY_SLUG[route.query.cat] ?? null) : null,
@@ -36,7 +39,7 @@ const showsCategory = computed(() => categoryName.value === null);
 </script>
 
 <template>
-  <div>
+  <div :style="restoring ? { visibility: 'hidden' } : undefined">
     <PageBreadcrumb :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: '特技' }]" />
     <h2 class="text-xl font-bold mb-3">{{ title }}</h2>
 
