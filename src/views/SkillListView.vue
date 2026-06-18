@@ -66,19 +66,23 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
       />
       <p class="text-sm text-gray-500 mb-2">{{ visibleSkills.length }} 件</p>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto rounded-lg border">
         <table class="w-full text-sm border-collapse">
           <thead>
             <tr class="table-header-row">
-              <th class="px-2 py-2 border">No.</th>
-              <th class="px-2 py-2 border">スキル</th>
-              <th class="px-2 py-2 border">耐性アップ</th>
+              <th class="px-3 py-2 font-semibold">No.</th>
+              <th class="px-3 py-2 font-semibold">スキル</th>
+              <th class="px-3 py-2 font-semibold">耐性アップ</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="skill in visibleSkills" :key="skill.id" class="border-b hover:bg-gray-50">
-              <td class="px-3 py-2 border whitespace-nowrap">{{ skill.id }}</td>
-              <td class="px-3 py-2 border">
+            <tr
+              v-for="skill in visibleSkills"
+              :key="skill.id"
+              class="border-b last:border-0 hover:bg-gray-50"
+            >
+              <td class="px-3 py-2 whitespace-nowrap">{{ skill.id }}</td>
+              <td class="px-3 py-2">
                 <router-link
                   :to="{ name: 'skill-detail', params: { id: skill.id } }"
                   class="app-link"
@@ -86,7 +90,7 @@ function guardBadges(skill: Skill): { element: string; step: number }[] {
                   {{ skill.name }}
                 </router-link>
               </td>
-              <td class="px-3 py-2 border">
+              <td class="px-3 py-2">
                 <span
                   v-for="badge in guardBadges(skill)"
                   :key="badge.element"

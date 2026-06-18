@@ -24,6 +24,11 @@ const open = ref(false);
 /** キーボード操作でハイライト中の選択肢 */
 const activeIndex = ref(-1);
 const triggerRef = ref<HTMLButtonElement | null>(null);
+/** 下に十分なスペースが無いときは上向きに開く */
+const dropUp = ref(false);
+
+/** 候補リストの想定高さ（max-h-72 = 18rem = 288px が上限）。 */
+const MAX_LIST_HEIGHT = 288;
 
 const selectedIndex = computed(() =>
   props.options.findIndex((option) => option.value === modelValue.value),
@@ -34,6 +39,16 @@ const hasAnyIcon = computed(() => props.options.some((option) => option.icon));
 
 function openList(): void {
   if (open.value) return;
+  // トリガーの位置から、下に開くか上に開くかを決める。
+  const rect = triggerRef.value?.getBoundingClientRect();
+  if (rect) {
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const needed = Math.min(MAX_LIST_HEIGHT, props.options.length * 34 + 8);
+    dropUp.value = spaceBelow < needed && spaceAbove > spaceBelow;
+  } else {
+    dropUp.value = false;
+  }
   open.value = true;
   activeIndex.value = selectedIndex.value >= 0 ? selectedIndex.value : 0;
 }
@@ -146,7 +161,8 @@ watch(activeIndex, async (index) => {
         :id="listboxId"
         role="listbox"
         :aria-label="ariaLabel"
-        class="absolute left-0 right-0 z-50 mt-1 max-h-72 overflow-auto rounded border bg-white shadow-lg"
+        class="absolute left-0 right-0 z-50 max-h-72 overflow-auto rounded border bg-white shadow-lg"
+        :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
       >
         <li
           v-for="(option, index) in options"

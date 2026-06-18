@@ -51,23 +51,23 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
       />
       <p class="text-sm text-gray-500 mb-2">{{ visibleAttributes.length }} 件</p>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto rounded-lg border">
         <table class="w-full text-sm border-collapse">
           <thead>
             <tr class="table-header-row">
-              <th class="px-2 py-2 border">No.</th>
-              <th class="px-2 py-2 border">特性</th>
-              <th class="px-2 py-2 border">効果</th>
+              <th class="px-3 py-2 font-semibold">No.</th>
+              <th class="px-3 py-2 font-semibold">特性</th>
+              <th class="px-3 py-2 font-semibold">効果</th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="attribute in visibleAttributes"
               :key="attribute.id"
-              class="border-b hover:bg-gray-50"
+              class="border-b last:border-0 hover:bg-gray-50"
             >
-              <td class="px-3 py-2 border whitespace-nowrap">{{ attribute.id }}</td>
-              <td class="px-3 py-2 border">
+              <td class="px-3 py-2 whitespace-nowrap">{{ attribute.id }}</td>
+              <td class="px-3 py-2">
                 <router-link
                   :to="{ name: 'attribute-detail', params: { id: attribute.id } }"
                   class="app-link"
@@ -75,7 +75,7 @@ const title = computed(() => (categoryName.value ? `${categoryName.value} の特
                   {{ attribute.name }}
                 </router-link>
               </td>
-              <td class="px-3 py-2 border text-gray-600">{{ attribute.description }}</td>
+              <td class="px-3 py-2 text-gray-600">{{ attribute.description }}</td>
             </tr>
           </tbody>
         </table>

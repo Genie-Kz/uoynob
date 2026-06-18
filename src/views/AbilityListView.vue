@@ -49,24 +49,24 @@ const showsCategory = computed(() => categoryName.value === null);
       />
       <p class="text-sm text-gray-500 mb-2">{{ visibleAbilities.length }} 件</p>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto rounded-lg border">
         <table class="w-full text-sm border-collapse">
           <thead>
             <tr class="table-header-row">
-              <th class="px-2 py-2 border">No.</th>
-              <th class="px-2 py-2 border">特技</th>
-              <th v-if="showsCategory" class="px-2 py-2 border">カテゴリー</th>
-              <th class="px-2 py-2 border">効果</th>
+              <th class="px-3 py-2 font-semibold">No.</th>
+              <th class="px-3 py-2 font-semibold">特技</th>
+              <th v-if="showsCategory" class="px-3 py-2 font-semibold">カテゴリー</th>
+              <th class="px-3 py-2 font-semibold">効果</th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="ability in visibleAbilities"
               :key="ability.id"
-              class="border-b hover:bg-gray-50"
+              class="border-b last:border-0 hover:bg-gray-50"
             >
-              <td class="px-3 py-2 border whitespace-nowrap">{{ ability.id }}</td>
-              <td class="px-3 py-2 border">
+              <td class="px-3 py-2 whitespace-nowrap">{{ ability.id }}</td>
+              <td class="px-3 py-2">
                 <router-link
                   :to="{ name: 'ability-detail', params: { id: ability.id } }"
                   class="app-link"
@@ -74,10 +74,10 @@ const showsCategory = computed(() => categoryName.value === null);
                   {{ ability.name }}
                 </router-link>
               </td>
-              <td v-if="showsCategory" class="px-3 py-2 border whitespace-nowrap">
+              <td v-if="showsCategory" class="px-3 py-2 whitespace-nowrap">
                 {{ ability.category }}
               </td>
-              <td class="px-3 py-2 border text-gray-600 whitespace-pre-wrap">
+              <td class="px-3 py-2 text-gray-600 whitespace-pre-wrap">
                 {{ ability.description }}
               </td>
             </tr>

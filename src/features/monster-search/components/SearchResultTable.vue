@@ -66,27 +66,27 @@ const sortedMonsters = computed<Monster[]>(() => {
 
     <p class="text-sm text-gray-500 mb-2">{{ sortedMonsters.length }} 体</p>
 
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-lg border">
       <table class="w-full text-sm border-collapse">
         <caption class="sr-only">
           検索結果（No.・名前・ランク・系統・サイズ）
         </caption>
         <thead>
           <tr class="table-header-row">
-            <th scope="col" class="px-2 py-2 border">No.</th>
-            <th scope="col" class="px-2 py-2 border">モンスター</th>
-            <th scope="col" class="px-2 py-2 border">ランク</th>
-            <th scope="col" class="px-2 py-2 border">系統</th>
-            <th scope="col" class="px-2 py-2 border">サイズ</th>
+            <th scope="col" class="px-3 py-2 font-semibold">No.</th>
+            <th scope="col" class="px-3 py-2 font-semibold">モンスター</th>
+            <th scope="col" class="px-3 py-2 font-semibold">ランク</th>
+            <th scope="col" class="px-3 py-2 font-semibold">系統</th>
+            <th scope="col" class="px-3 py-2 font-semibold">サイズ</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="monster in sortedMonsters"
             :key="monster.id"
-            class="border-b hover:bg-gray-50 [content-visibility:auto] [contain-intrinsic-size:auto_41px]"
+            class="border-b last:border-0 hover:bg-gray-50 [content-visibility:auto] [contain-intrinsic-size:auto_41px]"
           >
-            <td class="px-3 py-2 border text-center whitespace-nowrap">
+            <td class="px-3 py-2 text-center whitespace-nowrap">
               <MonsterIcon :lineage="monster.系統" :no="monster.no" />
               <router-link
                 :to="{ name: 'monster-detail', params: { id: monster.id } }"
@@ -95,7 +95,7 @@ const sortedMonsters = computed<Monster[]>(() => {
                 {{ monster.no }}
               </router-link>
             </td>
-            <td class="px-3 py-2 border">
+            <td class="px-3 py-2">
               <router-link
                 :to="{ name: 'monster-detail', params: { id: monster.id } }"
                 class="app-link"
@@ -103,8 +103,8 @@ const sortedMonsters = computed<Monster[]>(() => {
                 {{ monster.名前 }}
               </router-link>
             </td>
-            <td class="px-3 py-2 border text-center">{{ monster.ランク }}</td>
-            <td class="px-3 py-2 border text-center">
+            <td class="px-3 py-2 text-center">{{ monster.ランク }}</td>
+            <td class="px-3 py-2 text-center">
               <img
                 v-if="LINEAGE_ICON[monster.系統]"
                 :src="LINEAGE_ICON[monster.系統]"
@@ -118,7 +118,7 @@ const sortedMonsters = computed<Monster[]>(() => {
               />
               <span v-else>{{ lineageInfoOf(monster.系統).label }}</span>
             </td>
-            <td class="px-3 py-2 border text-center">
+            <td class="px-3 py-2 text-center">
               <BodySizeIcon :size="monster.サイズ特性" />
             </td>
           </tr>
