@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// 入れ替え用の選択モーダル。候補をボタンで選び、下部の検索欄で絞り込める。
+// 開いた時点の高さを固定し、絞り込みで件数が変わってもモーダルが伸縮しないようにする。
 import { computed, nextTick, ref, toRef, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';

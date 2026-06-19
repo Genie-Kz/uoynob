@@ -1,11 +1,14 @@
+// サイト内横断検索のドメインロジック。モンスター・特性・スキル・特技を1つの結果配列にまとめる。
 import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
 import type { MonsterListItem } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { includesKeyword } from '@/shared/search/textSearch';
 
+// 検索ヒットの種類。
 export type SiteSearchKind = 'monster' | 'attribute' | 'skill' | 'ability';
 
+// 検索ヒット1件。どの種類のどのページかが分かる情報を持つ。
 export interface SiteSearchHit {
   kind: SiteSearchKind;
   kindLabel: string;
@@ -13,6 +16,7 @@ export interface SiteSearchHit {
   label: string;
 }
 
+// 検索対象になる4種のデータ。
 export interface SiteSearchData {
   monsters: MonsterListItem[];
   attributes: Attribute[];
@@ -20,6 +24,7 @@ export interface SiteSearchData {
   abilities: Ability[];
 }
 
+// 読みがな検索用の対応表（種類ごとの id→読み、および汎用 labels）。
 export interface SiteSearchReadings {
   monster: Record<string, string>;
   attribute: Record<string, string>;
@@ -28,6 +33,7 @@ export interface SiteSearchReadings {
   labels: Record<string, string>;
 }
 
+// 1件がキーワードに一致するか。表示名そのものか、対応する読みがなのどちらかに含まれれば一致。
 function matches(
   kind: SiteSearchKind,
   id: string,
@@ -45,8 +51,10 @@ export function searchSite(
   readings?: SiteSearchReadings,
 ): SiteSearchHit[] {
   const query = keyword.trim();
+  // 空クエリでは全件が返らないよう、空配列で早期リターンする
   if (!query) return [];
 
+  // 4種それぞれを絞り込み、種類ラベル付きのヒットへ整形して連結する（モンスター→特性→スキル→特技の順）
   return [
     ...data.monsters
       .filter((monster) => matches('monster', monster.id, monster.名前, query, readings))

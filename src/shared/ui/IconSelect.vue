@@ -1,4 +1,6 @@
 <script setup lang="ts" generic="T extends string | number | null">
+// アイコン付きの選択肢を扱えるセレクト。ネイティブ <select> では画像を入れられないため、
+// listbox パターンで自作している。下にスペースが無ければ上向きに開く。
 import { computed, nextTick, ref, useId, watch } from 'vue';
 
 interface IconOption {

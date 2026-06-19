@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// モンスター一覧表。系統/ランク/サイズ/名前で絞り込み、結果を表で表示する。
+// スクロールでフィルタが画面外に出たら、上部に追従する固定フィルタ（モバイル向け）を出す。
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { BodySize, MonsterListItem } from '@/types/monster';
 import {
@@ -22,15 +24,18 @@ const props = defineProps<{
   hiddenColumns?: Array<'rank' | 'lineage' | 'bodySize'>;
 }>();
 
-const keyword = ref('');
-const selectedLineage = ref('');
-const selectedRank = ref('');
-const selectedBodySize = ref('');
-const filterPanelRef = ref<HTMLElement | null>(null);
-const stickyFiltersExpanded = ref(false);
-const isScrolledPastFilters = ref(false);
-let scrollFrame = 0;
+// --- 絞り込みの入力値 ---
+const keyword = ref(''); // 名前キーワード
+const selectedLineage = ref(''); // 系統
+const selectedRank = ref(''); // ランク
+const selectedBodySize = ref(''); // サイズ
+// --- 追従フィルタ（スクロール連動）用の状態 ---
+const filterPanelRef = ref<HTMLElement | null>(null); // 通常のフィルタ枠への参照（画面外判定に使う）
+const stickyFiltersExpanded = ref(false); // 追従フィルタを展開しているか
+const isScrolledPastFilters = ref(false); // 通常フィルタを過ぎてスクロールしたか
+let scrollFrame = 0; // requestAnimationFrame の多重実行を防ぐためのフレームID
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
+// 系統セレクトの選択肢（先頭は「全系統」、各系統はアイコン付き）。
 const lineageOptions = [
   { value: '', label: '全系統' },
   ...Object.entries(LINEAGE_BY_NAME).map(([value, info]) => ({
@@ -39,19 +44,23 @@ const lineageOptions = [
     icon: LINEAGE_ICON[value],
   })),
 ];
+// ランクセレクトの選択肢（先頭は「全ランク」）。
 const rankOptions = [
   { value: '', label: '全ランク' },
   ...MONSTER_RANKS.map((rank) => ({ value: rank, label: rank })),
 ];
+// サイズセレクトの選択肢（先頭は「全サイズ」）。
 const bodySizeOptions = [
   { value: '', label: '全サイズ' },
   ...BODY_SIZES.map((size) => ({ value: size, label: size })),
 ];
 
+// IconSelect の選択値を BodySize 型に変換する（BodySizeIcon に渡すため）。該当なしは null。
 function bodySizeOptionValue(value: string | number | null): BodySize | null {
   return BODY_SIZES.find((size) => size === value) ?? null;
 }
 
+// 選択値に対応する表示ラベルを引く（絞り込み要約の表示に使う）。
 function selectedLabel(
   options: Array<{ value: string | number | null; label: string }>,
   value: string,
@@ -62,6 +71,7 @@ function selectedLabel(
 // 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
 const sortedMonsters = computed(() => sortMonstersByDexOrder(props.monsters));
 
+// 並べ替え済みの一覧に、現在の絞り込み条件を適用した表示対象。
 const visibleMonsters = computed(() =>
   filterMonstersByControls(
     sortedMonsters.value,
@@ -90,6 +100,7 @@ const stickyFilterGridClass = computed(() => {
   if (visibleFilterCount.value === 2) return 'grid-cols-2';
   return 'grid-cols-1';
 });
+// スクリーンリーダー向けの表キャプション。表示中の列名を並べて作る。
 const tableCaption = computed(() => {
   const columns = ['No.', '名前'];
   if (showsRank.value) columns.push('ランク');
@@ -98,6 +109,7 @@ const tableCaption = computed(() => {
   return `モンスター一覧（${columns.join('・')}）`;
 });
 
+// 現在有効な絞り込み条件をラベルの配列にする（追従フィルタの要約表示に使う）。
 const activeFilterLabels = computed(() => {
   const labels: string[] = [];
   if (selectedLineage.value) labels.push(selectedLabel(lineageOptions, selectedLineage.value));
@@ -107,8 +119,10 @@ const activeFilterLabels = computed(() => {
   return labels;
 });
 
+// 絞り込み要約を1行のテキストにまとめたもの。
 const filterSummary = computed(() => activeFilterLabels.value.join(' / '));
 
+// すべての絞り込み条件を初期化する。
 function resetFilters(): void {
   selectedLineage.value = '';
   selectedRank.value = '';
@@ -116,13 +130,17 @@ function resetFilters(): void {
   keyword.value = '';
 }
 
+// 通常フィルタが画面外に出たかを判定し、追従フィルタの表示状態を更新する。
 function updateStickyFilterVisibility(): void {
   const panel = filterPanelRef.value;
   if (!panel) return;
+  // フィルタ枠の下端が画面より上にいったら「通り過ぎた」とみなす
   isScrolledPastFilters.value = panel.getBoundingClientRect().bottom < 0;
+  // フィルタが見えている間は、追従フィルタの展開状態は閉じておく
   if (!isScrolledPastFilters.value) stickyFiltersExpanded.value = false;
 }
 
+// スクロール毎の処理を1フレームに1回へ間引く（負荷軽減のため requestAnimationFrame でまとめる）。
 function scheduleStickyFilterUpdate(): void {
   if (scrollFrame) return;
   scrollFrame = window.requestAnimationFrame(() => {
@@ -131,12 +149,14 @@ function scheduleStickyFilterUpdate(): void {
   });
 }
 
+// マウント時に初期状態を反映し、スクロール・リサイズの監視を始める。
 onMounted(() => {
   updateStickyFilterVisibility();
   window.addEventListener('scroll', scheduleStickyFilterUpdate, { passive: true });
   window.addEventListener('resize', scheduleStickyFilterUpdate);
 });
 
+// 破棄時にイベント監視と未処理のフレーム予約を後始末する（リーク防止）。
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', scheduleStickyFilterUpdate);
   window.removeEventListener('resize', scheduleStickyFilterUpdate);
@@ -146,6 +166,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
+    <!-- 通常のフィルタ枠（系統・ランク・サイズ・名前）。スクロールで画面外に出たら下の追従フィルタへ引き継ぐ -->
     <div ref="filterPanelRef" class="mb-3">
       <div class="flex flex-nowrap justify-end gap-1 sm:gap-2 mb-2">
         <IconSelect
@@ -185,6 +206,7 @@ onBeforeUnmount(() => {
       />
     </div>
 
+    <!-- 追従フィルタ。通常フィルタを過ぎてスクロールしたときだけ上部に固定表示する -->
     <div
       v-if="isScrolledPastFilters"
       class="sticky top-0 z-30 -mx-1 mb-3 rounded border bg-white/95 p-2 shadow-sm backdrop-blur"
@@ -257,6 +279,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
+    <!-- 絞り込み後の件数 -->
     <p class="text-sm text-gray-500 mb-2">{{ visibleMonsters.length }} 体</p>
 
     <div class="overflow-x-auto rounded-lg border">

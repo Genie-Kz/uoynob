@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 耐性を3列グリッドで表示するコンポーネント。図鑑とビルド結果で同じ見た目を共有する。
 import { computed } from 'vue';
 import type { ResistanceCellView } from '@/presentation/resistanceCells';
 

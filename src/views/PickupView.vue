@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// ピックアップ（特集）ページ。スキル/モンスター/グループ分けの特集を、種類に応じて表示する。
 import { computed } from 'vue';
 import type { PickupRef } from '@/types/pickup';
 import type { MonsterListItem } from '@/types/monster';
@@ -27,7 +28,9 @@ const { skills } = useSkills();
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
+// URL のキー（例: skill-killer）に対応する特集エントリ。無ければ null。
 const entry = computed(() => pickups.value?.[props.pickupKey] ?? null);
+// 特集データのモンスター参照IDを、実際のモンスターIDへ解決する関数。
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
 /** スキル系ピックアップを目的別に分類したグループ（対象外は null） */
@@ -36,10 +39,12 @@ const skillGroups = computed(() => {
   if (!target || target.type !== 'skills' || !skills.value) return null;
   return groupPickupSkills(props.pickupKey, target.items, skills.value);
 });
+// スキルグループに表示用アイコンを付けたビュー。
 const skillGroupViews = computed(() =>
   createPickupSkillGroupViews(props.pickupKey, skillGroups.value, monsters.value ?? []),
 );
 
+// 特集の総件数。グループ分け型は全グループの合計、それ以外は items の件数。
 function totalCount(): number {
   const target = entry.value;
   if (!target) return 0;
@@ -56,22 +61,27 @@ const seoDescription = computed(() => {
 
 usePageSeo(() => entry.value?.title, seoDescription);
 
+// id からモンスターを引くための索引（Map）。
 const monsterById = computed(
   () => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])),
 );
 
+// 特集の参照から、対応するモンスター（無ければ null）を返す。
 function monsterOf(ref: PickupRef): MonsterListItem | null {
   return pickupMonsterByRef(ref, resolveMonsterId.value, monsterById.value);
 }
 
+// 特集の参照から、モンスター詳細へのルートを返す。
 function monsterRoute(ref: PickupRef) {
   return pickupMonsterRoute(ref, resolveMonsterId.value);
 }
 
+// グループ見出しの要素ID（ページ内ジャンプの対象）。
 function groupId(index: number): string {
   return `pickup-group-${index}`;
 }
 
+// 指定グループの見出しまでスムーズスクロールする（目次クリック時）。
 function scrollToGroup(index: number): void {
   document.getElementById(groupId(index))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

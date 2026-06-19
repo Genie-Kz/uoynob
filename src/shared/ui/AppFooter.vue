@@ -1,6 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// 全ページ共通のフッター。ホームへのリンクと、サイトの説明・著作権表記を表示する。
+</script>
 
 <template>
+  <!-- 中央寄せ・上罫線つきのフッター領域 -->
   <footer class="max-w-5xl mx-auto px-3 mt-10 pt-4 border-t text-center text-sm text-gray-500">
     <p class="mb-1">
       <router-link :to="{ name: 'home' }" class="text-gray-500 hover:underline">home</router-link>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// ビルドシミュレーターの本体。特性・スキル・武器鍛冶・装備・系図などを入れ替えて、
+// 最終耐性とステータスを計算・表示し、構成を共有URLとして保存できる。
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { BodySize } from '@/types/monster';

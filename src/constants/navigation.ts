@@ -20,21 +20,25 @@ export interface NavCard {
   items: NavItem[];
 }
 
+// ランク別（SS〜F）の入口。各ランクでモンスター一覧を絞り込むリンクを生成する。
 const rankItems: NavItem[] = MONSTER_RANKS.map((rank) => ({
   label: RANK_FULLWIDTH_LABEL[rank],
   to: { name: 'monster-list', query: { rank: rank.toLowerCase() } },
 }));
 
+// 系統別（スライム系・ドラゴン系…）の入口。
 const lineageItems: NavItem[] = Object.values(LINEAGE_BY_NAME).map((lineage) => ({
   label: lineage.label,
   to: { name: 'monster-list', query: { lineage: lineage.slug } },
 }));
 
+// ボディサイズ別の入口。
 const bodySizeItems: NavItem[] = BODY_SIZES.map((size) => ({
   label: size,
   to: { name: 'monster-list', query: { size: BODY_SIZE_SLUG[size] } },
 }));
 
+// サイドナビに並べるカード一覧。各カードは見出しと、その分類への入口リンクを持つ。
 export const NAV_CARDS: NavCard[] = [
   {
     id: 'monster',

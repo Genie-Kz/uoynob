@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// スキルの詳細ページ。スキル構成（覚える特技・特性）と、そのスキルを持つモンスターを表示する。
 import { computed } from 'vue';
 import { useSkills } from '@/composables/useSkills';
 import { useMonsterList } from '@/composables/useMonsterList';
@@ -8,13 +9,16 @@ import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 
+// URL の :id を受け取る。
 const props = defineProps<{ id: string }>();
 
 const { skills, isLoading, errorMessage } = useSkills();
 const { monsters } = useMonsterList();
 
+// id に一致するスキルを探す。無ければ null。
 const skill = computed(() => skills.value?.find((candidate) => candidate.id === props.id) ?? null);
 
+// 検索エンジン向けの説明文。構成は先頭5件だけ抜き出して並べる。
 const seoDescription = computed(() => {
   const target = skill.value;
   if (!target) return null;
@@ -27,8 +31,10 @@ const seoDescription = computed(() => {
 
 usePageSeo(() => skill.value?.name, seoDescription);
 
+// スキルデータのモンスター参照IDを、実際のモンスターIDへ解決する関数。
 const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
+// 構成項目が「耐性アップ系の特技」かどうか。バッジ表示の出し分けに使う。
 function isGuardAbility(name: string): boolean {
   return guardAbilityToElement(name) !== null;
 }
@@ -45,11 +51,13 @@ function isGuardAbility(name: string): boolean {
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <!-- id に該当するスキルが無い場合の案内 -->
       <div v-if="!skill" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         スキルが見つかりませんでした（id={{ id }}）。
         <router-link :to="{ name: 'skill-list' }" class="app-link">一覧へ戻る</router-link>
       </div>
 
+      <!-- スキルが見つかった場合の本体 -->
       <div v-else>
         <div class="border rounded p-4 mb-4">
           <h2 class="text-xl font-bold">{{ skill.name }}</h2>
@@ -67,6 +75,7 @@ function isGuardAbility(name: string): boolean {
             class="px-3 py-2 flex items-center gap-2"
           >
             <span>{{ item.name }}</span>
+            <!-- 耐性アップ系の特技には「耐性+2」、特性には「特性」のバッジを付ける -->
             <span v-if="isGuardAbility(item.name)" class="bg-sky-200 rounded px-1.5 py-0.5 text-xs"
               >耐性+2</span
             >
@@ -83,6 +92,7 @@ function isGuardAbility(name: string): boolean {
           <span class="text-sm text-gray-500 font-normal">{{ skill.monsters.length }} 体</span>
         </h3>
         <div class="flex flex-wrap gap-1">
+          <!-- モンスターIDが解決できたものはリンク、できなければただのタグ表示にする -->
           <template v-for="monsterRef in skill.monsters" :key="monsterRef.id">
             <router-link
               v-if="resolveMonsterId(monsterRef.id)"

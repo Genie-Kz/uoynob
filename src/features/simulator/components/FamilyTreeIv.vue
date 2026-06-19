@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// 系図（4体の親系統）と個体値（テンプレート/手入力）を編集するコンポーネント。
+// 系統の組み合わせや個体値テンプレートが、最終ステータスの計算に影響する。
 import { computed, ref } from 'vue';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS, INDIVIDUAL_VALUE_RANGE } from '@/constants/statsRules';

@@ -1,6 +1,10 @@
+// 「不利な特性」のドメインロジック。
+// 装備中の特性からデメリット指数を合計し、ランクに応じて付与される不利な特性を導く。
 import type { MonsterRank } from '@/types/monster';
 import { normalizeTraitCostKey } from '@/shared/search/normalization';
 
+// 特性ごとのデメリット指数の一覧（値が小さいほど不利が大きい）。
+// 名前をキーにした完全一致テーブル。パターンで決まる特性は下の関数側で扱う。
 const EXACT_COSTS: Record<string, number> = {
   みかわしアップ: -4,
   アンチみかわしアップ: -4,
@@ -148,29 +152,37 @@ const EXACT_COSTS: Record<string, number> = {
   ＨＰ成長力アップ小: -8,
 };
 
+// モントナー(ゆうかん)の特例判定に使う、勇敢ペアの特性名。
 const MONTO_BRAVE_TRAITS = ['ゆうかん', 'さいごのきぼう'] as const;
 
 /** 特性単体のデメリット指数。個別値不明のモントナー特例はここでは0。 */
 export function disadvantageCostOfTrait(name: string): number {
+  // 表記ゆれを吸収したキーに正規化してから引く
   const normalized = normalizeTraitCostKey(name);
+  // まず完全一致テーブルを優先する
   const exact = EXACT_COSTS[normalized];
   if (exact !== undefined) return exact;
-  if (/^AI\d(?:～\d)?回行動$/.test(normalized)) return -3;
-  if (normalized.endsWith('攻撃')) return -2;
-  if (normalized.endsWith('のコツ')) return 3;
-  if (normalized.endsWith('ブレイク')) return -2;
+  // 以下は名前のパターンで決まる特性（個別に列挙せず末尾等で判定する）
+  if (/^AI\d(?:～\d)?回行動$/.test(normalized)) return -3; // AI○回行動
+  if (normalized.endsWith('攻撃')) return -2; // ○○攻撃
+  if (normalized.endsWith('のコツ')) return 3; // ○○のコツ
+  if (normalized.endsWith('ブレイク')) return -2; // ○○ブレイク
+  // どれにも当てはまらなければ指数なし（0）
   return 0;
 }
 
 /** スキル由来を除いた、装備中の特性だけからデメリット指数合計を求める。 */
 export function totalDisadvantageCost(traits: string[], monsterName = ''): number {
+  // 空を除き、正規化したうえで各特性の指数を合算する
   const normalizedTraits = traits.filter(Boolean).map(normalizeTraitCostKey);
   let total = normalizedTraits.reduce((sum, trait) => sum + disadvantageCostOfTrait(trait), 0);
+  // モントナー(ゆうかん)が勇敢ペアを両方持つ場合の特例補正
   const hasBravePair = MONTO_BRAVE_TRAITS.every((trait) => normalizedTraits.includes(trait));
   if (monsterName === 'モントナー(ゆうかん)' && hasBravePair) total += 2;
   return total;
 }
 
+// ランク帯ごと・指数合計（1〜5）ごとに付与される不利な特性の対応表。
 const DISADVANTAGES_BY_RANK: Record<'low' | 'c' | 'mid' | 'high', Record<number, string[]>> = {
   low: {
     1: ['自動ＭＰダウン'],
@@ -202,6 +214,7 @@ const DISADVANTAGES_BY_RANK: Record<'low' | 'c' | 'mid' | 'high', Record<number,
   },
 };
 
+// モンスターのランクを、不利な特性テーブルのランク帯（low/c/mid/high）に振り分ける。
 function rankGroup(rank: MonsterRank): keyof typeof DISADVANTAGES_BY_RANK {
   if (rank === 'F' || rank === 'E' || rank === 'D') return 'low';
   if (rank === 'C') return 'c';
@@ -211,7 +224,10 @@ function rankGroup(rank: MonsterRank): keyof typeof DISADVANTAGES_BY_RANK {
 
 /** ランクと指数合計から付与される不利な特性を返す。 */
 export function disadvantageTraits(rank: MonsterRank, totalCost: number): string[] {
+  // 指数が0以下なら不利な特性は付かない
   if (totalCost <= 0) return [];
+  // 指数6以上は上限扱いで固定の2種が付く
   if (totalCost >= 6) return ['ヘロヘロ', '強者のよゆう'];
+  // それ以外はランク帯×指数で対応表から引く
   return DISADVANTAGES_BY_RANK[rankGroup(rank)][totalCost] ?? [];
 }

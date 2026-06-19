@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// 該当ルートが無いときに表示する 404 ページ。ホームへ戻る導線を置く。
+</script>
 
 <template>
   <div class="py-10 text-center">

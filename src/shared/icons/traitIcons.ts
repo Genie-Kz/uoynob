@@ -1,3 +1,4 @@
+// 特性スロット（Lv25/50/100・メガ・ギガ・超ギガで解放される枠）を表すアイコン画像をまとめる。
 import icon25 from '@/assets/images/icons/trait/icon-25.jpg';
 import icon50 from '@/assets/images/icons/trait/icon-50.jpg';
 import icon100 from '@/assets/images/icons/trait/icon-100.jpg';
@@ -5,6 +6,7 @@ import iconMega from '@/assets/images/icons/trait/icon-m.jpg';
 import iconGiga from '@/assets/images/icons/trait/icon-g.png';
 import iconSuperGiga from '@/assets/images/icons/trait/icon-sg.png';
 
+// 特性枠の種別 → アイコン画像URL。
 export const TRAIT_SLOT_ICONS = {
   level25: icon25,
   level50: icon50,

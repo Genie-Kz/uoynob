@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// モンスター検索の結果テーブル。各ステータスでの並び替えに対応する（絞り込みフォームは持たない）。
 import { computed } from 'vue';
 import type { Monster } from '@/types/monster';
 import type { StatKey } from '@/types/stats';
@@ -19,6 +20,7 @@ const props = defineProps<{
 const sortKey = defineModel<'' | StatKey>('sortKey', { required: true });
 const sortDescending = defineModel<boolean>('sortDescending', { required: true });
 
+// 並び替えキーの選択肢（先頭は既定の No. 順、以降は各ステータス）。
 const sortKeyOptions = [
   { value: '', label: '既定（No.順）' },
   ...STAT_KEYS.map((key) => ({ value: key, label: key })),

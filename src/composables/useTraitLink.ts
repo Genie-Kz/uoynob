@@ -7,6 +7,7 @@ import { useAttributes } from './useAttributes';
 export function useTraitLink() {
   const { attributes } = useAttributes();
 
+  // 正規化した特性名 → 特性id の索引。表記ゆれを吸収して名前から id を引けるようにする。
   const idByName = computed(() => {
     const map = new Map<string, string>();
     for (const attribute of attributes.value ?? []) {

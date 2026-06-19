@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// モンスターの詳細ページ（図鑑）。特性・耐性・ステータス・覚えるスキル・装備可能武器を表示する。
 import { computed } from 'vue';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';
@@ -24,6 +25,7 @@ const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 const { traitRoute } = useTraitLink();
 
+// id に一致するモンスター。無ければ null（見つからない表示）。
 const monster = computed(
   () => monsters.value?.find((candidate) => candidate.id === props.id) ?? null,
 );
@@ -32,16 +34,21 @@ const breadcrumbItems = computed(() => [
   { label: 'モンスター', to: { name: 'monster-list' } },
   { label: monster.value?.名前 ?? '詳細' },
 ]);
+// 系統情報（ラベル・色）。
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
+// 既定構成（本来のサイズ・初期特性）での最終耐性を、グリッド表示用セルに変換する。
 const resistanceCells = computed(() =>
   monster.value
     ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value)))
     : [],
 );
+// 装備できる武器の一覧。
 const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(monster.value) : []));
+// このモンスターが覚えられるスキルの一覧。
 const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],
 );
+// 構成によって付く「不利な特性」。本来のサイズの初期特性からデメリット指数を求めて導く。
 const unfavorableTraits = computed(() => {
   const target = monster.value;
   if (!target) return [];
@@ -71,16 +78,20 @@ interface TraitItem {
   name: string;
 }
 
+// 表示用の特性一覧を、解放タイミング順（サイズ→新生前→Lv25/50/100→メガ→ギガ→超ギガ）に組み立てる。
 const traitItems = computed<TraitItem[]>(() => {
   const target = monster.value;
   if (!target) return [];
   const items: TraitItem[] = [];
+  // 1フィールド分の特性（「、」区切り）を、対応するアイコン付きで追加する小関数
   const add = (icon: string | undefined, field: string | undefined | null): void => {
     for (const name of splitTraits(field)) items.push({ icon, name });
   };
+  // サイズ特性・新生前特性にはアイコンを付けない
   add(undefined, target.サイズ特性);
   add(undefined, target.新生前特性1);
   add(undefined, target.新生前特性2);
+  // レベル帯・サイズ帯で解放される特性にはそれぞれのアイコンを付ける
   add(TRAIT_SLOT_ICONS.level25, target.特性25);
   add(TRAIT_SLOT_ICONS.level50, target.特性50);
   add(TRAIT_SLOT_ICONS.level100, target.特性100);
@@ -90,6 +101,7 @@ const traitItems = computed<TraitItem[]>(() => {
   return items;
 });
 
+// ステータステーブル表示用の行データ（ラベルと値の組）。
 const statRows = computed(() => {
   const target = monster.value;
   if (!target) return [];
@@ -109,11 +121,13 @@ const statRows = computed(() => {
     <PageBreadcrumb :items="breadcrumbItems" />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <!-- id に該当するモンスターが無い場合の案内 -->
       <div v-if="!monster" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         モンスターが見つかりませんでした（id={{ id }}）。
         <router-link :to="{ name: 'monster-list' }" class="app-link">一覧へ戻る</router-link>
       </div>
 
+      <!-- モンスターが見つかった場合の本体 -->
       <div v-else>
         <!-- ヘッダー -->
         <div class="border rounded p-4 mb-4 flex items-center">
