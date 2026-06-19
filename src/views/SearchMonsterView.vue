@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { previousRouteName } from '@/router';
-import type { BodySize } from '@/types/monster';
 import { useMonsters } from '@/composables/useMonsters';
-import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
+import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
 import { isEmptyCriteria, searchMonsters, type ResistanceThreshold } from '@/domain/monsterSearch';
-import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
-import { useMonsterSearchState } from '@/features/monster-search/useMonsterSearchState';
+import SearchResultTable from '@/features/monster-search/components/SearchResultTable.vue';
 import {
   bodySizeOptionValue,
   bodySizeSelectOptions,
   thresholdSelectOptions,
 } from '@/features/monster-search/searchOptions';
+import { useMonsterSearchState } from '@/features/monster-search/useMonsterSearchState';
+import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
+import { previousRouteName } from '@/router';
 import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
 import DataState from '@/shared/ui/DataState.vue';
-import IconSelect from '@/shared/ui/IconSelect.vue';
 import FilterModal from '@/shared/ui/FilterModal.vue';
-import PickerModal from '@/shared/ui/PickerModal.vue';
-import SearchResultTable from '@/features/monster-search/components/SearchResultTable.vue';
+import IconSelect from '@/shared/ui/IconSelect.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import PickerModal from '@/shared/ui/PickerModal.vue';
+import type { BodySize } from '@/types/monster';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 
@@ -163,9 +163,6 @@ onMounted(() => {
       :items="[{ label: 'ホーム', to: { name: 'home' } }, { label: 'モンスター検索' }]"
     />
     <h2 class="text-xl font-bold mb-1">モンスター検索</h2>
-    <p class="text-sm text-gray-500 mb-4">
-      モンスターを耐性・特性から検索します。「○○↑」は、その耐性以上（より強い）モンスターを対象にします。
-    </p>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
       <h3 class="font-bold mb-2">検索時のボディサイズ</h3>
@@ -209,10 +206,9 @@ onMounted(() => {
       </div>
 
       <!-- 結果 -->
-      <h3 class="font-bold mb-2">検索結果</h3>
-      <p v-if="searchResults === null" class="text-gray-500">
-        「耐性」または「特性」を設定し、モーダル内の検索ボタンを押してください。
-      </p>
+      <h3 v-if="searchResults !== null" class="font-bold mb-2">検索結果</h3>
+      <!-- 未検索（null）のときは何も出さない。SearchResultTable の v-else に null を渡さないための受け皿 -->
+      <template v-if="searchResults === null" />
       <p v-else-if="!searchResults.length" class="text-gray-500">
         条件に合うモンスターはいません。
       </p>
