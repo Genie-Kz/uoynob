@@ -5,6 +5,7 @@ import { useAbilities } from '@/composables/useAbilities';
 import { usePageSeo } from '@/composables/usePageSeo';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
 // URL の :id を受け取る。
 const props = defineProps<{ id: string }>();
@@ -38,6 +39,9 @@ usePageSeo(() => ability.value?.name, seoDescription);
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <DetailSkeleton :sections="1" />
+      </template>
       <!-- id に該当する特技が無い場合の案内 -->
       <div v-if="!ability" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         特技が見つかりませんでした（id={{ id }}）。

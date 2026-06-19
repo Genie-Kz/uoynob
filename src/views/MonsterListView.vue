@@ -13,6 +13,7 @@ import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import TableSkeleton from '@/shared/ui/TableSkeleton.vue';
 
 const route = useRoute();
 const { monsters, isLoading, errorMessage } = useMonsterList();
@@ -57,6 +58,9 @@ const hiddenColumns = computed(() => {
     <h2 class="text-xl font-bold mb-3">{{ result.title }}</h2>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <TableSkeleton controls />
+      </template>
       <MonsterTable
         :monsters="result.monsters"
         link-route-name="monster-detail"

@@ -19,6 +19,7 @@ import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
 const props = defineProps<{ pickupKey: string }>();
 
@@ -97,6 +98,9 @@ function scrollToGroup(index: number): void {
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <DetailSkeleton :sections="3" />
+      </template>
       <div v-if="!entry" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         ピックアップが見つかりませんでした（{{ pickupKey }}）。
         <router-link :to="{ name: 'home' }" class="app-link">ホームへ戻る</router-link>

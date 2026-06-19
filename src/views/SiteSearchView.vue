@@ -12,6 +12,7 @@ import { routeForSiteSearchHit } from '@/router/siteSearchGuard';
 import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import Skeleton from '@/shared/ui/Skeleton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -103,6 +104,21 @@ function submitSearch(): void {
     </form>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <div class="overflow-hidden rounded border">
+          <div class="border-b bg-gray-50 px-3 py-2">
+            <Skeleton class="h-5 w-40" />
+          </div>
+          <div
+            v-for="row in 8"
+            :key="row"
+            class="flex items-center gap-3 border-b px-3 py-3 last:border-0"
+          >
+            <Skeleton class="h-7 w-14 shrink-0" />
+            <Skeleton class="h-5 flex-1" />
+          </div>
+        </div>
+      </template>
       <p v-if="!keyword" class="text-gray-500">検索語を入力してください。</p>
       <p v-else-if="results.length === 0" class="text-gray-500">
         「{{ keyword }}」に一致する候補は見つかりませんでした。

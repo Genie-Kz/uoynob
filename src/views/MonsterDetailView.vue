@@ -16,6 +16,7 @@ import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 import ResistanceGrid from '@/shared/ui/ResistanceGrid.vue';
 import StatusTable from '@/shared/ui/StatusTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 import DisadvantageTraits from '@/features/simulator/components/DisadvantageTraits.vue';
 import { TRAIT_SLOT_ICONS } from '@/shared/icons/traitIcons';
 
@@ -121,6 +122,9 @@ const statRows = computed(() => {
     <PageBreadcrumb :items="breadcrumbItems" />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <DetailSkeleton icon :sections="4" />
+      </template>
       <!-- id に該当するモンスターが無い場合の案内 -->
       <div v-if="!monster" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         モンスターが見つかりませんでした（id={{ id }}）。

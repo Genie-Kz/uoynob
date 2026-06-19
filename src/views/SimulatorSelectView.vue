@@ -5,6 +5,7 @@ import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';
 import MonsterTable from '@/features/monster-search/components/MonsterTable.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import TableSkeleton from '@/shared/ui/TableSkeleton.vue';
 
 const { monsters, isLoading, errorMessage } = useMonsterList();
 // ビルドシミュレーター（詳細）から戻ったときにスクロール位置を復元する。
@@ -22,6 +23,9 @@ const { restoring } = useScrollRestore();
     </p>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <TableSkeleton controls />
+      </template>
       <MonsterTable :monsters="monsters ?? []" link-route-name="simulator-build" />
     </DataState>
 

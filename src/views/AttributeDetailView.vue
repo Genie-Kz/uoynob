@@ -7,6 +7,7 @@ import { usePageSeo } from '@/composables/usePageSeo';
 import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
+import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
 // URL の :id を受け取る。
 const props = defineProps<{ id: string }>();
@@ -50,6 +51,9 @@ usePageSeo(() => attribute.value?.name, seoDescription);
     />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <DetailSkeleton :sections="2" />
+      </template>
       <!-- id に該当する特性が無い場合の案内 -->
       <div v-if="!attribute" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         特性が見つかりませんでした（id={{ id }}）。

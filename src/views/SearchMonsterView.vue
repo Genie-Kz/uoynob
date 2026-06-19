@@ -15,6 +15,7 @@ import { traitPickerItems } from '@/features/simulator/simulatorViewModel';
 import { previousRouteName } from '@/router';
 import BodySizeIcon from '@/shared/icons/BodySizeIcon.vue';
 import DataState from '@/shared/ui/DataState.vue';
+import FormSkeleton from '@/shared/ui/FormSkeleton.vue';
 import FilterModal from '@/shared/ui/FilterModal.vue';
 import IconSelect from '@/shared/ui/IconSelect.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
@@ -165,6 +166,9 @@ onMounted(() => {
     <h2 class="text-xl font-bold mb-1">モンスター検索</h2>
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <FormSkeleton />
+      </template>
       <h3 class="font-bold mb-2">検索時のボディサイズ</h3>
       <IconSelect
         v-model="searchBodySize"

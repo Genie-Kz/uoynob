@@ -34,6 +34,7 @@ import ResistanceGrid from '@/shared/ui/ResistanceGrid.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import PickerModal from '@/shared/ui/PickerModal.vue';
 import StatsBar from '@/shared/ui/StatsBar.vue';
+import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 import FamilyTreeIv from '@/features/simulator/components/FamilyTreeIv.vue';
 import DisadvantageTraits from '@/features/simulator/components/DisadvantageTraits.vue';
 import type { PickerItem } from '@/types/picker';
@@ -242,6 +243,9 @@ const monshouOptions = MONSHOU_LIST;
     <PageBreadcrumb :items="breadcrumbItems" />
 
     <DataState :is-loading="isLoading" :error-message="errorMessage">
+      <template #skeleton>
+        <DetailSkeleton icon :sections="5" :tags="false" />
+      </template>
       <div v-if="!monster" class="border border-yellow-300 bg-yellow-50 rounded p-3">
         モンスターが見つかりませんでした（id={{ id }}）。
         <router-link :to="{ name: 'simulator-select' }" class="app-link">検索へ戻る</router-link>
