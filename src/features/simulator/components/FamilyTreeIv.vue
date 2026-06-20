@@ -9,6 +9,7 @@ import {
   INDIVIDUAL_VALUE_TEMPLATES,
   individualValuesFromTemplate,
 } from '@/domain/individualValueTemplate';
+import { useResettableTimeout } from '@/composables/useResettableTimeout';
 import PickerModal from '@/shared/ui/PickerModal.vue';
 
 const props = defineProps<{
@@ -56,10 +57,11 @@ function lineageOf(index: number): string | null {
 
 /* ---- 系統で一括設定（押下フィードバック） ---- */
 const lastFilled = ref<string | null>(null);
+const fillFeedbackTimeout = useResettableTimeout();
 function onFill(lineage: string): void {
   emit('fill', lineage);
   lastFilled.value = lineage;
-  window.setTimeout(() => {
+  fillFeedbackTimeout.start(() => {
     if (lastFilled.value === lineage) lastFilled.value = null;
   }, 800);
 }
@@ -73,11 +75,12 @@ function onIvInput(stat: StatKey, event: Event): void {
 }
 
 const lastIvPreset = ref<string | null>(null);
+const ivPresetFeedbackTimeout = useResettableTimeout();
 function setIvPreset(stat: StatKey, value: number): void {
   emit('setIv', stat, value);
   const presetKey = `${stat}:${value}`;
   lastIvPreset.value = presetKey;
-  window.setTimeout(() => {
+  ivPresetFeedbackTimeout.start(() => {
     if (lastIvPreset.value === presetKey) lastIvPreset.value = null;
   }, 800);
 }

@@ -10,6 +10,7 @@ import { useAsyncData } from '@/composables/useAsyncData';
 import { useBuildSimulator } from '@/features/simulator/useBuildSimulator';
 import { useTraitLink } from '@/composables/useTraitLink';
 import { usePageSeo } from '@/composables/usePageSeo';
+import { useResettableTimeout } from '@/composables/useResettableTimeout';
 import { loadAttributes, loadWeapons } from '@/shared/data/datasets';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
@@ -127,11 +128,14 @@ watch(shareQuery, (query) => {
 });
 
 const copied = ref(false);
+const copiedFeedbackTimeout = useResettableTimeout();
 async function copyShareUrl(): Promise<void> {
   try {
     await navigator.clipboard.writeText(location.href);
     copied.value = true;
-    setTimeout(() => (copied.value = false), 1500);
+    copiedFeedbackTimeout.start(() => {
+      copied.value = false;
+    }, 1500);
   } catch {
     /* クリップボード不可の環境では何もしない */
   }

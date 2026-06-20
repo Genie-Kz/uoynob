@@ -7,10 +7,25 @@ import { onBeforeUnmount, watch, type Ref } from 'vue';
 
 let lockCount = 0;
 let savedScrollY = 0;
+let savedBodyStyle: {
+  position: string;
+  top: string;
+  left: string;
+  right: string;
+  width: string;
+} | null = null;
 
 function freezeBody(): void {
   savedScrollY = window.scrollY;
   const { style } = document.body;
+  // アプリ外のCSSや別処理が設定した inline style を、解除時に消さず復元する。
+  savedBodyStyle = {
+    position: style.position,
+    top: style.top,
+    left: style.left,
+    right: style.right,
+    width: style.width,
+  };
   style.position = 'fixed';
   style.top = `-${savedScrollY}px`;
   style.left = '0';
@@ -20,11 +35,13 @@ function freezeBody(): void {
 
 function unfreezeBody(): void {
   const { style } = document.body;
-  style.position = '';
-  style.top = '';
-  style.left = '';
-  style.right = '';
-  style.width = '';
+  const restoreStyle = savedBodyStyle;
+  style.position = restoreStyle?.position ?? '';
+  style.top = restoreStyle?.top ?? '';
+  style.left = restoreStyle?.left ?? '';
+  style.right = restoreStyle?.right ?? '';
+  style.width = restoreStyle?.width ?? '';
+  savedBodyStyle = null;
   window.scrollTo(0, savedScrollY);
 }
 

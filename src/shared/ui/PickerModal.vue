@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 入れ替え用の選択モーダル。候補をボタンで選び、下部の検索欄で絞り込める。
 // 開いた時点の高さを固定し、絞り込みで件数が変わってもモーダルが伸縮しないようにする。
-import { computed, nextTick, ref, toRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
 import { loadSearchReadings } from '@/shared/data/datasets';
@@ -35,6 +35,23 @@ const panelEl = ref<HTMLElement | null>(null);
  * 候補が少ないモーダルは小さく、多いモーダルは上限まで、で安定する。
  */
 const lockedHeight = ref<number | null>(null);
+let lockHeightFrame: number | null = null;
+
+function cancelHeightMeasurement(): void {
+  if (lockHeightFrame === null) return;
+  cancelAnimationFrame(lockHeightFrame);
+  lockHeightFrame = null;
+}
+
+function measureLockedHeight(): void {
+  // 開閉を素早く繰り返した場合は、古い計測予約が後から高さを書き戻さないようにする。
+  cancelHeightMeasurement();
+  lockHeightFrame = requestAnimationFrame(() => {
+    lockHeightFrame = null;
+    if (!props.open) return;
+    lockedHeight.value = panelEl.value?.getBoundingClientRect().height ?? null;
+  });
+}
 
 // 開くたびに検索をリセットし、現在値を選択状態にして、その時点の高さを固定する
 watch(
@@ -45,11 +62,11 @@ watch(
     selectedValue.value = props.current ?? null;
     lockedHeight.value = null;
     await nextTick();
-    requestAnimationFrame(() => {
-      lockedHeight.value = panelEl.value?.getBoundingClientRect().height ?? null;
-    });
+    measureLockedHeight();
   },
 );
+
+onBeforeUnmount(cancelHeightMeasurement);
 
 const filteredItems = computed(() => {
   const query = keyword.value.trim();
