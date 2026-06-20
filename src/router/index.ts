@@ -6,6 +6,7 @@ import {
 } from 'vue-router';
 import { ref } from 'vue';
 import { redirectSingleSiteSearchResult } from './siteSearchGuard';
+import { installChunkLoadRecovery } from './chunkLoadRecovery';
 
 /** 直前に表示していたルート名。画面側で「どこから来たか」による分岐に使う。 */
 export const previousRouteName = ref<RouteRecordName | null | undefined>(undefined);
@@ -152,3 +153,5 @@ router.beforeEach(redirectSingleSiteSearchResult);
 router.beforeEach((_to, from) => {
   previousRouteName.value = from.name;
 });
+
+installChunkLoadRecovery(router);
