@@ -77,15 +77,6 @@ function monsterRoute(ref: PickupRef) {
   return pickupMonsterRoute(ref, resolveMonsterId.value);
 }
 
-// パラメータ上昇スキルの表示名から「[+N]」の上昇量表記を切り離して、スキル名だけを返す。
-function paramSkillName(name: string): string {
-  return name.replace(/\s*\[\+\d+\]$/, '');
-}
-// 表示名末尾の「[+N]」から上昇量（"+N"）を取り出す。テーブルの上昇量列に使う。
-function paramSkillAmount(name: string): string {
-  return name.match(/\[(\+\d+)\]$/)?.[1] ?? '';
-}
-
 // グループ見出しの要素ID（ページ内ジャンプの対象）。
 function groupId(index: number): string {
   return `pickup-group-${index}`;
@@ -157,20 +148,13 @@ function scrollToGroup(index: number): void {
               {{ group.label }}
             </h3>
             <!-- パラメータ上昇スキルは、上昇量の高い順に1行ずつ並ぶテーブルで表示する
-                 （横並びだと視線が左右に動き、高い順に上から下へ追えないため） -->
+                 （横並びだと視線が左右に動き、高い順に上から下へ追えないため）。
+                 名前末尾の「[+N]」表記はそのまま残す。 -->
             <div
               v-if="pickupKey === 'skill-parameter-up'"
               class="overflow-hidden rounded-lg border"
             >
               <table class="w-full text-sm border-collapse">
-                <thead>
-                  <tr class="table-header-row">
-                    <th scope="col" class="px-3 py-2 font-semibold text-left">スキル</th>
-                    <th scope="col" class="px-3 py-2 font-semibold text-right whitespace-nowrap">
-                      上昇量
-                    </th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr
                     v-for="ref in group.items"
@@ -182,11 +166,8 @@ function scrollToGroup(index: number): void {
                         :to="{ name: 'skill-detail', params: { id: ref.id } }"
                         class="app-link"
                       >
-                        {{ paramSkillName(ref.name) }}
+                        {{ ref.name }}
                       </router-link>
-                    </td>
-                    <td class="px-3 py-2 text-right font-semibold whitespace-nowrap">
-                      {{ paramSkillAmount(ref.name) }}
                     </td>
                   </tr>
                 </tbody>
