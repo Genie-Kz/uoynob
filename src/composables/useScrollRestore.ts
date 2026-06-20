@@ -11,7 +11,7 @@
  * 打ち消す」「時間切れ時は最下部へ飛ばさず先頭のままにする」を行い、合わせ
  * 終えるまでは本文を隠してちらつきを防ぐ。
  */
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { previousRouteName } from '@/router';
 
@@ -34,6 +34,8 @@ export function useScrollRestore() {
   // この一覧ページを表す key は、インスタンス生成時の URL で固定する。
   const key = route.fullPath;
   const restoring = ref(false);
+  let cleanupRestore: (() => void) | null = null;
+  let restoreFrame: number | null = null;
 
   onMounted(() => {
     const saved = scrollByRoute.get(key);
@@ -50,12 +52,23 @@ export function useScrollRestore() {
     const previousAnchor = root.style.overflowAnchor;
     root.style.overflowAnchor = 'none';
 
-    const finish = (): void => {
-      root.style.overflowAnchor = previousAnchor;
-      restoring.value = false;
+    const scheduleStep = (): void => {
+      restoreFrame = requestAnimationFrame(step);
     };
 
+    const finish = (): void => {
+      if (restoreFrame !== null) {
+        cancelAnimationFrame(restoreFrame);
+        restoreFrame = null;
+      }
+      root.style.overflowAnchor = previousAnchor;
+      restoring.value = false;
+      cleanupRestore = null;
+    };
+    cleanupRestore = finish;
+
     const step = (): void => {
+      restoreFrame = null;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       // まだ保存位置まで届く高さが無いうちはスクロールしない（最下部クランプ回避）。
       if (maxScroll < saved - 1) {
@@ -63,7 +76,7 @@ export function useScrollRestore() {
           finish(); // 諦める（先頭のまま）
           return;
         }
-        requestAnimationFrame(step);
+        scheduleStep();
         return;
       }
       // 十分な高さになった。合わせてから数フレーム保持する。
@@ -73,9 +86,13 @@ export function useScrollRestore() {
         finish();
         return;
       }
-      requestAnimationFrame(step);
+      scheduleStep();
     };
-    requestAnimationFrame(step);
+    scheduleStep();
+  });
+
+  onBeforeUnmount(() => {
+    cleanupRestore?.();
   });
 
   // 離れるとき（遷移開始時）に、その時点の正確なスクロール位置を保存する。
