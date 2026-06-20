@@ -91,9 +91,15 @@
   }
 }
 
-/* ---- 画面遷移のフェード（router-view） ---- */
-.route-fade-enter-active,
-.route-fade-leave-active {
+/* ---- 画面遷移のフェードイン（router-view） ---- */
+/* 入場（新ページ）だけをフェードインさせる。退場（前ページ）は即時に消す。
+   以前は mode="out-in" ＋ 退場フェードのため、前ページが消えてから新ページが
+   フェードインし始めるまでの約0.3秒、新ページが opacity:0 のまま存在して
+   「背景だけの空白」が見えていた。さらにキャッシュ済みデータはこの不可視の間に
+   読み込み完了するため、スケルトンが見えないまま中身に差し替わっていた。
+   退場フェードを無くし入場のみにすることで、前ページは即座に消え、新ページの
+   中身（またはスケルトン）がその場でフェードインする。 */
+.route-fade-enter-active {
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
@@ -101,10 +107,6 @@
 .route-fade-enter-from {
   opacity: 0;
   transform: translateY(6px);
-}
-.route-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
 }
 
 /* ---- モーダル：上からゆっくりふわっと滑り降りて表示 ---- */

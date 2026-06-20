@@ -39,8 +39,10 @@ usePageSeo(pageTitle, pageDescription);
         </aside>
 
         <div class="min-w-0" :class="{ 'px-1 py-2 sm:px-3 lg:px-4': useComfortableContent }">
-          <!-- ページ遷移時はフェードで切り替える。key はパス単位なのでクエリ変更では再生成しない -->
-          <transition name="route-fade" mode="out-in">
+          <!-- ページ遷移は新ページの入場フェードのみ。out-in だと前ページの退場を
+               待つ間に新ページが opacity:0 のまま存在し「背景だけの空白」が見える。
+               退場を即時にして無表示フレームを無くす。key はパス単位なのでクエリ変更では再生成しない -->
+          <transition name="route-fade">
             <component :is="Component" :key="route.path" />
           </transition>
 
