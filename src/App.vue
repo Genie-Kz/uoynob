@@ -8,8 +8,9 @@ import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import { DEFAULT_DESCRIPTION, usePageSeo } from '@/composables/usePageSeo';
 
 const route = useRoute();
-// ホームかどうか。ホームではサイドナビを出さず、レイアウトを変える。
-const isHome = computed(() => route.name === 'home');
+// ホームかどうか。初期描画直後は route.name が未確定な瞬間があるため、
+// path も併用して最初の描画からホーム用の中央寄せレイアウトを適用する。
+const isHome = computed(() => route.name === 'home' || route.path === '/');
 // 余白を広めにとる通常ページか。ホームとビルド画面は独自レイアウトなので対象外。
 const useComfortableContent = computed(
   () => route.name !== 'home' && route.name !== 'simulator-build',
