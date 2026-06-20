@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMonsters } from '@/composables/useMonsters';
+import { useScrollRestore } from '@/composables/useScrollRestore';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';
 import { RESISTANCE_ELEMENTS } from '@/constants/resistances';
 import { collectAllTraitNames } from '@/domain/monster';
@@ -21,7 +22,7 @@ import IconSelect from '@/shared/ui/IconSelect.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import PickerModal from '@/shared/ui/PickerModal.vue';
 import type { BodySize } from '@/types/monster';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const { monsters, isLoading, errorMessage } = useMonsters();
 
@@ -34,7 +35,6 @@ const {
   searchResults,
   sortKey,
   sortDescending,
-  scrollY,
   resetResistance,
   resetAll,
 } = useMonsterSearchState();
@@ -51,8 +51,9 @@ const originalBodySizeOptions = [
 const resistanceModalOpen = ref(false);
 const traitModalOpen = ref(false);
 const traitPicker = ref<{ open: boolean; index: number }>({ open: false, index: 0 });
-// スクロール位置を復元し終えるまでは本文を隠し、ちらつき（上→保存位置への飛び）を防ぐ。
-const restoring = ref(false);
+// 詳細ページから戻ったときのスクロール位置復元は、他の一覧画面と同じ共通処理に委ねる。
+// 復元し終えるまで本文を隠してちらつき（上→保存位置への飛び）を防ぐ点も共通化されている。
+const { restoring } = useScrollRestore();
 
 const allTraitNames = computed(() => collectAllTraitNames(monsters.value ?? []));
 const traitOptions = computed(() => traitPickerItems(allTraitNames.value));
@@ -124,38 +125,6 @@ function handleTraitPick(value: string): void {
   traitSlots.value[traitPicker.value.index] = value;
   traitPicker.value.open = false;
 }
-
-// 詳細ページへ離れるときにスクロール位置を保存し、戻ったときに復元する。
-onBeforeUnmount(() => {
-  scrollY.value = window.scrollY;
-});
-
-onMounted(() => {
-  // 検索結果がある状態（＝詳細から戻ってきた）ときだけ位置を復元する。
-  if (!searchResults.value || scrollY.value <= 0) return;
-  const target = scrollY.value;
-  // 復元位置に合わせるまで本文を隠しておき、合わせ終えてから表示する。
-  restoring.value = true;
-  const reveal = () =>
-    void nextTick(() => {
-      window.scrollTo(0, target);
-      restoring.value = false;
-    });
-  if (!isLoading.value) {
-    reveal();
-  } else {
-    // データ読み込み中なら、結果が描画されてから復元する。
-    const stop = watch(isLoading, (loading) => {
-      if (loading) return;
-      stop();
-      reveal();
-    });
-  }
-  // 念のため、何があっても一定時間後には必ず表示を戻す。
-  window.setTimeout(() => {
-    restoring.value = false;
-  }, 1000);
-});
 </script>
 
 <template>

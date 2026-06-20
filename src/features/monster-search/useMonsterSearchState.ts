@@ -1,7 +1,8 @@
 /**
  * モンスター検索画面の状態を、ページ遷移をまたいで保持するためのストア。
  * モジュールレベルの singleton なので、詳細ページへ遷移して戻っても
- * 検索条件・検索結果・並び替え・スクロール位置が維持される。
+ * 検索条件・検索結果・並び替えが維持される。
+ * （スクロール位置の保存・復元は共通の useScrollRestore が担う。）
  */
 import { ref } from 'vue';
 import type { Monster } from '@/types/monster';
@@ -28,8 +29,6 @@ const searchResults = ref<Monster[] | null>(null);
 // 並び替え（'' は既定＝No.順）と方向
 const sortKey = ref<'' | StatKey>('');
 const sortDescending = ref(false);
-// 詳細ページから戻ったときに復元するスクロール位置
-const scrollY = ref(0);
 
 export function useMonsterSearchState() {
   return {
@@ -40,7 +39,6 @@ export function useMonsterSearchState() {
     searchResults,
     sortKey,
     sortDescending,
-    scrollY,
     resetResistance(): void {
       selectedLevelByElement.value = emptyLevels();
     },
@@ -53,7 +51,6 @@ export function useMonsterSearchState() {
       searchResults.value = null;
       sortKey.value = '';
       sortDescending.value = false;
-      scrollY.value = 0;
     },
   };
 }
