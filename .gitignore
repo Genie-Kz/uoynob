@@ -12,3 +12,6 @@ test-results
 
 *storybook.log
 storybook-static
+
+# 個人用のメモ・下書き置き場（リポジトリには含めない）
+.notes/

@@ -14,6 +14,7 @@ export default defineConfigWithVueTs(
       'public/**',
       'playwright-report/**',
       'test-results/**',
+      '.notes/**',
     ],
   },
   {
