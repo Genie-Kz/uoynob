@@ -7,7 +7,14 @@ import globals from 'globals';
 export default defineConfigWithVueTs(
   {
     name: 'app/ignores',
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'public/**'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'public/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
   {
     name: 'app/source',

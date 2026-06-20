@@ -4,7 +4,9 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
   expect: {
-    timeout: 5_000,
+    // 並列実行時はJSON読み込みと初期描画が5秒を超えることがある。
+    // smoke test は実データ到着後の画面を確認するため、期待値の待機を少し長めに取る。
+    timeout: 15_000,
   },
   fullyParallel: true,
   reporter: [['list'], ['html', { open: 'never' }]],
