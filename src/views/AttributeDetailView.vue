@@ -4,8 +4,8 @@ import { computed } from 'vue';
 import { useAttributes } from '@/composables/useAttributes';
 import { useMonsterList } from '@/composables/useMonsterList';
 import { usePageSeo } from '@/composables/usePageSeo';
-import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/shared/ui/DataState.vue';
+import MonsterRefTags from '@/shared/ui/MonsterRefTags.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
@@ -19,8 +19,6 @@ const { monsters } = useMonsterList();
 const attribute = computed(
   () => attributes.value?.find((candidate) => candidate.id === props.id) ?? null,
 );
-// 特性データ側のモンスター参照IDを、実際のモンスターIDへ解決する関数。
-const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
 // SP 説明を表示すべきか。SP 特性が無い旨のプレースホルダ文言なら表示しない。
 const hasSpDescription = computed(
@@ -83,20 +81,11 @@ usePageSeo(() => attribute.value?.name, seoDescription);
           この特性を持つモンスター
           <span class="text-sm text-gray-500 font-normal">{{ attribute.monsters.length }} 体</span>
         </h3>
-        <div class="flex flex-wrap gap-1 mb-4">
-          <!-- モンスターIDが解決できたものはリンク、できなければただのタグ表示にする -->
-          <template v-for="monsterRef in attribute.monsters" :key="monsterRef.id">
-            <router-link
-              v-if="resolveMonsterId(monsterRef.id)"
-              :to="{ name: 'monster-detail', params: { id: resolveMonsterId(monsterRef.id) } }"
-              class="tag-link app-link"
-            >
-              {{ monsterRef.name }}
-            </router-link>
-            <span v-else class="tag-link text-gray-600">{{ monsterRef.name }}</span>
-          </template>
-          <span v-if="!attribute.monsters.length" class="text-gray-500">なし</span>
-        </div>
+        <MonsterRefTags
+          :monster-refs="attribute.monsters"
+          :monster-list="monsters ?? []"
+          class="mb-4"
+        />
 
         <h3 class="text-lg font-bold mb-2">
           この特性を持つスキル

@@ -5,8 +5,8 @@ import { useSkills } from '@/composables/useSkills';
 import { useMonsterList } from '@/composables/useMonsterList';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { guardAbilityToElement } from '@/domain/skillAnalysis';
-import { createMonsterIdResolver } from '@/domain/skillLookup';
 import DataState from '@/shared/ui/DataState.vue';
+import MonsterRefTags from '@/shared/ui/MonsterRefTags.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
@@ -31,9 +31,6 @@ const seoDescription = computed(() => {
 });
 
 usePageSeo(() => skill.value?.name, seoDescription);
-
-// スキルデータのモンスター参照IDを、実際のモンスターIDへ解決する関数。
-const resolveMonsterId = computed(() => createMonsterIdResolver(monsters.value ?? []));
 
 // 構成項目が「耐性アップ系の特技」かどうか。バッジ表示の出し分けに使う。
 function isGuardAbility(name: string): boolean {
@@ -95,20 +92,7 @@ function isGuardAbility(name: string): boolean {
           このスキルを持つモンスター
           <span class="text-sm text-gray-500 font-normal">{{ skill.monsters.length }} 体</span>
         </h3>
-        <div class="flex flex-wrap gap-1">
-          <!-- モンスターIDが解決できたものはリンク、できなければただのタグ表示にする -->
-          <template v-for="monsterRef in skill.monsters" :key="monsterRef.id">
-            <router-link
-              v-if="resolveMonsterId(monsterRef.id)"
-              :to="{ name: 'monster-detail', params: { id: resolveMonsterId(monsterRef.id) } }"
-              class="tag-link app-link"
-            >
-              {{ monsterRef.name }}
-            </router-link>
-            <span v-else class="tag-link text-gray-600">{{ monsterRef.name }}</span>
-          </template>
-          <span v-if="!skill.monsters.length" class="text-gray-500">なし</span>
-        </div>
+        <MonsterRefTags :monster-refs="skill.monsters" :monster-list="monsters ?? []" />
       </div>
     </DataState>
 
