@@ -10,16 +10,16 @@ import MonsterRefTags from '@/shared/ui/MonsterRefTags.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
-// URL の :id を受け取る。
+/** URL の :id を受け取る。 */
 const props = defineProps<{ id: string }>();
 
 const { skills, isLoading, errorMessage } = useSkills();
 const { monsters } = useMonsterList();
 
-// id に一致するスキルを探す。無ければ null。
+/** id に一致するスキルを探す。無ければ null。 */
 const skill = computed(() => skills.value?.find((candidate) => candidate.id === props.id) ?? null);
 
-// 検索エンジン向けの説明文。構成は先頭5件だけ抜き出して並べる。
+/** 検索エンジン向けの説明文。構成は先頭5件だけ抜き出して並べる。 */
 const seoDescription = computed(() => {
   const target = skill.value;
   if (!target) return null;

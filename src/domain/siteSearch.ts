@@ -33,7 +33,7 @@ export interface SiteSearchReadings {
   labels: Record<string, string>;
 }
 
-// 1件がキーワードに一致するか。表示名そのものか、対応する読みがなのどちらかに含まれれば一致。
+/** 1件がキーワードに一致するか。表示名そのものか、対応する読みがなのどちらかに含まれれば一致。 */
 function matches(
   kind: SiteSearchKind,
   id: string,

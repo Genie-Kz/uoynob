@@ -9,14 +9,14 @@ const props = defineProps<{
   size: BodySize;
 }>();
 
-// 文字バッジで表すサイズのラベル（スタンダード=S、スモール=s）。画像表示するサイズは null。
+/** 文字バッジで表すサイズのラベル（スタンダード=S、スモール=s）。画像表示するサイズは null。 */
 const bodySizeLabel = computed(() => {
   if (props.size === 'スタンダードボディ') return 'S';
   if (props.size === 'スモールボディ') return 's';
   return null;
 });
 
-// 文字バッジの配色クラス。スタンダードとスモールで色を変える。
+/** 文字バッジの配色クラス。スタンダードとスモールで色を変える。 */
 const bodySizeBadgeClass = computed(() => {
   if (props.size === 'スタンダードボディ') {
     return 'body-size-badge-standard';
@@ -27,7 +27,7 @@ const bodySizeBadgeClass = computed(() => {
   return '';
 });
 
-// 画像で表すサイズ（メガ・ギガ・超ギガ）のアイコン画像。無ければ null。
+/** 画像で表すサイズ（メガ・ギガ・超ギガ）のアイコン画像。無ければ null。 */
 const bodySizeImage = computed(() => BODY_SIZE_ICON[props.size] ?? null);
 </script>
 

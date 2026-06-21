@@ -8,15 +8,17 @@ import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import { DEFAULT_DESCRIPTION, usePageSeo } from '@/composables/usePageSeo';
 
 const route = useRoute();
-// ホームかどうか。ホームではサイドナビを出さず、レイアウトを中央寄せに変える。
-// main.ts で router.isReady() を待ってからマウントするため、最初の描画から
-// route.name は確定しており、path を併用する必要はない。
+/**
+ * ホームかどうか。ホームではサイドナビを出さず、レイアウトを中央寄せに変える。
+ * main.ts で router.isReady() を待ってからマウントするため、最初の描画から
+ * route.name は確定しており、path を併用する必要はない。
+ */
 const isHome = computed(() => route.name === 'home');
-// 余白を広めにとる通常ページか。ホームとビルド画面は独自レイアウトなので対象外。
+/** 余白を広めにとる通常ページか。ホームとビルド画面は独自レイアウトなので対象外。 */
 const useComfortableContent = computed(
   () => route.name !== 'home' && route.name !== 'simulator-build',
 );
-// ルートの meta からページタイトル・説明を取り出す（無ければ既定値）。
+/** ルートの meta からページタイトル・説明を取り出す（無ければ既定値）。 */
 const pageTitle = computed(() => (typeof route.meta.title === 'string' ? route.meta.title : null));
 const pageDescription = computed(() =>
   typeof route.meta.description === 'string' ? route.meta.description : DEFAULT_DESCRIPTION,

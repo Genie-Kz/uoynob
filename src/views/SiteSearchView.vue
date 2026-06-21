@@ -33,11 +33,11 @@ const {
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
-// 検索キーワード（URL の ?q）。実際の検索対象になる確定値。
+/** 検索キーワード（URL の ?q）。実際の検索対象になる確定値。 */
 const keyword = computed(() => (typeof route.query.q === 'string' ? route.query.q.trim() : ''));
-// 入力欄の値。送信するまでは URL に反映しない。
+/** 入力欄の値。送信するまでは URL に反映しない。 */
 const inputKeyword = ref(keyword.value);
-// 4種のデータのどれかが読み込み中なら、全体として読み込み中とみなす。
+/** 4種のデータのどれかが読み込み中なら、全体として読み込み中とみなす。 */
 const isLoading = computed(
   () =>
     monstersLoading.value ||
@@ -46,7 +46,7 @@ const isLoading = computed(
     attributesLoading.value ||
     searchReadingsLoading.value,
 );
-// いずれかの読み込みでエラーがあれば、最初のエラーを表示する。
+/** いずれかの読み込みでエラーがあれば、最初のエラーを表示する。 */
 const errorMessage = computed(
   () =>
     monstersError.value ??
@@ -55,7 +55,7 @@ const errorMessage = computed(
     attributesError.value ??
     searchReadingsError.value,
 );
-// 全データを横断してキーワード検索した結果。
+/** 全データを横断してキーワード検索した結果。 */
 const results = computed(() =>
   searchSite(
     {

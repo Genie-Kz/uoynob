@@ -28,18 +28,18 @@ const props = defineProps<{
   hiddenColumns?: Array<'rank' | 'lineage' | 'bodySize'>;
 }>();
 
-// --- 絞り込みの入力値 ---
+/** --- 絞り込みの入力値 --- */
 const keyword = ref(''); // 名前キーワード
 const selectedLineage = ref(''); // 系統
 const selectedRank = ref(''); // ランク
 const selectedBodySize = ref(''); // サイズ
-// --- 追従フィルタ（スクロール連動）用の状態 ---
+/** --- 追従フィルタ（スクロール連動）用の状態 --- */
 const filterPanelRef = ref<HTMLElement | null>(null); // 通常のフィルタ枠への参照（画面外判定に使う）
 const stickyFiltersExpanded = ref(false); // 追従フィルタを展開しているか
 const isScrolledPastFilters = ref(false); // 通常フィルタを過ぎてスクロールしたか
 let scrollFrame = 0; // requestAnimationFrame の多重実行を防ぐためのフレームID
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
-// 系統セレクトの選択肢（先頭は「全系統」、各系統はアイコン付き）。
+/** 系統セレクトの選択肢（先頭は「全系統」、各系統はアイコン付き）。 */
 const lineageOptions = [
   { value: '', label: '全系統' },
   ...Object.entries(LINEAGE_BY_NAME).map(([value, info]) => ({
@@ -48,12 +48,12 @@ const lineageOptions = [
     icon: LINEAGE_ICON[value],
   })),
 ];
-// ランクセレクトの選択肢（先頭は「全ランク」）。
+/** ランクセレクトの選択肢（先頭は「全ランク」）。 */
 const rankOptions = [
   { value: '', label: '全ランク' },
   ...MONSTER_RANKS.map((rank) => ({ value: rank, label: rank })),
 ];
-// サイズセレクトの選択肢（先頭は「全サイズ」）。
+/** サイズセレクトの選択肢（先頭は「全サイズ」）。 */
 const bodySizeOptions = [
   { value: '', label: '全サイズ' },
   ...BODY_SIZES.map((size) => ({ value: size, label: size })),
@@ -72,10 +72,10 @@ function selectedLabel(
   return options.find((option) => option.value === value)?.label ?? '';
 }
 
-// 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する
+/** 既定で全件を No.（位階）昇順、同位階は連番昇順で表示する */
 const sortedMonsters = computed(() => sortMonstersByDexOrder(props.monsters));
 
-// 並べ替え済みの一覧に、現在の絞り込み条件を適用した表示対象。
+/** 並べ替え済みの一覧に、現在の絞り込み条件を適用した表示対象。 */
 const visibleMonsters = computed(() =>
   filterMonstersByControls(
     sortedMonsters.value,
@@ -89,12 +89,12 @@ const visibleMonsters = computed(() =>
   ),
 );
 
-// ランク・系統・サイズ別ページでは、対応するフィルタと表の列を隠す（条件が固定されているため）。
+/** ランク・系統・サイズ別ページでは、対応するフィルタと表の列を隠す（条件が固定されているため）。 */
 const showsRank = computed(() => !props.hiddenColumns?.includes('rank'));
 const showsLineage = computed(() => !props.hiddenColumns?.includes('lineage'));
 const showsBodySize = computed(() => !props.hiddenColumns?.includes('bodySize'));
 
-// 固定パネル（モバイル）のグリッド列数は、表示中のフィルタ数に合わせて詰める。
+/** 固定パネル（モバイル）のグリッド列数は、表示中のフィルタ数に合わせて詰める。 */
 const visibleFilterCount = computed(
   () => [showsLineage.value, showsRank.value, showsBodySize.value].filter(Boolean).length,
 );
@@ -104,7 +104,7 @@ const stickyFilterGridClass = computed(() => {
   if (visibleFilterCount.value === 2) return 'grid-cols-2';
   return 'grid-cols-1';
 });
-// スクリーンリーダー向けの表キャプション。表示中の列名を並べて作る。
+/** スクリーンリーダー向けの表キャプション。表示中の列名を並べて作る。 */
 const tableCaption = computed(() => {
   const columns = ['No.', '名前'];
   if (showsRank.value) columns.push('ランク');
@@ -113,7 +113,7 @@ const tableCaption = computed(() => {
   return `モンスター一覧（${columns.join('・')}）`;
 });
 
-// 現在有効な絞り込み条件をラベルの配列にする（追従フィルタの要約表示に使う）。
+/** 現在有効な絞り込み条件をラベルの配列にする（追従フィルタの要約表示に使う）。 */
 const activeFilterLabels = computed(() => {
   const labels: string[] = [];
   if (selectedLineage.value) labels.push(selectedLabel(lineageOptions, selectedLineage.value));
@@ -123,7 +123,7 @@ const activeFilterLabels = computed(() => {
   return labels;
 });
 
-// 絞り込み要約を1行のテキストにまとめたもの。
+/** 絞り込み要約を1行のテキストにまとめたもの。 */
 const filterSummary = computed(() => activeFilterLabels.value.join(' / '));
 
 /** すべての絞り込み条件を初期化する。 */

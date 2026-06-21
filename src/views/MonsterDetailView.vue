@@ -26,7 +26,7 @@ const { monsters, isLoading, errorMessage } = useMonsters();
 const { skills } = useSkills();
 const { traitRoute } = useTraitLink();
 
-// id に一致するモンスター。無ければ null（見つからない表示）。
+/** id に一致するモンスター。無ければ null（見つからない表示）。 */
 const monster = computed(
   () => monsters.value?.find((candidate) => candidate.id === props.id) ?? null,
 );
@@ -35,21 +35,21 @@ const breadcrumbItems = computed(() => [
   { label: 'モンスター', to: { name: 'monster-list' } },
   { label: monster.value?.名前 ?? '詳細' },
 ]);
-// 系統情報（ラベル・色）。
+/** 系統情報（ラベル・色）。 */
 const lineage = computed(() => (monster.value ? lineageInfoOf(monster.value.系統) : null));
-// 既定構成（本来のサイズ・初期特性）での最終耐性を、グリッド表示用セルに変換する。
+/** 既定構成（本来のサイズ・初期特性）での最終耐性を、グリッド表示用セルに変換する。 */
 const resistanceCells = computed(() =>
   monster.value
     ? buildResistanceCells(computeBuildResistances(defaultBuildConfiguration(monster.value)))
     : [],
 );
-// 装備できる武器の一覧。
+/** 装備できる武器の一覧。 */
 const equippableWeapons = computed(() => (monster.value ? equippableWeaponsOf(monster.value) : []));
-// このモンスターが覚えられるスキルの一覧。
+/** このモンスターが覚えられるスキルの一覧。 */
 const learnableSkills = computed(() =>
   monster.value && skills.value ? skillsForMonster(skills.value, monster.value) : [],
 );
-// 構成によって付く「不利な特性」。本来のサイズの初期特性からデメリット指数を求めて導く。
+/** 構成によって付く「不利な特性」。本来のサイズの初期特性からデメリット指数を求めて導く。 */
 const unfavorableTraits = computed(() => {
   const target = monster.value;
   if (!target) return [];
@@ -79,7 +79,7 @@ interface TraitItem {
   name: string;
 }
 
-// 表示用の特性一覧を、解放タイミング順（サイズ→新生前→Lv25/50/100→メガ→ギガ→超ギガ）に組み立てる。
+/** 表示用の特性一覧を、解放タイミング順（サイズ→新生前→Lv25/50/100→メガ→ギガ→超ギガ）に組み立てる。 */
 const traitItems = computed<TraitItem[]>(() => {
   const target = monster.value;
   if (!target) return [];
@@ -102,7 +102,7 @@ const traitItems = computed<TraitItem[]>(() => {
   return items;
 });
 
-// ステータステーブル表示用の行データ（ラベルと値の組）。
+/** ステータステーブル表示用の行データ（ラベルと値の組）。 */
 const statRows = computed(() => {
   const target = monster.value;
   if (!target) return [];

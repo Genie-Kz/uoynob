@@ -9,25 +9,25 @@ import MonsterRefTags from '@/shared/ui/MonsterRefTags.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
-// URL の :id を受け取る。
+/** URL の :id を受け取る。 */
 const props = defineProps<{ id: string }>();
 
 const { attributes, isLoading, errorMessage } = useAttributes();
 const { monsters } = useMonsterList();
 
-// id に一致する特性を探す。無ければ null。
+/** id に一致する特性を探す。無ければ null。 */
 const attribute = computed(
   () => attributes.value?.find((candidate) => candidate.id === props.id) ?? null,
 );
 
-// SP 説明を表示すべきか。SP 特性が無い旨のプレースホルダ文言なら表示しない。
+/** SP 説明を表示すべきか。SP 特性が無い旨のプレースホルダ文言なら表示しない。 */
 const hasSpDescription = computed(
   () =>
     !!attribute.value?.descriptionSp &&
     !attribute.value.descriptionSp.includes('ＳＰ特性は　ありません'),
 );
 
-// 検索エンジン向けの説明文を組み立てる。
+/** 検索エンジン向けの説明文を組み立てる。 */
 const seoDescription = computed(() => {
   const target = attribute.value;
   if (!target) return null;

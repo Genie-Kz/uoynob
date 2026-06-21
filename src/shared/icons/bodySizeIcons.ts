@@ -5,7 +5,7 @@ import iconMega from '@/assets/images/icons/size/icon-m.jpg';
 import iconGiga from '@/assets/images/icons/size/icon-g.png';
 import iconSuperGiga from '@/assets/images/icons/size/icon-sg.png';
 
-// サイズ → アイコン画像URL。画像を持たないサイズは未登録（Partial）。
+/** サイズ → アイコン画像URL。画像を持たないサイズは未登録（Partial）。 */
 export const BODY_SIZE_ICON: Partial<Record<BodySize, string>> = {
   メガボディ: iconMega,
   ギガボディ: iconGiga,

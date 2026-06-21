@@ -26,7 +26,7 @@ function queryString(key: string): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-// クエリ（ランク/系統/サイズ/名前）で絞り込んだ結果と、その見出しタイトル。
+/** クエリ（ランク/系統/サイズ/名前）で絞り込んだ結果と、その見出しタイトル。 */
 const result = computed(() =>
   filterMonsterList(monsters.value ?? [], {
     rankSlug: queryString('rank'),
@@ -36,7 +36,7 @@ const result = computed(() =>
   }),
 );
 
-// 表で隠す列。そのページの絞り込み条件と同じ列（例: ランク別ページのランク列）は冗長なので隠す。
+/** 表で隠す列。そのページの絞り込み条件と同じ列（例: ランク別ページのランク列）は冗長なので隠す。 */
 const hiddenColumns = computed(() => {
   const columns: Array<'rank' | 'lineage' | 'bodySize'> = [];
   const rankSlug = queryString('rank')?.toUpperCase();

@@ -30,8 +30,10 @@ const emit = defineEmits<{
   setIv: [stat: StatKey, value: number];
 }>();
 
-/** 家系図の段（仕様の重み順 index に対応）。grid-cols-8 上での桁数で配置を揃える。 */
-// 曽祖父母 index 6..13（各1桁）、祖父母 index 2..5（各2桁）、両親 index 0..1（各4桁）
+/**
+ * 家系図の段（仕様の重み順 index に対応）。grid-cols-8 上での桁数で配置を揃える。
+ * 曽祖父母 index 6..13（各1桁）、祖父母 index 2..5（各2桁）、両親 index 0..1（各4桁）。
+ */
 const GREAT_GRANDPARENTS = [6, 7, 8, 9, 10, 11, 12, 13];
 const GRANDPARENTS = [2, 3, 4, 5];
 const PARENTS = [0, 1];

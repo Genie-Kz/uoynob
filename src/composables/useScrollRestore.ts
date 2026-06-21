@@ -15,12 +15,12 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { previousRouteName } from '@/router';
 
-// ルート（fullPath）ごとのスクロール位置。ページ遷移をまたいで保持する。
+/** ルート（fullPath）ごとのスクロール位置。ページ遷移をまたいで保持する。 */
 const scrollByRoute = new Map<string, number>();
 
-// 合わせた後にこのフレーム数だけ位置を保持し、描画直後のずれを打ち消す。
+/** 合わせた後にこのフレーム数だけ位置を保持し、描画直後のずれを打ち消す。 */
 const HOLD_FRAMES = 4;
-// これを過ぎても十分な高さにならなければ復元を諦める（最下部へは飛ばさない）。
+/** これを過ぎても十分な高さにならなければ復元を諦める（最下部へは飛ばさない）。 */
 const RESTORE_TIMEOUT_MS = 3000;
 
 /** 詳細ページかどうか（戻ってきたときに復元するかの判定に使う）。 */

@@ -16,19 +16,23 @@ const props = defineProps<{
   monsters: Monster[];
 }>();
 
-// 並び替え状態は親が保持する（ページ遷移をまたいで維持するため）。
-// '' は既定（図鑑＝位階順）。それ以外は各ステータス。
+/**
+ * 並び替え状態は親が保持する（ページ遷移をまたいで維持するため）。
+ * '' は既定（図鑑＝位階順）。それ以外は各ステータス。
+ */
 const sortKey = defineModel<'' | StatKey>('sortKey', { required: true });
 const sortDescending = defineModel<boolean>('sortDescending', { required: true });
 
-// 並び替えキーの選択肢（先頭は既定の No. 順、以降は各ステータス）。
+/** 並び替えキーの選択肢（先頭は既定の No. 順、以降は各ステータス）。 */
 const sortKeyOptions = [
   { value: '', label: '既定（No.順）' },
   ...STAT_KEYS.map((key) => ({ value: key, label: key })),
 ];
 
-// セレクトでキーを変えたときは、そのキーに自然な方向を既定にする
-// （ステータスは大きい順、No.順は小さい順）。トグルで反転もできる。
+/**
+ * セレクトでキーを変えたときは、そのキーに自然な方向を既定にする
+ * （ステータスは大きい順、No.順は小さい順）。トグルで反転もできる。
+ */
 const sortKeyProxy = computed<'' | StatKey>({
   get: () => sortKey.value,
   set: (value) => {

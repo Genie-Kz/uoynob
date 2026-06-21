@@ -18,27 +18,27 @@ const { skills, isLoading, errorMessage } = useSkills();
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
-// クエリのスラッグ（category）から実際のカテゴリー名へ変換する対応表。
+/** クエリのスラッグ（category）から実際のカテゴリー名へ変換する対応表。 */
 const CATEGORY_BY_SLUG: Record<string, SkillCategory> = {
   ability: '特技系',
   parameter: 'パラメータ系',
 };
 
-// クエリ ?category=... のスラッグ。未指定なら空文字。
+/** クエリ ?category=... のスラッグ。未指定なら空文字。 */
 const categorySlug = computed(() =>
   typeof route.query.category === 'string' ? route.query.category : '',
 );
-// スラッグから引いたカテゴリー名。該当が無ければ null（全件）。
+/** スラッグから引いたカテゴリー名。該当が無ければ null（全件）。 */
 const categoryName = computed<SkillCategory | null>(
   () => CATEGORY_BY_SLUG[categorySlug.value] ?? null,
 );
 
-// 名前での絞り込みキーワード。
+/** 名前での絞り込みキーワード。 */
 const keyword = ref('');
 // 読みがな検索用のデータ。
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
-// 表示するスキル一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。
+/** 表示するスキル一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。 */
 const visibleSkills = computed(() => {
   let list = [...(skills.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   // カテゴリー指定があれば、そのカテゴリーだけに絞る
@@ -53,7 +53,7 @@ const visibleSkills = computed(() => {
   return list;
 });
 
-// 見出し。カテゴリー指定時は「○○ のスキル」、未指定なら「スキル一覧」。
+/** 見出し。カテゴリー指定時は「○○ のスキル」、未指定なら「スキル一覧」。 */
 const title = computed(() =>
   categoryName.value ? `${categoryName.value} のスキル` : 'スキル一覧',
 );

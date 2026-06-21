@@ -16,10 +16,10 @@ const props = defineProps<{
   monsterList: MonsterListItem[];
 }>();
 
-// 参照id → モンスター情報 の解決関数。アイコン（系統・no）と詳細リンク（id）に使う。
+/** 参照id → モンスター情報 の解決関数。アイコン（系統・no）と詳細リンク（id）に使う。 */
 const resolve = computed(() => createMonsterResolver(props.monsterList));
 
-// 各参照を、解決済みモンスター（あれば）とともに表示用へ展開する。
+/** 各参照を、解決済みモンスター（あれば）とともに表示用へ展開する。 */
 const items = computed(() =>
   props.monsterRefs.map((monsterRef) => ({ monsterRef, monster: resolve.value(monsterRef.id) })),
 );

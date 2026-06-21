@@ -16,17 +16,17 @@ function emptyLevels(): Record<ResistanceElement, number | null> {
   >;
 }
 
-// 耐性の閾値選択
+/** 耐性の閾値選択 */
 const selectedLevelByElement = ref<Record<ResistanceElement, number | null>>(emptyLevels());
-// 特性スロット（初期3行）。空文字は未選択。
+/** 特性スロット（初期3行）。空文字は未選択。 */
 const traitSlots = ref<string[]>(['', '', '']);
-// 本来のサイズ特性での絞り込み（空文字＝指定なし）
+/** 本来のサイズ特性での絞り込み（空文字＝指定なし） */
 const requiredOriginalBodySize = ref('');
-// 検索時のボディサイズ（変換）
+/** 検索時のボディサイズ（変換） */
 const searchBodySize = ref('');
-// 検索結果。null は未検索。
+/** 検索結果。null は未検索。 */
 const searchResults = ref<Monster[] | null>(null);
-// 並び替え（'' は既定＝No.順）と方向
+/** 並び替え（'' は既定＝No.順）と方向 */
 const sortKey = ref<'' | StatKey>('');
 const sortDescending = ref(false);
 

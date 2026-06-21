@@ -2,7 +2,7 @@
 import type { Attribute } from '@/types/attribute';
 import { normalizeNfkcCompact } from '@/shared/search/normalization';
 
-// 「SP 特性なし」を表す特性データ側の文言。これと一致するなら SP 化不可とみなす。
+/** 「SP 特性なし」を表す特性データ側の文言。これと一致するなら SP 化不可とみなす。 */
 const NO_SP_DESCRIPTION = 'この特性にSP特性はありません';
 
 /** 特性データのSP説明を基準にSP化できるか判定する。 */

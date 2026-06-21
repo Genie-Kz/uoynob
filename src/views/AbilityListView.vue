@@ -17,17 +17,17 @@ const { abilities, isLoading, errorMessage } = useAbilities();
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
-// クエリ ?cat=... のスラッグからカテゴリー名を引く。未指定なら null（全件）。
+/** クエリ ?cat=... のスラッグからカテゴリー名を引く。未指定なら null（全件）。 */
 const categoryName = computed(() =>
   typeof route.query.cat === 'string' ? (ABILITY_CATEGORY_BY_SLUG[route.query.cat] ?? null) : null,
 );
 
-// 名前での絞り込みキーワード。
+/** 名前での絞り込みキーワード。 */
 const keyword = ref('');
 // 読みがな検索用のデータ（ひらがな等での部分一致に使う）。
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
-// 表示する特技一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。
+/** 表示する特技一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。 */
 const visibleAbilities = computed(() => {
   let list = [...(abilities.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   // カテゴリー指定があれば、そのカテゴリーだけに絞る
@@ -42,9 +42,9 @@ const visibleAbilities = computed(() => {
   return list;
 });
 
-// 見出し。カテゴリー指定時は「○○ の特技」、未指定なら「特技一覧」。
+/** 見出し。カテゴリー指定時は「○○ の特技」、未指定なら「特技一覧」。 */
 const title = computed(() => (categoryName.value ? `${categoryName.value} の特技` : '特技一覧'));
-// カテゴリー列を出すか。カテゴリーで絞り込み済みのページでは冗長なので隠す。
+/** カテゴリー列を出すか。カテゴリーで絞り込み済みのページでは冗長なので隠す。 */
 const showsCategory = computed(() => categoryName.value === null);
 </script>
 

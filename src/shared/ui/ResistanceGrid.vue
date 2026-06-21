@@ -10,7 +10,7 @@ const props = defineProps<{
   title?: string;
 }>();
 
-// 3列ずつの行に分割
+/** 3列ずつの行に分割 */
 const rows = computed<ResistanceCellView[][]>(() => {
   const grouped: ResistanceCellView[][] = [];
   for (let i = 0; i < props.cells.length; i += 3) grouped.push(props.cells.slice(i, i + 3));

@@ -65,12 +65,12 @@ const thresholds = computed<ResistanceThreshold[]>(() =>
     return level === null ? [] : [{ element, minLevel: level }];
   }),
 );
-// スロットから重複・空を除いた検索対象の特性。
+/** スロットから重複・空を除いた検索対象の特性。 */
 const requiredTraits = computed(() => [
   ...new Set(traitSlots.value.map((name) => name.trim()).filter(Boolean)),
 ]);
 
-// 条件が1つでも指定されていれば検索可能。すべて空なら検索ボタンを非活性にする。
+/** 条件が1つでも指定されていれば検索可能。すべて空なら検索ボタンを非活性にする。 */
 const canSearch = computed(
   () =>
     thresholds.value.length > 0 ||

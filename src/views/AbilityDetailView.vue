@@ -7,16 +7,16 @@ import DataState from '@/shared/ui/DataState.vue';
 import PageBreadcrumb from '@/shared/ui/PageBreadcrumb.vue';
 import DetailSkeleton from '@/shared/ui/DetailSkeleton.vue';
 
-// URL の :id を受け取る。
+/** URL の :id を受け取る。 */
 const props = defineProps<{ id: string }>();
 
 const { abilities, isLoading, errorMessage } = useAbilities();
-// 読み込んだ特技一覧から、id が一致するものを探す。無ければ null（見つからない表示にする）。
+/** 読み込んだ特技一覧から、id が一致するものを探す。無ければ null（見つからない表示にする）。 */
 const ability = computed(
   () => abilities.value?.find((candidate) => candidate.id === props.id) ?? null,
 );
 
-// 検索エンジン向けの説明文を組み立てる（改行・連続空白は1つにまとめる）。
+/** 検索エンジン向けの説明文を組み立てる（改行・連続空白は1つにまとめる）。 */
 const seoDescription = computed(() => {
   const target = ability.value;
   if (!target) return null;

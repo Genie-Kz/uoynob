@@ -8,7 +8,7 @@
 import type { Monster, ResistanceValue } from '@/types/monster';
 import { computeBuildResistances, defaultBuildConfiguration } from './buildSimulator';
 
-// モンスターは読み込み後に共有される不変オブジェクトなので、結果をキャッシュする
+/** モンスターは読み込み後に共有される不変オブジェクトなので、結果をキャッシュする */
 const cache = new WeakMap<Monster, Record<string, ResistanceValue>>();
 
 /** モンスターの実効耐性（要素 → 段階値）を返す */

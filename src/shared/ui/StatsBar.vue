@@ -12,7 +12,7 @@ defineProps<{
 /** 初期状態は展開。折りたたみ可能。 */
 const expanded = ref(true);
 
-// 狭い幅でも収まるよう、ステータス名を短縮表示するための対応表。
+/** 狭い幅でも収まるよう、ステータス名を短縮表示するための対応表。 */
 const SHORT_LABEL: Record<StatKey, string> = {
   HP: 'HP',
   MP: 'MP',

@@ -5,12 +5,14 @@ import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import Skeleton from '@/shared/ui/Skeleton.vue';
 import logoUrl from '@/assets/images/icons/logo/logo.png';
 
-// ロゴ画像の読み込み状態。読み込み中はスケルトンを表示してガタつき（CLS）を防ぐ。
-// 成否を別々のフラグで持つと「成功でも失敗でもある」といった不整合な状態を作れて
-// しまうため、起こりうる状態を一つの値で表す。
-//   loading: 読み込み中（スケルトン表示）
-//   loaded : 成功（画像を表示）
-//   failed : 失敗（空の壊れた画像ではなくタイトル文字で代替）
+/**
+ * ロゴ画像の読み込み状態。読み込み中はスケルトンを表示してガタつき（CLS）を防ぐ。
+ * 成否を別々のフラグで持つと「成功でも失敗でもある」といった不整合な状態を作れて
+ * しまうため、起こりうる状態を一つの値で表す。
+ * loading: 読み込み中（スケルトン表示）
+ * loaded : 成功（画像を表示）
+ * failed : 失敗（空の壊れた画像ではなくタイトル文字で代替）
+ */
 type LogoStatus = 'loading' | 'loaded' | 'failed';
 const logoStatus = ref<LogoStatus>('loading');
 const logoEl = ref<HTMLImageElement | null>(null);

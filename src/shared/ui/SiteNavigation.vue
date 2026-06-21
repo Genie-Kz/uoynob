@@ -5,9 +5,9 @@ import { useRouter } from 'vue-router';
 import { NAV_CARDS } from '@/constants/navigation';
 
 const router = useRouter();
-// サイト内検索の入力値。
+/** サイト内検索の入力値。 */
 const searchKeyword = ref('');
-// カードID → 開いているか。各カードの開閉状態を保持する。
+/** カードID → 開いているか。各カードの開閉状態を保持する。 */
 const openCardIds = ref<Record<string, boolean>>({});
 
 /** 検索を実行する。空入力のときは何もしない。 */

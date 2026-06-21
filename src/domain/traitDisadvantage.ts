@@ -5,8 +5,10 @@
 import type { MonsterRank } from '@/types/monster';
 import { normalizeTraitCostKey } from '@/shared/search/normalization';
 
-// 特性ごとのデメリット指数の一覧（値が小さいほど不利が大きい）。
-// 名前をキーにした完全一致テーブル。パターンで決まる特性は下の関数側で扱う。
+/**
+ * 特性ごとのデメリット指数の一覧（値が小さいほど不利が大きい）。
+ * 名前をキーにした完全一致テーブル。パターンで決まる特性は下の関数側で扱う。
+ */
 const EXACT_COSTS: Record<string, number> = {
   みかわしアップ: -4,
   アンチみかわしアップ: -4,
@@ -154,7 +156,7 @@ const EXACT_COSTS: Record<string, number> = {
   ＨＰ成長力アップ小: -8,
 };
 
-// モントナー(ゆうかん)の特例判定に使う、勇敢ペアの特性名。
+/** モントナー(ゆうかん)の特例判定に使う、勇敢ペアの特性名。 */
 const MONTO_BRAVE_TRAITS = ['ゆうかん', 'さいごのきぼう'] as const;
 
 /** 特性単体のデメリット指数。個別値不明のモントナー特例はここでは0。 */
@@ -184,7 +186,7 @@ export function totalDisadvantageCost(traits: string[], monsterName = ''): numbe
   return total;
 }
 
-// ランク帯ごと・指数合計（1〜5）ごとに付与される不利な特性の対応表。
+/** ランク帯ごと・指数合計（1〜5）ごとに付与される不利な特性の対応表。 */
 const DISADVANTAGES_BY_RANK: Record<'low' | 'c' | 'mid' | 'high', Record<number, string[]>> = {
   low: {
     1: ['自動ＭＰダウン'],
@@ -216,7 +218,7 @@ const DISADVANTAGES_BY_RANK: Record<'low' | 'c' | 'mid' | 'high', Record<number,
   },
 };
 
-// モンスターのランクを、不利な特性テーブルのランク帯（low/c/mid/high）に振り分ける。
+/** モンスターのランクを、不利な特性テーブルのランク帯（low/c/mid/high）に振り分ける。 */
 function rankGroup(rank: MonsterRank): keyof typeof DISADVANTAGES_BY_RANK {
   if (rank === 'F' || rank === 'E' || rank === 'D') return 'low';
   if (rank === 'C') return 'c';

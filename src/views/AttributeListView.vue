@@ -17,19 +17,19 @@ const { attributes, isLoading, errorMessage } = useAttributes();
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
-// クエリ ?cat=... のスラッグからカテゴリー名を引く。未指定なら null（全件）。
+/** クエリ ?cat=... のスラッグからカテゴリー名を引く。未指定なら null（全件）。 */
 const categoryName = computed(() =>
   typeof route.query.cat === 'string'
     ? (ATTRIBUTE_CATEGORY_BY_SLUG[route.query.cat] ?? null)
     : null,
 );
 
-// 名前での絞り込みキーワード。
+/** 名前での絞り込みキーワード。 */
 const keyword = ref('');
 // 読みがな検索用のデータ。
 const { data: searchReadings } = useAsyncData(loadSearchReadings);
 
-// 表示する特性一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。
+/** 表示する特性一覧。id 昇順に並べ、カテゴリーと名前で順に絞り込む。 */
 const visibleAttributes = computed(() => {
   let list = [...(attributes.value ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   // カテゴリー指定があれば、そのカテゴリーだけに絞る
@@ -45,7 +45,7 @@ const visibleAttributes = computed(() => {
   return list;
 });
 
-// 見出し。カテゴリー指定時は「○○ の特性」、未指定なら「特性一覧」。
+/** 見出し。カテゴリー指定時は「○○ の特性」、未指定なら「特性一覧」。 */
 const title = computed(() => (categoryName.value ? `${categoryName.value} の特性` : '特性一覧'));
 </script>
 

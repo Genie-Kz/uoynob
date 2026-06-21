@@ -20,11 +20,12 @@ const props = defineProps<{
   ariaLabel?: string;
 }>();
 
-// ネイティブ <select> は <option> に画像を入れられないため、listbox パターンで自作する
+/** ネイティブ <select> は <option> に画像を入れられないため、listbox パターンで自作する */
 const modelValue = defineModel<T>({ required: true });
 
 const baseId = useId();
 const listboxId = `${baseId}-listbox`;
+/** 指定インデックスの選択肢要素のid（aria-activedescendant 用）を返す。 */
 const optionId = (index: number): string => `${baseId}-option-${index}`;
 
 const open = ref(false);
