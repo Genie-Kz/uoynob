@@ -10,7 +10,7 @@ const searchKeyword = ref('');
 // カードID → 開いているか。各カードの開閉状態を保持する。
 const openCardIds = ref<Record<string, boolean>>({});
 
-// 検索を実行する。空入力のときは何もしない。
+/** 検索を実行する。空入力のときは何もしない。 */
 function submitSearch(): void {
   const keyword = searchKeyword.value.trim();
   // 空白だけ／未入力なら遷移しない
@@ -18,7 +18,7 @@ function submitSearch(): void {
   void router.push({ name: 'site-search', query: { q: keyword } });
 }
 
-// 指定カードの開閉を反転する。
+/** 指定カードの開閉を反転する。 */
 function toggleCard(cardId: string): void {
   openCardIds.value[cardId] = !openCardIds.value[cardId];
 }

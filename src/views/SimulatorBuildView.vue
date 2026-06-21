@@ -174,6 +174,7 @@ const picker = ref<{
   current: '',
 });
 
+/** ボディサイズ選択モーダルを開く。 */
 function openBodySizePicker(): void {
   picker.value = {
     open: true,
@@ -184,6 +185,7 @@ function openBodySizePicker(): void {
     current: bodySize.value,
   };
 }
+/** 指定スロットの特性選択モーダルを開く。 */
 function openTraitPicker(index: number): void {
   picker.value = {
     open: true,
@@ -194,6 +196,7 @@ function openTraitPicker(index: number): void {
     current: traitSlots.value[index] ?? '',
   };
 }
+/** 指定スロットのスキル選択モーダルを開く。 */
 function openSkillPicker(index: number): void {
   picker.value = {
     open: true,
@@ -204,6 +207,7 @@ function openSkillPicker(index: number): void {
     current: skillSlots.value[index]?.id ?? '',
   };
 }
+/** 指定スロットの武器鍛冶選択モーダルを開く。 */
 function openForgePicker(index: number): void {
   picker.value = {
     open: true,
@@ -214,6 +218,7 @@ function openForgePicker(index: number): void {
     current: forgeSlots.value[index] ?? '',
   };
 }
+/** 武器選択モーダルを開く（装備可能な武器のみ）。 */
 function openWeaponPicker(): void {
   picker.value = {
     open: true,
@@ -225,6 +230,7 @@ function openWeaponPicker(): void {
   };
 }
 
+/** モーダルでの選択結果を、現在のモードに応じた更新処理へ振り分ける。 */
 function handlePick(value: string): void {
   const { mode, index } = picker.value;
   if (mode === 'size') changeBodySize(value as BodySize);
@@ -236,6 +242,7 @@ function handlePick(value: string): void {
   picker.value.open = false;
 }
 
+/** 親レベル合計の入力を 0〜200 にクランプして反映する。 */
 function onParentLevelInput(event: Event): void {
   const raw = Number((event.target as HTMLInputElement).value);
   setParentLevelTotal(Math.max(0, Math.min(200, Number.isFinite(raw) ? raw : 0)));

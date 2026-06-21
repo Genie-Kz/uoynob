@@ -69,7 +69,7 @@ const results = computed(() =>
   ),
 );
 
-// 検索ヒット1件から、その詳細ページへのルートを求める。
+/** 検索ヒット1件から、その詳細ページへのルートを求める。 */
 function routeFor(hit: SiteSearchHit): RouteLocationRaw {
   return routeForSiteSearchHit(hit);
 }
@@ -79,7 +79,7 @@ watch(keyword, (value) => {
   inputKeyword.value = value;
 });
 
-// 入力欄の値で再検索する。空入力なら何もしない。
+/** 入力欄の値で再検索する。空入力なら何もしない。 */
 function submitSearch(): void {
   const query = inputKeyword.value.trim();
   if (!query) return;

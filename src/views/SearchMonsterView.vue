@@ -78,6 +78,7 @@ const canSearch = computed(
     requiredOriginalBodySize.value !== '',
 );
 
+/** 耐性しきい値レベルに対応する表示ラベルを返す。 */
 function thresholdLabel(level: number | null): string {
   return thresholdSelectOptions.find((option) => option.value === level)?.label ?? '';
 }
@@ -95,6 +96,7 @@ const traitSummary = computed(() => {
   return parts.length ? parts.join(' / ') : '未設定';
 });
 
+/** 現在の条件で検索を実行する（空条件なら結果は空）。 */
 function runSearch(): void {
   const criteria = {
     thresholds: thresholds.value,
@@ -109,19 +111,24 @@ function runSearch(): void {
   traitModalOpen.value = false;
 }
 
+/** 耐性のしきい値条件をすべて解除する。 */
 function clearResistance(): void {
   resetResistance();
 }
+/** 特性スロットと本来のサイズ特性条件を初期化する。 */
 function clearTraits(): void {
   traitSlots.value = ['', '', ''];
   requiredOriginalBodySize.value = '';
 }
+/** 特性スロットを1つ追加する。 */
 function addTraitSlot(): void {
   traitSlots.value.push('');
 }
+/** 指定スロットの特性選択モーダルを開く。 */
 function openTraitPicker(index: number): void {
   traitPicker.value = { open: true, index };
 }
+/** モーダルで選んだ特性を対象スロットへ反映し、閉じる。 */
 function handleTraitPick(value: string): void {
   traitSlots.value[traitPicker.value.index] = value;
   traitPicker.value.open = false;

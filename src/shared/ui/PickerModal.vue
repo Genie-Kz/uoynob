@@ -42,12 +42,14 @@ const panelEl = ref<HTMLElement | null>(null);
 const lockedHeight = ref<number | null>(null);
 let lockHeightFrame: number | null = null;
 
+/** 予約済みの高さ計測（requestAnimationFrame）をキャンセルする。 */
 function cancelHeightMeasurement(): void {
   if (lockHeightFrame === null) return;
   cancelAnimationFrame(lockHeightFrame);
   lockHeightFrame = null;
 }
 
+/** 次フレームでパネルの高さを計測し、固定高さとして記録する。 */
 function measureLockedHeight(): void {
   // 開閉を素早く繰り返した場合は、古い計測予約が後から高さを書き戻さないようにする。
   cancelHeightMeasurement();
@@ -85,10 +87,12 @@ const filteredItems = computed(() => {
   );
 });
 
+/** 候補を反転表示の選択状態にする（確定はしない）。 */
 function selectItem(value: string): void {
   selectedValue.value = value;
 }
 
+/** 選択中の値を確定し、親へ select イベントで通知する。 */
 function confirm(): void {
   if (selectedValue.value === null) return;
   emit('select', selectedValue.value);

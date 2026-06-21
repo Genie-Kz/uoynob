@@ -22,7 +22,7 @@ const SHORT_LABEL: Record<StatKey, string> = {
   賢さ: '賢さ',
 };
 
-// 表示用の値を返す。stats が無ければ「-」にする。
+/** 表示用の値を返す。stats が無ければ「-」にする。 */
 function display(stats: StatValues | null, key: StatKey): string {
   return stats ? String(stats[key]) : '-';
 }

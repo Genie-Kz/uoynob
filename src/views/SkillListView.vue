@@ -58,8 +58,10 @@ const title = computed(() =>
   categoryName.value ? `${categoryName.value} のスキル` : 'スキル一覧',
 );
 
-// スキルが持つ耐性アップ効果を、表示用のバッジ（属性名＋段階）に変換する。
-// summarizeGuardEffects の回数は「+2段階／回」なので step は ×2 する。
+/**
+ * スキルが持つ耐性アップ効果を、表示用のバッジ（属性名＋段階）に変換する。
+ * summarizeGuardEffects の回数は「+2段階／回」なので step は ×2 する。
+ */
 function guardBadges(skill: Skill): { element: string; step: number }[] {
   return [...summarizeGuardEffects(skill)].map(([element, count]) => ({
     element,

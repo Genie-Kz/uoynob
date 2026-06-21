@@ -20,7 +20,7 @@ const { monsters, isLoading, errorMessage } = useMonsterList();
 // 詳細から戻ったときにスクロール位置を復元する。
 const { restoring } = useScrollRestore();
 
-// クエリ文字列を安全に取り出す。配列など文字列でない場合は undefined にする。
+/** クエリ文字列を安全に取り出す。配列など文字列でない場合は undefined にする。 */
 function queryString(key: string): string | undefined {
   const value = route.query[key];
   return typeof value === 'string' ? value : undefined;

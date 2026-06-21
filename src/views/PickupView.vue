@@ -45,7 +45,7 @@ const skillGroupViews = computed(() =>
   createPickupSkillGroupViews(props.pickupKey, skillGroups.value, monsters.value ?? []),
 );
 
-// 特集の総件数。グループ分け型は全グループの合計、それ以外は items の件数。
+/** 特集の総件数。グループ分け型は全グループの合計、それ以外は items の件数。 */
 function totalCount(): number {
   const target = entry.value;
   if (!target) return 0;
@@ -67,22 +67,22 @@ const monsterById = computed(
   () => new Map((monsters.value ?? []).map((monster) => [monster.id, monster])),
 );
 
-// 特集の参照から、対応するモンスター（無ければ null）を返す。
+/** 特集の参照から、対応するモンスター（無ければ null）を返す。 */
 function monsterOf(ref: PickupRef): MonsterListItem | null {
   return pickupMonsterByRef(ref, resolveMonsterId.value, monsterById.value);
 }
 
-// 特集の参照から、モンスター詳細へのルートを返す。
+/** 特集の参照から、モンスター詳細へのルートを返す。 */
 function monsterRoute(ref: PickupRef) {
   return pickupMonsterRoute(ref, resolveMonsterId.value);
 }
 
-// グループ見出しの要素ID（ページ内ジャンプの対象）。
+/** グループ見出しの要素ID（ページ内ジャンプの対象）。 */
 function groupId(index: number): string {
   return `pickup-group-${index}`;
 }
 
-// 指定グループの見出しまでスムーズスクロールする（目次クリック時）。
+/** 指定グループの見出しまでスムーズスクロールする（目次クリック時）。 */
 function scrollToGroup(index: number): void {
   document.getElementById(groupId(index))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

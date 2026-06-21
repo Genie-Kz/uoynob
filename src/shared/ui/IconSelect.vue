@@ -61,6 +61,7 @@ function nearestClipRect(el: HTMLElement): DOMRect | null {
   return null;
 }
 
+/** 候補リストを開く。下の余白が足りなければ上向きに開く。 */
 function openList(): void {
   if (open.value) return;
   // トリガーの位置と、実際にクリップされる境界から、下に開くか上に開くかを決める。
@@ -81,23 +82,27 @@ function openList(): void {
   activeIndex.value = selectedIndex.value >= 0 ? selectedIndex.value : 0;
 }
 
+/** 候補リストを閉じる。refocus が true ならトリガーへフォーカスを戻す。 */
 function closeList(refocus = true): void {
   if (!open.value) return;
   open.value = false;
   if (refocus) triggerRef.value?.focus();
 }
 
+/** 値を選択して確定し、リストを閉じる。 */
 function choose(value: T): void {
   modelValue.value = value;
   closeList();
 }
 
+/** ハイライト位置を delta だけ移動する（範囲内にクランプ）。 */
 function moveActive(delta: number): void {
   const count = props.options.length;
   if (count === 0) return;
   activeIndex.value = Math.min(count - 1, Math.max(0, activeIndex.value + delta));
 }
 
+/** キーボード操作（矢印・Home/End・Enter/Space）でリストを操作する。 */
 function onKeydown(event: KeyboardEvent): void {
   switch (event.key) {
     case 'ArrowDown':

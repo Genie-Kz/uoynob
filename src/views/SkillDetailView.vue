@@ -32,7 +32,7 @@ const seoDescription = computed(() => {
 
 usePageSeo(() => skill.value?.name, seoDescription);
 
-// 構成項目が「耐性アップ系の特技」かどうか。バッジ表示の出し分けに使う。
+/** 構成項目が「耐性アップ系の特技」かどうか。バッジ表示の出し分けに使う。 */
 function isGuardAbility(name: string): boolean {
   return guardAbilityToElement(name) !== null;
 }

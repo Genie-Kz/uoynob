@@ -59,12 +59,12 @@ const bodySizeOptions = [
   ...BODY_SIZES.map((size) => ({ value: size, label: size })),
 ];
 
-// IconSelect の選択値を BodySize 型に変換する（BodySizeIcon に渡すため）。該当なしは null。
+/** IconSelect の選択値を BodySize 型に変換する（BodySizeIcon に渡すため）。該当なしは null。 */
 function bodySizeOptionValue(value: string | number | null): BodySize | null {
   return BODY_SIZES.find((size) => size === value) ?? null;
 }
 
-// 選択値に対応する表示ラベルを引く（絞り込み要約の表示に使う）。
+/** 選択値に対応する表示ラベルを引く（絞り込み要約の表示に使う）。 */
 function selectedLabel(
   options: Array<{ value: string | number | null; label: string }>,
   value: string,
@@ -126,7 +126,7 @@ const activeFilterLabels = computed(() => {
 // 絞り込み要約を1行のテキストにまとめたもの。
 const filterSummary = computed(() => activeFilterLabels.value.join(' / '));
 
-// すべての絞り込み条件を初期化する。
+/** すべての絞り込み条件を初期化する。 */
 function resetFilters(): void {
   selectedLineage.value = '';
   selectedRank.value = '';
@@ -134,7 +134,7 @@ function resetFilters(): void {
   keyword.value = '';
 }
 
-// 通常フィルタが画面外に出たかを判定し、追従フィルタの表示状態を更新する。
+/** 通常フィルタが画面外に出たかを判定し、追従フィルタの表示状態を更新する。 */
 function updateStickyFilterVisibility(): void {
   const panel = filterPanelRef.value;
   if (!panel) return;
@@ -144,7 +144,7 @@ function updateStickyFilterVisibility(): void {
   if (!isScrolledPastFilters.value) stickyFiltersExpanded.value = false;
 }
 
-// スクロール毎の処理を1フレームに1回へ間引く（負荷軽減のため requestAnimationFrame でまとめる）。
+/** スクロール毎の処理を1フレームに1回へ間引く（負荷軽減のため requestAnimationFrame でまとめる）。 */
 function scheduleStickyFilterUpdate(): void {
   if (scrollFrame) return;
   scrollFrame = window.requestAnimationFrame(() => {

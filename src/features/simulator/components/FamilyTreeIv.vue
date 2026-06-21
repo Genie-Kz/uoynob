@@ -49,15 +49,18 @@ const STAT_LABEL: Record<StatKey, string> = {
 const pickerOpen = ref(false);
 const pickerIndex = ref(0);
 
+/** 指定枠の系統選択モーダルを開く。 */
 function openPicker(index: number): void {
   pickerIndex.value = index;
   pickerOpen.value = true;
 }
+/** モーダルで選んだ系統を親へ通知し、モーダルを閉じる。 */
 function chooseLineage(lineage: string): void {
   emit('setLineage', pickerIndex.value, lineage);
   pickerOpen.value = false;
 }
 
+/** 指定枠の現在の系統を返す（未設定は null）。 */
 function lineageOf(index: number): string | null {
   return props.familyTree[index] ?? null;
 }
@@ -65,6 +68,7 @@ function lineageOf(index: number): string | null {
 /* ---- 系統で一括設定（押下フィードバック） ---- */
 const lastFilled = ref<string | null>(null);
 const fillFeedbackTimeout = useResettableTimeout();
+/** 家系図を1系統で一括設定し、押下フィードバックを一時表示する。 */
 function onFill(lineage: string): void {
   emit('fill', lineage);
   lastFilled.value = lineage;
@@ -74,6 +78,7 @@ function onFill(lineage: string): void {
 }
 
 /* ---- 個体値 ---- */
+/** 個体値の手入力をステータスごとの範囲にクランプして親へ通知する。 */
 function onIvInput(stat: StatKey, event: Event): void {
   const range = INDIVIDUAL_VALUE_RANGE[stat];
   const raw = Number((event.target as HTMLInputElement).value);
@@ -83,6 +88,7 @@ function onIvInput(stat: StatKey, event: Event): void {
 
 const lastIvPreset = ref<string | null>(null);
 const ivPresetFeedbackTimeout = useResettableTimeout();
+/** 個体値プリセット（最大/最小ボタン）を適用し、押下フィードバックを一時表示する。 */
 function setIvPreset(stat: StatKey, value: number): void {
   emit('setIv', stat, value);
   const presetKey = `${stat}:${value}`;
@@ -92,6 +98,7 @@ function setIvPreset(stat: StatKey, value: number): void {
   }, 800);
 }
 
+/** 直近に押した個体値プリセットボタンの強調表示クラスを返す。 */
 function ivPresetClass(stat: StatKey, value: number): string {
   return lastIvPreset.value === `${stat}:${value}`
     ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300'
@@ -111,6 +118,7 @@ const currentTemplate = computed(
     }) ?? '',
 );
 
+/** 個体値テンプレートを6種すべてに展開して親へ通知し、モーダルを閉じる。 */
 function applyIvTemplate(template: string): void {
   const values = individualValuesFromTemplate(template);
   for (const stat of STAT_KEYS) emit('setIv', stat, values[stat]);
