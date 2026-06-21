@@ -1,6 +1,7 @@
 import { INDIVIDUAL_VALUE_RANGE, STAT_KEYS } from '@/constants/statsRules';
 import type { StatKey, StatValues } from '@/types/stats';
 
+/** 個体値テンプレートのコード一覧（各文字が能力を表す。大文字=最大／小文字=最小）。 */
 export const INDIVIDUAL_VALUE_TEMPLATES = [
   'HMS',
   'HMW',

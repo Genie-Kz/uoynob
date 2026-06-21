@@ -4,6 +4,7 @@
  */
 import { onBeforeUnmount } from 'vue';
 
+/** 直近の1件だけ有効なタイマー。start で予約・clear で解除し、破棄時に自動解除する。 */
 export function useResettableTimeout() {
   let timeoutId: number | null = null;
 

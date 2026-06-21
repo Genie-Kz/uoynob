@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ピックアップ（特集）ページ。スキル/モンスター/グループ分けの特集を、種類に応じて表示する。
+/** ピックアップ（特集）ページ。スキル/モンスター/グループ分けの特集を、種類に応じて表示する。 */
 import { computed } from 'vue';
 import type { PickupRef } from '@/types/pickup';
 import type { MonsterListItem } from '@/types/monster';

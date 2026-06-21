@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// 系図（4体の親系統）と個体値（テンプレート/手入力）を編集するコンポーネント。
-// 系統の組み合わせや個体値テンプレートが、最終ステータスの計算に影響する。
+/**
+ * 系図（4体の親系統）と個体値（テンプレート/手入力）を編集するコンポーネント。
+ * 系統の組み合わせや個体値テンプレートが、最終ステータスの計算に影響する。
+ */
 import { computed, ref } from 'vue';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS, INDIVIDUAL_VALUE_RANGE } from '@/constants/statsRules';
@@ -13,13 +15,18 @@ import { useResettableTimeout } from '@/composables/useResettableTimeout';
 import PickerModal from '@/shared/ui/PickerModal.vue';
 
 const props = defineProps<{
+  /** 家系図14枠の系統（仕様の重み順。null/空は未設定）。 */
   familyTree: (string | null)[];
+  /** 現在の個体値6種。 */
   individualValues: StatValues;
 }>();
 
 const emit = defineEmits<{
+  /** 指定枠の系統を変更したことを親へ通知する。 */
   setLineage: [index: number, lineage: string | null];
+  /** 家系図を1系統で一括設定するよう親へ要求する。 */
   fill: [lineage: string];
+  /** 指定ステータスの個体値変更を親へ通知する。 */
   setIv: [stat: StatKey, value: number];
 }>();
 

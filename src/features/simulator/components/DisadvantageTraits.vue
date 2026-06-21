@@ -1,18 +1,18 @@
 <script setup lang="ts">
-// ビルドの構成によって付く「不利な特性」を一覧表示する。SP 化できる特性には SP ボタンを出す。
+/** ビルドの構成によって付く「不利な特性」を一覧表示する。SP 化できる特性には SP ボタンを出す。 */
 defineProps<{
-  // 不利な特性名の配列。
+  /** 不利な特性名の配列。 */
   traits: string[];
-  // SP 切り替えボタンを表示するか。
+  /** SP 切り替えボタンを表示するか。 */
   showSp?: boolean;
-  // 現在 SP 化されている特性名。
+  /** 現在 SP 化されている特性名。 */
   spTraits?: string[];
-  // SP 化が可能な特性名。
+  /** SP 化が可能な特性名。 */
   spAvailableTraits?: string[];
 }>();
 
 defineEmits<{
-  // SP ボタン押下時に、対象の特性名を親へ通知する。
+  /** SP ボタン押下時に、対象の特性名を親へ通知する。 */
   toggleSp: [trait: string];
 }>();
 </script>

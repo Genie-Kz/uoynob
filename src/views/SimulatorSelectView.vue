@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ビルドシミュレーターの入口。モンスター一覧から1体選ぶとビルド画面へ遷移する。
+/** ビルドシミュレーターの入口。モンスター一覧から1体選ぶとビルド画面へ遷移する。 */
 import { useMonsterList } from '@/composables/useMonsterList';
 import { useScrollRestore } from '@/composables/useScrollRestore';
 import DataState from '@/shared/ui/DataState.vue';

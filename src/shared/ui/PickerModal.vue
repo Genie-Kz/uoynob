@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// 入れ替え用の選択モーダル。候補をボタンで選び、下部の検索欄で絞り込める。
-// 開いた時点の高さを固定し、絞り込みで件数が変わってもモーダルが伸縮しないようにする。
+/**
+ * 入れ替え用の選択モーダル。候補をボタンで選び、下部の検索欄で絞り込める。
+ * 開いた時点の高さを固定し、絞り込みで件数が変わってもモーダルが伸縮しないようにする。
+ */
 import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import type { PickerItem } from '@/types/picker';
 import { includesKeywordWithReading } from '@/shared/search/textSearch';
@@ -9,8 +11,11 @@ import { useAsyncData } from '@/composables/useAsyncData';
 import { useScrollLock } from '@/composables/useScrollLock';
 
 const props = defineProps<{
+  /** モーダルを開いているか。 */
   open: boolean;
+  /** ヘッダーに表示するタイトル。 */
   title: string;
+  /** 選択候補の一覧。 */
   items: PickerItem[];
   /** 現在選択中の値（開いたときに反転表示する） */
   current?: string;

@@ -1,14 +1,14 @@
-// サイト内横断検索のドメインロジック。モンスター・特性・スキル・特技を1つの結果配列にまとめる。
+/** サイト内横断検索のドメインロジック。モンスター・特性・スキル・特技を1つの結果配列にまとめる。 */
 import type { Ability } from '@/types/ability';
 import type { Attribute } from '@/types/attribute';
 import type { MonsterListItem } from '@/types/monster';
 import type { Skill } from '@/types/skill';
 import { includesKeyword } from '@/shared/search/textSearch';
 
-// 検索ヒットの種類。
+/** 検索ヒットの種類。 */
 export type SiteSearchKind = 'monster' | 'attribute' | 'skill' | 'ability';
 
-// 検索ヒット1件。どの種類のどのページかが分かる情報を持つ。
+/** 検索ヒット1件。どの種類のどのページかが分かる情報を持つ。 */
 export interface SiteSearchHit {
   kind: SiteSearchKind;
   kindLabel: string;
@@ -16,7 +16,7 @@ export interface SiteSearchHit {
   label: string;
 }
 
-// 検索対象になる4種のデータ。
+/** 検索対象になる4種のデータ。 */
 export interface SiteSearchData {
   monsters: MonsterListItem[];
   attributes: Attribute[];
@@ -24,7 +24,7 @@ export interface SiteSearchData {
   abilities: Ability[];
 }
 
-// 読みがな検索用の対応表（種類ごとの id→読み、および汎用 labels）。
+/** 読みがな検索用の対応表（種類ごとの id→読み、および汎用 labels）。 */
 export interface SiteSearchReadings {
   monster: Record<string, string>;
   attribute: Record<string, string>;

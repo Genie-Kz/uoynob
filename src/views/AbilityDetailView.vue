@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 特技の詳細ページ。説明と、その特技を覚えられるスキル一覧を表示する。
+/** 特技の詳細ページ。説明と、その特技を覚えられるスキル一覧を表示する。 */
 import { computed } from 'vue';
 import { useAbilities } from '@/composables/useAbilities';
 import { usePageSeo } from '@/composables/usePageSeo';

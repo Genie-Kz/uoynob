@@ -1,6 +1,8 @@
-// デプロイ後に古いタブが旧ハッシュの遅延読み込みチャンクを参照した場合の復旧処理。
-// GitHub Pages では新しいビルドが配置されると古い assets/*.js が消えるため、
-// ルート遷移時の dynamic import が 404 になり、画面が止まることがある。
+/**
+ * デプロイ後に古いタブが旧ハッシュの遅延読み込みチャンクを参照した場合の復旧処理。
+ * GitHub Pages では新しいビルドが配置されると古い assets/*.js が消えるため、
+ * ルート遷移時の dynamic import が 404 になり、画面が止まることがある。
+ */
 import type { Router } from 'vue-router';
 
 const CHUNK_RELOAD_STORAGE_KEY = 'uoynob:chunk-load-reload-attempted';
@@ -34,6 +36,7 @@ function errorTextOf(error: unknown): string {
   return String(error);
 }
 
+/** エラーが遅延読み込みチャンクの取得失敗（旧チャンク404など）かどうかを判定する。 */
 export function isChunkLoadError(error: unknown): boolean {
   const text = errorTextOf(error);
   return CHUNK_LOAD_ERROR_PATTERNS.some((pattern) => text.includes(pattern));
@@ -65,6 +68,7 @@ function markReloadAttempted(storage: Storage): boolean {
   }
 }
 
+/** リロード試行フラグを消す（正常遷移後に呼び、次回デプロイでも自動復旧できるようにする）。 */
 export function clearChunkReloadAttempt(storage: Storage = window.sessionStorage): void {
   try {
     storage.removeItem(CHUNK_RELOAD_STORAGE_KEY);
@@ -73,6 +77,10 @@ export function clearChunkReloadAttempt(storage: Storage = window.sessionStorage
   }
 }
 
+/**
+ * チャンク読み込みエラーなら一度だけページをリロードして復旧を試みる。
+ * リロード済みフラグで無限リロードを防ぎ、復旧したかどうかを真偽値で返す。
+ */
 export function reloadOnceForChunkLoadError(
   error: unknown,
   dependencies: RecoveryDependencies = {},
@@ -93,6 +101,7 @@ export function reloadOnceForChunkLoadError(
   return true;
 }
 
+/** ルーターと window に、チャンク読み込み失敗時の自動リロード復旧を組み込む。 */
 export function installChunkLoadRecovery(router: Router): void {
   // ルートコンポーネントの dynamic import 失敗は Vue Router のエラーとして届く。
   router.onError((error) => {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
+/** 絞り込み条件を編集するモーダル。本文はスロットで差し込み、クリア／閉じる／検索を発火する。 */
 import { toRef } from 'vue';
 import { useScrollLock } from '@/composables/useScrollLock';
 
 const props = defineProps<{
+  /** モーダルを開いているか。 */
   open: boolean;
+  /** ヘッダーに表示するタイトル。 */
   title: string;
   /** 検索ボタンの活性状態。false のときは薄く非活性表示にする。 */
   canSearch: boolean;

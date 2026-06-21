@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// スキルの一覧ページ。カテゴリー絞り込み（クエリ）と名前での絞り込みに対応し、耐性アップ効果をバッジ表示する。
+/** スキルの一覧ページ。カテゴリー絞り込み（クエリ）と名前での絞り込みに対応し、耐性アップ効果をバッジ表示する。 */
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Skill, SkillCategory } from '@/types/skill';

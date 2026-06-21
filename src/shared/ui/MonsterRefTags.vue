@@ -1,16 +1,18 @@
 <script setup lang="ts">
-// スキル・特性などが参照するモンスター（{id, name}）を、アイコン付きのタグリンク列で表示する。
-// 図鑑のモンスター一覧で参照idを解決し、見つかればアイコン＋名前の詳細リンクを、
-// 見つからなければ名前だけのタグを表示する。複数の詳細ページで同じ表示を使うため共通化している。
+/**
+ * スキル・特性などが参照するモンスター（{id, name}）を、アイコン付きのタグリンク列で表示する。
+ * 図鑑のモンスター一覧で参照idを解決し、見つかればアイコン＋名前の詳細リンクを、
+ * 見つからなければ名前だけのタグを表示する。複数の詳細ページで同じ表示を使うため共通化している。
+ */
 import { computed } from 'vue';
 import type { MonsterListItem } from '@/types/monster';
 import { createMonsterResolver } from '@/domain/skillLookup';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 
 const props = defineProps<{
-  // 表示するモンスター参照（スキル/特性データ側の {id, name}）。
+  /** 表示するモンスター参照（スキル/特性データ側の {id, name}）。 */
   monsterRefs: { id: string; name: string }[];
-  // 参照idの解決とアイコン情報（系統・no）の取得に使う、図鑑の軽量モンスター一覧。
+  /** 参照idの解決とアイコン情報（系統・no）の取得に使う、図鑑の軽量モンスター一覧。 */
   monsterList: MonsterListItem[];
 }>();
 

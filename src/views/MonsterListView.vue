@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// モンスターの一覧ページ。ランク/系統/サイズ/名前（クエリ）で絞った結果を表で表示する。
+/** モンスターの一覧ページ。ランク/系統/サイズ/名前（クエリ）で絞った結果を表で表示する。 */
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMonsterList } from '@/composables/useMonsterList';

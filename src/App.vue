@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// アプリ全体のレイアウト（ヘッダー・サイドナビ・本文・フッター）を組み立てるルートコンポーネント。
+/** アプリ全体のレイアウト（ヘッダー・サイドナビ・本文・フッター）を組み立てるルートコンポーネント。 */
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppHeader from '@/shared/ui/AppHeader.vue';

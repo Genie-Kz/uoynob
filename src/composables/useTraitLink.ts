@@ -4,6 +4,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import { normalizeNfkcCompact } from '@/shared/search/normalization';
 import { useAttributes } from './useAttributes';
 
+/** 特性名から特性詳細ページへの遷移先を解決する traitRoute を返す。 */
 export function useTraitLink() {
   const { attributes } = useAttributes();
 

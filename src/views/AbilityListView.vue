@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 特技の一覧ページ。カテゴリー絞り込み（クエリ）と名前での絞り込みに対応する。
+/** 特技の一覧ページ。カテゴリー絞り込み（クエリ）と名前での絞り込みに対応する。 */
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAbilities } from '@/composables/useAbilities';

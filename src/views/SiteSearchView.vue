@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// サイト内検索の結果ページ。モンスター・特性・スキル・特技を横断検索して一覧表示する。
+/** サイト内検索の結果ページ。モンスター・特性・スキル・特技を横断検索して一覧表示する。 */
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
 import { loadAttributes, loadSearchReadings } from '@/shared/data/datasets';

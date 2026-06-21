@@ -1,6 +1,7 @@
 /** 系統・サイズ・ランクの分類に関する定数 */
 import type { BodySize, MonsterRank } from '@/types/monster';
 
+/** 系統の表示情報（スラッグ・ラベル・アイコン色）。 */
 export interface LineageInfo {
   /** URLや内部識別に使うスラッグ */
   slug: string;
@@ -27,12 +28,14 @@ export const LINEAGE_NAME_BY_SLUG: Record<string, string> = Object.fromEntries(
   Object.entries(LINEAGE_BY_NAME).map(([name, info]) => [info.slug, name]),
 );
 
+/** 未知の系統名に対するフォールバック表示情報（？？？系）。 */
 export const UNKNOWN_LINEAGE: LineageInfo = {
   slug: 'special',
   label: '？？？系',
   colorClass: 'bg-lineage-special',
 };
 
+/** 系統名から表示情報を引く。未知の系統は {@link UNKNOWN_LINEAGE} を返す。 */
 export function lineageInfoOf(lineageName: string): LineageInfo {
   return LINEAGE_BY_NAME[lineageName] ?? UNKNOWN_LINEAGE;
 }
@@ -55,6 +58,7 @@ export const BODY_SIZE_SLUG: Record<BodySize, string> = {
   超ギガボディ: 'super-giga',
 };
 
+/** スラッグ → ボディサイズ名 */
 export const BODY_SIZE_NAME_BY_SLUG: Record<string, BodySize> = Object.fromEntries(
   Object.entries(BODY_SIZE_SLUG).map(([name, slug]) => [slug, name]),
 ) as Record<string, BodySize>;

@@ -8,12 +8,14 @@ import {
   RANK_FULLWIDTH_LABEL,
 } from './monsterTaxonomy';
 
+/** サイドナビの1リンク項目。 */
 export interface NavItem {
   label: string;
   /** 遷移先。未指定の項目は「データ未提供」として無効表示する。 */
   to?: RouteLocationRaw;
 }
 
+/** サイドナビの折りたたみカード（見出し＋リンク項目群）。 */
 export interface NavCard {
   id: string;
   title: string;
@@ -38,7 +40,7 @@ const bodySizeItems: NavItem[] = BODY_SIZES.map((size) => ({
   to: { name: 'monster-list', query: { size: BODY_SIZE_SLUG[size] } },
 }));
 
-// サイドナビに並べるカード一覧。各カードは見出しと、その分類への入口リンクを持つ。
+/** サイドナビに並べるカード一覧。各カードは見出しと、その分類への入口リンクを持つ。 */
 export const NAV_CARDS: NavCard[] = [
   {
     id: 'monster',

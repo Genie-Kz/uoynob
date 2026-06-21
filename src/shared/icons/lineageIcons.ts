@@ -20,6 +20,7 @@ export const STAT_LINEAGES = [
   'ゾンビ',
 ] as const;
 
+/** 系統名 → アイコン画像URL。 */
 export const LINEAGE_ICON: Record<string, string> = {
   物質: material,
   悪魔: demon,

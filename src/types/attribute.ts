@@ -16,6 +16,7 @@ export interface AttributeSkillRef {
   name: string;
 }
 
+/** 特性1件分のデータ。 */
 export interface Attribute {
   id: string;
   name: string;

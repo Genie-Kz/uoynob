@@ -46,6 +46,7 @@ function loadCachedJson<T>(key: DatasetKey, relativePath: string): Promise<T> {
   return promise;
 }
 
+/** モンスター一覧（全フィールド）を読み込む。 */
 export function loadMonsters(): Promise<Monster[]> {
   return loadCachedJson<Monster[]>('monsters', 'data/monsters.json');
 }
@@ -55,26 +56,32 @@ export function loadMonsterList(): Promise<MonsterListItem[]> {
   return loadCachedJson<MonsterListItem[]>('monsterList', 'data/monsters-list.json');
 }
 
+/** スキル一覧を読み込む。 */
 export function loadSkills(): Promise<Skill[]> {
   return loadCachedJson<Skill[]>('skills', 'data/skills.json');
 }
 
+/** 特性一覧を読み込む。 */
 export function loadAttributes(): Promise<Attribute[]> {
   return loadCachedJson<Attribute[]>('attributes', 'data/attributes.json');
 }
 
+/** 特技一覧を読み込む。 */
 export function loadAbilities(): Promise<Ability[]> {
   return loadCachedJson<Ability[]>('abilities', 'data/abilities.json');
 }
 
+/** ピックアップ（特集ページ）のデータを読み込む。 */
 export function loadPickups(): Promise<PickupData> {
   return loadCachedJson<PickupData>('pickups', 'data/pickups.json');
 }
 
+/** 武器一覧を読み込む。 */
 export function loadWeapons(): Promise<Weapon[]> {
   return loadCachedJson<Weapon[]>('weapons', 'data/weapons.json');
 }
 
+/** サイト内検索の読みがな対応表を読み込む。 */
 export function loadSearchReadings(): Promise<SiteSearchReadings> {
   return loadCachedJson<SiteSearchReadings>('searchReadings', 'data/search-readings.json');
 }

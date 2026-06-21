@@ -1,6 +1,7 @@
 import { toValue, watchEffect, type MaybeRefOrGetter } from 'vue';
 
 const SITE_NAME = 'Re:凡庸な イルルカSP';
+/** ページ個別の説明が無いときに使うサイト共通のメタ説明文。 */
 export const DEFAULT_DESCRIPTION =
   'ドラゴンクエストモンスターズ２ イルとルカの不思議な鍵SPの攻略データベース。モンスター図鑑、耐性・特性検索、スキル、ビルドシミュレーターを収録。';
 

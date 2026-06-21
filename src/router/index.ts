@@ -134,6 +134,7 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
+/** アプリ全体のルーター（ハッシュ履歴・遅延読み込み・スクロール挙動を設定済み）。 */
 export const router = createRouter({
   history: createWebHashHistory(),
   routes,

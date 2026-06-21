@@ -1,4 +1,4 @@
-// サイト内検索に関するルーターガードと、ヒット→詳細ページ変換。
+/** サイト内検索に関するルーターガードと、ヒット→詳細ページ変換。 */
 import type { NavigationGuard, RouteLocationRaw } from 'vue-router';
 import {
   loadAbilities,
@@ -9,7 +9,7 @@ import {
 } from '@/shared/data/datasets';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
 
-// 検索ヒットの種類から、対応する詳細ページのルートを作る。
+/** 検索ヒットの種類から、対応する詳細ページのルートを作る。 */
 export function routeForSiteSearchHit(hit: SiteSearchHit): RouteLocationRaw {
   const routeName = {
     monster: 'monster-detail',

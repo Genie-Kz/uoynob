@@ -11,6 +11,7 @@ import {
 } from '@/constants/pickupGroups';
 import { skillStatBonus } from './statBonus';
 
+/** 見出し付きで分類したピックアップスキルのグループ。 */
 export interface PickupSkillGroup {
   label: string;
   items: PickupRef[];

@@ -9,6 +9,7 @@ import {
 import type { MonsterRank } from '@/types/monster';
 import { includesKeyword, includesKeywordWithReading } from '@/shared/search/textSearch';
 
+/** URLのスラッグ（ランク／系統／サイズ）と名前クエリによる一覧の絞り込み条件。 */
 export interface MonsterListFilter {
   rankSlug?: string;
   lineageSlug?: string;
@@ -16,6 +17,7 @@ export interface MonsterListFilter {
   nameQuery?: string;
 }
 
+/** 絞り込み結果（画面見出しと該当モンスター）。 */
 export interface FilteredMonsterList<T extends MonsterListItem = MonsterListItem> {
   title: string;
   monsters: T[];

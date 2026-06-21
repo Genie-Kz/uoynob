@@ -1,14 +1,14 @@
-// ピックアップ画面の表示用ロジック（ビューモデル）。データと画面表示の橋渡しをする純粋関数を集める。
+/** ピックアップ画面の表示用ロジック（ビューモデル）。データと画面表示の橋渡しをする純粋関数を集める。 */
 import type { MonsterListItem } from '@/types/monster';
 import type { PickupRef } from '@/types/pickup';
 import type { PickupSkillGroup } from '@/domain/pickupGrouping';
 
-// スキルグループに、見出し横へ出すアイコン用モンスターを付与したビュー型。
+/** スキルグループに、見出し横へ出すアイコン用モンスターを付与したビュー型。 */
 export interface PickupSkillGroupView extends PickupSkillGroup {
   iconMonster: MonsterListItem | null;
 }
 
-// ピックアップ参照（id）から、対応するモンスターを解決して返す。見つからなければ null。
+/** ピックアップ参照（id）から、対応するモンスターを解決して返す。見つからなければ null。 */
 export function pickupMonsterByRef(
   ref: PickupRef,
   resolveMonsterId: (id: string) => string | null,
@@ -18,7 +18,7 @@ export function pickupMonsterByRef(
   return resolved ? (monsterById.get(resolved) ?? null) : null;
 }
 
-// ピックアップ参照から、モンスター詳細へのルートオブジェクトを作る。解決できなければ null。
+/** ピックアップ参照から、モンスター詳細へのルートオブジェクトを作る。解決できなければ null。 */
 export function pickupMonsterRoute(
   ref: PickupRef,
   resolveMonsterId: (id: string) => string | null,
@@ -27,7 +27,7 @@ export function pickupMonsterRoute(
   return resolved ? { name: 'monster-detail', params: { id: resolved } } : null;
 }
 
-// スキルグループ一覧に、表示用のアイコンモンスターを付けて返す。
+/** スキルグループ一覧に、表示用のアイコンモンスターを付けて返す。 */
 export function createPickupSkillGroupViews(
   pickupKey: string,
   groups: PickupSkillGroup[] | null,

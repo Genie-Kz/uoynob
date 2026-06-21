@@ -29,6 +29,10 @@ function isDetailRoute(name: unknown): boolean {
   return value.endsWith('-detail') || value === 'simulator-build';
 }
 
+/**
+ * 一覧ページのスクロール位置を遷移をまたいで保存・復元する。
+ * 返り値の restoring を本文の表示制御にバインドし、復元完了までちらつきを隠す用途で使う。
+ */
 export function useScrollRestore() {
   const route = useRoute();
   // この一覧ページを表す key は、インスタンス生成時の URL で固定する。

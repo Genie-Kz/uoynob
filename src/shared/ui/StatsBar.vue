@@ -1,11 +1,13 @@
 <script setup lang="ts">
-// 画面下部に固定表示するステータスバー。ビルドシミュレーターで現在のステータスを常時確認できる。
+/** 画面下部に固定表示するステータスバー。ビルドシミュレーターで現在のステータスを常時確認できる。 */
 import { ref } from 'vue';
 import type { StatKey, StatValues } from '@/types/stats';
 import { STAT_KEYS } from '@/constants/statsRules';
 
-// stats が null のときは未計算扱いで各値を「-」にする。
-defineProps<{ stats: StatValues | null }>();
+defineProps<{
+  /** 表示するステータス。null のときは未計算扱いで各値を「-」にする。 */
+  stats: StatValues | null;
+}>();
 
 /** 初期状態は展開。折りたたみ可能。 */
 const expanded = ref(true);

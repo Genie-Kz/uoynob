@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/** モンスター検索ページ。耐性・特性・サイズの条件で全モンスターを絞り込み、結果を表示する。 */
 import { useMonsters } from '@/composables/useMonsters';
 import { useScrollRestore } from '@/composables/useScrollRestore';
 import { BODY_SIZES } from '@/constants/monsterTaxonomy';

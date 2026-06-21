@@ -1,12 +1,17 @@
 /** 非同期データ読み込みを reactive な状態として扱う汎用コンポーザブル */
 import { onScopeDispose, ref, shallowRef, type Ref, type ShallowRef } from 'vue';
 
+/** 非同期読み込みの状態（データ・ローディング・エラーメッセージ）。 */
 export interface AsyncData<T> {
   data: ShallowRef<T | null>;
   isLoading: Ref<boolean>;
   errorMessage: Ref<string | null>;
 }
 
+/**
+ * loader を呼んで結果を reactive な {@link AsyncData} として返す。
+ * スコープ破棄後に遅れて解決した結果は無視するため、画面遷移後の更新事故を防ぐ。
+ */
 export function useAsyncData<T>(loader: () => Promise<T>): AsyncData<T> {
   const data = shallowRef<T | null>(null);
   const isLoading = ref(true);

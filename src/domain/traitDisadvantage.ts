@@ -1,5 +1,7 @@
-// 「不利な特性」のドメインロジック。
-// 装備中の特性からデメリット指数を合計し、ランクに応じて付与される不利な特性を導く。
+/**
+ * 「不利な特性」のドメインロジック。
+ * 装備中の特性からデメリット指数を合計し、ランクに応じて付与される不利な特性を導く。
+ */
 import type { MonsterRank } from '@/types/monster';
 import { normalizeTraitCostKey } from '@/shared/search/normalization';
 

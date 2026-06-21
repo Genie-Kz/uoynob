@@ -1,9 +1,11 @@
 /** 文字列照合で使う正規化ユーティリティ。用途ごとに意味を分けて公開する。 */
 
+/** NFKC 正規化（全角英数記号→半角、半角カナ→全角カナ などを統一）。 */
 export function normalizeNfkc(text: string): string {
   return text.normalize('NFKC');
 }
 
+/** NFKC 正規化に加えて空白をすべて除去する（名前→id 照合などのキー用）。 */
 export function normalizeNfkcCompact(text: string): string {
   return normalizeNfkc(text).replace(/\s+/g, '');
 }

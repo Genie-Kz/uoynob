@@ -35,6 +35,7 @@ export const RESISTANCE_ELEMENTS = [
   'フール',
 ] as const;
 
+/** 耐性要素名（RESISTANCE_ELEMENTS の要素のいずれか）。 */
 export type ResistanceElement = (typeof RESISTANCE_ELEMENTS)[number];
 
 /**
@@ -106,8 +107,13 @@ export const RESISTANCE_COLOR_CLASS: Record<ResistanceValue, string> = {
   反射: 'bg-resistance-reflect',
 };
 
-/** 上昇上限：属性耐性は「回復」、それ以外は「無効」。反射は元々持つ場合のみ。 */
+/* 上昇上限：属性耐性は「回復」、それ以外は「無効」。反射は元々持つ場合のみ。 */
+
+/** 属性耐性の上昇上限レベル（「回復」）。 */
 export const ATTRIBUTE_BOOST_CAP_LEVEL = RESISTANCE_LEVEL['回復'];
+/** 非属性耐性の上昇上限レベル（「無効」）。 */
 export const NON_ATTRIBUTE_BOOST_CAP_LEVEL = RESISTANCE_LEVEL['無効'];
+/** 反射の段階レベル。 */
 export const REFLECT_LEVEL = RESISTANCE_LEVEL['反射'];
+/** 最弱（「弱点」）の段階レベル＝下限。 */
 export const WEAKEST_LEVEL = RESISTANCE_LEVEL['弱点'];

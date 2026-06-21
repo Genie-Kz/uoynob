@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// スキルの詳細ページ。スキル構成（覚える特技・特性）と、そのスキルを持つモンスターを表示する。
+/** スキルの詳細ページ。スキル構成（覚える特技・特性）と、そのスキルを持つモンスターを表示する。 */
 import { computed } from 'vue';
 import { useSkills } from '@/composables/useSkills';
 import { useMonsterList } from '@/composables/useMonsterList';

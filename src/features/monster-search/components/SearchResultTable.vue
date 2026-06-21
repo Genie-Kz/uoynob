@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// モンスター検索の結果テーブル。各ステータスでの並び替えに対応する（絞り込みフォームは持たない）。
+/** モンスター検索の結果テーブル。各ステータスでの並び替えに対応する（絞り込みフォームは持たない）。 */
 import { computed } from 'vue';
 import type { Monster } from '@/types/monster';
 import type { StatKey } from '@/types/stats';
@@ -12,6 +12,7 @@ import IconSelect from '@/shared/ui/IconSelect.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 
 const props = defineProps<{
+  /** 並び替え対象のモンスター検索結果。 */
   monsters: Monster[];
 }>();
 

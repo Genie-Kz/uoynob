@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// モンスターの詳細ページ（図鑑）。特性・耐性・ステータス・覚えるスキル・装備可能武器を表示する。
+/** モンスターの詳細ページ（図鑑）。特性・耐性・ステータス・覚えるスキル・装備可能武器を表示する。 */
 import { computed } from 'vue';
 import { useMonsters } from '@/composables/useMonsters';
 import { useSkills } from '@/composables/useSkills';

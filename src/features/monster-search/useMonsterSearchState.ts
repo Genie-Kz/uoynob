@@ -30,6 +30,7 @@ const searchResults = ref<Monster[] | null>(null);
 const sortKey = ref<'' | StatKey>('');
 const sortDescending = ref(false);
 
+/** ページ遷移をまたいで保持される検索状態（条件・結果・並び替え）と操作関数を返す。 */
 export function useMonsterSearchState() {
   return {
     selectedLevelByElement,

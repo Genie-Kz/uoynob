@@ -2,6 +2,7 @@
 import type { BodySize } from '@/types/monster';
 import type { ForgeStatUp, Monshou, StatKey, StatValues } from '@/types/stats';
 
+/** ステータス6種のキー（計算・表示の反復順）。 */
 export const STAT_KEYS: StatKey[] = ['HP', 'MP', '攻撃力', '守備力', '素早さ', '賢さ'];
 
 /** 基礎値に一律でかかる係数 */
@@ -21,7 +22,7 @@ function uniform(value: number): StatValues {
   return { HP: value, MP: value, 攻撃力: value, 守備力: value, 素早さ: value, 賢さ: value };
 }
 
-/* ---- ボディサイズ倍率 ---- */
+/** ボディサイズごとのステータス倍率。 */
 export const BODY_SIZE_MULTIPLIERS: Record<BodySize, StatValues> = {
   スモールボディ: { HP: 0.7, MP: 0.8, 攻撃力: 0.8, 守備力: 0.8, 素早さ: 0.8, 賢さ: 0.8 },
   スタンダードボディ: uniform(1),
@@ -39,7 +40,7 @@ export const BODY_SIZE_MULTIPLIERS_METAL: Record<BodySize, StatValues> = {
   超ギガボディ: { HP: 2.5, MP: 2.5, 攻撃力: 1.15, 守備力: 1, 素早さ: 1, 賢さ: 1.15 },
 };
 
-/* ---- AI行動回数倍率（全ステータス共通の値） ---- */
+/** AI行動回数特性ごとのステータス倍率（全ステータス共通の値）。 */
 export const AI_ACTION_MULTIPLIER: Record<string, number> = {
   'AI1～2回行動': 0.9,
   AI2回行動: 0.8,
@@ -64,7 +65,7 @@ export const AI_ACTION_MULTIPLIER_METAL: Record<string, number> = {
 /** メタルボディ装備時に倍率を1に固定するステータス */
 export const METAL_FIXED_STATS: StatKey[] = ['守備力', '素早さ'];
 
-/* ---- メタルボディのHP倍率 ---- */
+/** メタル系ボディ特性ごとのHP倍率。 */
 export const METAL_BODY_HP_MULTIPLIER: Record<string, number> = {
   ライトメタルボディ: 0.5,
   メタルボディ: 1 / 3,
@@ -80,13 +81,19 @@ export const METAL_TABLE_OVERRIDE_TRAITS = [
 ];
 
 /* ---- つねにアタックカンタ／マホカンタ（HPのみ。SP化で補正なし） ---- */
+/** つねにアタックカンタのHP倍率。 */
 export const ALWAYS_ATTACK_KANTA_HP_MULTIPLIER = 0.75;
+/** つねにマホカンタのHP倍率。 */
 export const ALWAYS_MAHO_KANTA_HP_MULTIPLIER = 0.875;
+/** つねにアタックカンタの特性名。 */
 export const ALWAYS_ATTACK_KANTA_TRAIT = 'つねにアタックカンタ';
+/** つねにマホカンタの特性名。 */
 export const ALWAYS_MAHO_KANTA_TRAIT = 'つねにマホカンタ';
 
 /* ---- HPバブル／MPバブル ---- */
+/** HPバブルの特性名。 */
 export const HP_BUBBLE_TRAIT = 'ＨＰバブル';
+/** MPバブルの特性名。 */
 export const MP_BUBBLE_TRAIT = 'ＭＰバブル';
 /** HPバブルが影響するステータスと倍率（通常 / SP） */
 export const HP_BUBBLE_MULTIPLIERS: Partial<StatValues> = { HP: 1.5, 攻撃力: 0.5, 素早さ: 0.5 };
@@ -123,7 +130,7 @@ export function parentLevelBonusPercent(parentLevelTotal: number): number {
   return (parentLevelTotal / 200) * 5;
 }
 
-/* ---- 武器鍛冶のステータスアップ ---- */
+/** 武器鍛冶で選べるステータスアップの選択肢一覧。 */
 export const FORGE_STAT_UP_OPTIONS: ForgeStatUp[] = [
   { label: '攻撃力+5', stat: '攻撃力', value: 5 },
   { label: '攻撃力+10', stat: '攻撃力', value: 10 },
@@ -143,7 +150,7 @@ export const FORGE_STAT_UP_OPTIONS: ForgeStatUp[] = [
   { label: '賢さ+60', stat: '賢さ', value: 60 },
 ];
 
-/* ---- 紋晶 ---- */
+/** 紋晶（装備で1つ選択）の一覧とステータス補正値。 */
 export const MONSHOU_LIST: Monshou[] = [
   { name: '赤の紋晶', HP: 0, MP: 24, 攻撃力: 30, 守備力: 0, 素早さ: 0, 賢さ: 0 },
   { name: '青の紋晶', HP: 0, MP: 24, 攻撃力: 0, 守備力: 0, 素早さ: 0, 賢さ: 60 },

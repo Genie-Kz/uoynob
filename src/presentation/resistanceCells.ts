@@ -2,6 +2,7 @@
 import type { ResistanceOutcome } from '@/domain/buildSimulator';
 import { resistanceColorForElement, resistanceDisplayForElement } from '@/domain/resistance';
 
+/** 耐性グリッドの1セル分の表示情報。 */
 export interface ResistanceCellView {
   element: string;
   /** 値の表示テキスト（普通→「-」など） */

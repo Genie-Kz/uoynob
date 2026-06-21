@@ -50,6 +50,11 @@ function zeroIndividualValues(): StatValues {
   return { HP: 0, MP: 0, 攻撃力: 0, 守備力: 0, 素早さ: 0, 賢さ: 0 };
 }
 
+/**
+ * ビルドシミュレーターの状態（特性・スキル・武器鍛冶・系図・個体値など）を管理する。
+ * 初期クエリに共有パラメータがあれば復元し、無ければモンスター既定値で初期化する。
+ * 計算済みの耐性・ステータス・共有用クエリと、各種更新関数をまとめて返す。
+ */
 export function useBuildSimulator(
   monster: Ref<Monster | null>,
   allMonsters: Ref<Monster[] | null>,

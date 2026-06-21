@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// トップページ。ロゴと一言説明、そしてサイト内メニュー（検索・各分類への入口）を表示する。
+/** トップページ。ロゴと一言説明、そしてサイト内メニュー（検索・各分類への入口）を表示する。 */
 import { onMounted, ref } from 'vue';
 import SiteNavigation from '@/shared/ui/SiteNavigation.vue';
 import Skeleton from '@/shared/ui/Skeleton.vue';

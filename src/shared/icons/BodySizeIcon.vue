@@ -1,10 +1,11 @@
 <script setup lang="ts">
-// ボディサイズを表すアイコン。スタンダード/スモールは文字バッジ、それ以外（メガ等）は画像で表示する。
+/** ボディサイズを表すアイコン。スタンダード/スモールは文字バッジ、それ以外（メガ等）は画像で表示する。 */
 import { computed } from 'vue';
 import type { BodySize } from '@/types/monster';
 import { BODY_SIZE_ICON } from '@/shared/icons/bodySizeIcons';
 
 const props = defineProps<{
+  /** 表示するボディサイズ。 */
   size: BodySize;
 }>();
 

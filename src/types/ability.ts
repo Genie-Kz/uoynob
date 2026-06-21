@@ -9,6 +9,7 @@ export interface AbilitySkillRef {
   name: string;
 }
 
+/** 特技1件分のデータ。 */
 export interface Ability {
   id: string;
   name: string;

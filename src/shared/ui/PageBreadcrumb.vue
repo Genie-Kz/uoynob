@@ -1,14 +1,17 @@
 <script setup lang="ts">
-// パンくずリスト。各画面の上部・下部に「ホーム / … / 現在地」の階層を表示する。
+/** パンくずリスト。各画面の上部・下部に「ホーム / … / 現在地」の階層を表示する。 */
 import type { RouteLocationRaw } from 'vue-router';
 
-// パンくず1項目。to があればリンク、無ければ現在地（末尾）として文字表示する。
+/** パンくず1項目。to があればリンク、無ければ現在地（末尾）として文字表示する。 */
 interface BreadcrumbItem {
   label: string;
   to?: RouteLocationRaw;
 }
 
-defineProps<{ items: BreadcrumbItem[] }>();
+defineProps<{
+  /** 先頭から現在地までの階層項目。 */
+  items: BreadcrumbItem[];
+}>();
 </script>
 
 <template>

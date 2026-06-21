@@ -1,9 +1,10 @@
 <script setup lang="ts">
-// 耐性を3列グリッドで表示するコンポーネント。図鑑とビルド結果で同じ見た目を共有する。
+/** 耐性を3列グリッドで表示するコンポーネント。図鑑とビルド結果で同じ見た目を共有する。 */
 import { computed } from 'vue';
 import type { ResistanceCellView } from '@/presentation/resistanceCells';
 
 const props = defineProps<{
+  /** 表示する耐性セルの配列（3列ずつの行に分割される）。 */
   cells: ResistanceCellView[];
   /** 表の上部に表示する見出し（グレーのヘッダーバー） */
   title?: string;

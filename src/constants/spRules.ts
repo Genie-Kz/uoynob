@@ -1,4 +1,4 @@
-// 特性を SP 化できるか（SP 特性を持つか）を判定するルール。
+/** 特性を SP 化できるか（SP 特性を持つか）を判定するルール。 */
 import type { Attribute } from '@/types/attribute';
 import { normalizeNfkcCompact } from '@/shared/search/normalization';
 

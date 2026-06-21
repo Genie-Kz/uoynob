@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// サイト内メニュー。サイト内検索フォームと、分類ごとに折りたためるリンクカード群を表示する。
+/** サイト内メニュー。サイト内検索フォームと、分類ごとに折りたためるリンクカード群を表示する。 */
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { NAV_CARDS } from '@/constants/navigation';

@@ -12,6 +12,7 @@ export interface ResistanceThreshold {
   minLevel: number;
 }
 
+/** 耐性段階のしきい値・必須特性・サイズ条件をまとめたモンスター検索条件。 */
 export interface MonsterSearchCriteria {
   thresholds: ResistanceThreshold[];
   requiredTraits: string[];

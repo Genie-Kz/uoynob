@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// モンスター一覧表。系統/ランク/サイズ/名前で絞り込み、結果を表で表示する。
-// スクロールでフィルタが画面外に出たら、上部に追従する固定フィルタ（モバイル向け）を出す。
+/**
+ * モンスター一覧表。系統/ランク/サイズ/名前で絞り込み、結果を表で表示する。
+ * スクロールでフィルタが画面外に出たら、上部に追従する固定フィルタ（モバイル向け）を出す。
+ */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { BodySize, MonsterListItem } from '@/types/monster';
 import {
@@ -18,9 +20,11 @@ import IconSelect from '@/shared/ui/IconSelect.vue';
 import MonsterIcon from '@/shared/icons/MonsterIcon.vue';
 
 const props = defineProps<{
+  /** 表示対象のモンスター一覧。 */
   monsters: MonsterListItem[];
   /** 行クリックの遷移先（モンスター詳細 or シミュレーター） */
   linkRouteName: 'monster-detail' | 'simulator-build';
+  /** 非表示にする列（ランク/系統/サイズ）。 */
   hiddenColumns?: Array<'rank' | 'lineage' | 'bodySize'>;
 }>();
 

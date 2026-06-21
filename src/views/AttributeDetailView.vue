@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 特性の詳細ページ。効果説明（通常／SP）と、その特性を持つモンスター・スキルを表示する。
+/** 特性の詳細ページ。効果説明（通常／SP）と、その特性を持つモンスター・スキルを表示する。 */
 import { computed } from 'vue';
 import { useAttributes } from '@/composables/useAttributes';
 import { useMonsterList } from '@/composables/useMonsterList';

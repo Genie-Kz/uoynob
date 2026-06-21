@@ -1,6 +1,7 @@
 /** ダーク／ライトモードの管理（localStorage に保持） */
 import { ref } from 'vue';
 
+/** 表示テーマ（ライト／ダーク）。 */
 export type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'theme';
@@ -28,6 +29,7 @@ export function initTheme(): void {
   applyTheme(theme.value);
 }
 
+/** 現在のテーマ（theme）と、設定・トグルする関数を返す。 */
 export function useTheme() {
   function setTheme(value: Theme): void {
     theme.value = value;

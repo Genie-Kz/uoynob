@@ -14,6 +14,7 @@ const STAT_BY_PREFIX: Record<string, StatKey> = {
   かしこさ: '賢さ',
 };
 
+/** すべて0で初期化したステータス6種の組を返す。 */
 export function zeroStats(): StatValues {
   return { HP: 0, MP: 0, 攻撃力: 0, 守備力: 0, 素早さ: 0, 賢さ: 0 };
 }
@@ -52,6 +53,7 @@ export function skillsGrantTrait(skills: Skill[], traitName: string): boolean {
   return skills.some((skill) => skill.composition.some((item) => item.name === traitName));
 }
 
+/** ステータス6種を要素ごとに加算した新しい組を返す（非破壊）。 */
 export function addStats(a: StatValues, b: StatValues): StatValues {
   const result = zeroStats();
   for (const key of STAT_KEYS) result[key] = a[key] + b[key];

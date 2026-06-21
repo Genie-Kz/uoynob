@@ -1,13 +1,15 @@
 <script setup lang="ts">
-// モンスターのアイコン画像。画像が無ければ系統色のプレースホルダ（No.表示）に切り替える。
+/** モンスターのアイコン画像。画像が無ければ系統色のプレースホルダ（No.表示）に切り替える。 */
 import { computed, ref, watch } from 'vue';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 
 const props = withDefaults(
   defineProps<{
+    /** 系統名（フォールバック時の配色に使う）。 */
     lineage: string;
+    /** 位階No.（アイコン画像のパス決定に使う）。 */
     no: string;
-    // 表示サイズ。一覧では sm、詳細ヘッダーなどで lg を使う。
+    /** 表示サイズ。一覧では sm、詳細ヘッダーなどで lg を使う。 */
     size?: 'sm' | 'lg';
   }>(),
   { size: 'sm' },

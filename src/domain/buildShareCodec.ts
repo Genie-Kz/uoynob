@@ -31,6 +31,7 @@ export interface BuildShareQuery {
   x: string;
 }
 
+/** 復元・エンコード対象となるビルド／系図個体値の全状態。 */
 export interface BuildShareState {
   bodySize: BodySize;
   traitSlots: string[];
@@ -44,6 +45,7 @@ export interface BuildShareState {
   spTraitNames: string[];
 }
 
+/** 共有コードの復元・生成に必要な参照データ（特性・スキル・武器・特性の索引など）。 */
 export interface BuildShareCodecContext {
   traitMaster: string[];
   skillById: ReadonlyMap<string, Skill>;
@@ -53,6 +55,7 @@ export interface BuildShareCodecContext {
   defaultFamilyTree: (ownLineage: string) => (string | null)[];
 }
 
+/** 復元時に受け取るクエリの入力形（vue-router の query 値を含む緩い型）。 */
 export type BuildShareQueryInput = Record<string, string | (string | null)[] | null | undefined>;
 
 /** 復元判定に使う共有パラメータのキー */
@@ -76,6 +79,7 @@ function zeroIndividualValues(): StatValues {
   return { HP: 0, MP: 0, 攻撃力: 0, 守備力: 0, 素早さ: 0, 賢さ: 0 };
 }
 
+/** クエリに共有パラメータが1つでも含まれているか（共有URLからの復元かどうかの判定）。 */
 export function hasBuildShareParams(query: BuildShareQueryInput): boolean {
   return SHARE_PARAM_KEYS.some((key) => readQuery(query, key) !== undefined);
 }
@@ -189,6 +193,7 @@ function encodeSpTraits(
   return ids.every((id): id is string => !!id) ? ids.join('-') : spTraitNames.join(',');
 }
 
+/** ビルド・系図個体値の状態を、URL共有用のクエリ文字列群にエンコードする。 */
 export function encodeBuildShareQuery(
   state: Omit<BuildShareState, 'weapon'> & { weapon: Weapon | null },
   context: Pick<BuildShareCodecContext, 'traitMaster' | 'attributeIdByName'>,
