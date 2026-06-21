@@ -416,7 +416,11 @@ const monshouOptions = MONSHOU_LIST;
               class="flex items-center justify-between px-3 py-2"
             >
               <span v-if="skill">
-                {{ skill.name }}
+                <router-link
+                  :to="{ name: 'skill-detail', params: { id: skill.id } }"
+                  class="app-link"
+                  >{{ skill.name }}</router-link
+                >
                 <span v-if="skillGuardSummary(skill)" class="text-xs text-gray-600 ml-1">{{
                   skillGuardSummary(skill)
                 }}</span>
