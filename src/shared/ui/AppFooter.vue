@@ -6,7 +6,9 @@
   <!-- 中央寄せ・上罫線つきのフッター領域 -->
   <footer class="max-w-5xl mx-auto px-3 mt-10 pt-4 border-t text-center text-sm text-gray-500">
     <p class="mb-1">
-      <router-link :to="{ name: 'home' }" class="text-gray-500 hover:underline">home</router-link>
+      <router-link :to="{ name: 'home' }" class="text-gray-500 hover:underline active:underline"
+        >home</router-link
+      >
     </p>
     <p class="mb-1">
       このサイトは「凡庸な イルルカSP」(bonyou.info/dqm2sp)
