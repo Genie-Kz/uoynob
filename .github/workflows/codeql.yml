@@ -1,0 +1,52 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # コードに変更が無くても、クエリ更新で新たに見つかる脆弱性を拾えるよう週次でも回す。
+  schedule:
+    - cron: '30 2 * * 1'
+
+# 既定権限は読み取りだけにし、解析結果のアップロードに必要な権限はジョブ側で付与する。
+permissions:
+  contents: read
+
+# PR は最新コミットだけを解析し、main の解析は途中で止めず完走させる。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      # 解析結果を Code scanning へアップロードするために必要。
+      security-events: write
+      # private リポジトリで Actions の情報を読むために必要（public では任意）。
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # JavaScript と TypeScript はこの1言語でまとめて解析できる。
+        language: [javascript-typescript]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # CodeQL データベースを初期化する。JS/TS はビルド不要でソースを直接解析する。
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # 既定のセキュリティクエリに加え、品質も含めた拡張セットで解析する。
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'
