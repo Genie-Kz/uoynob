@@ -15,7 +15,7 @@
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:actions": "node scripts/run-actionlint.js",
+    "lint:actions": "actionlint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run format:check && npm run lint:actions && npm run test && npm run build",
@@ -43,7 +43,8 @@
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
-    "commit-msg": "npx --no-install commitlint --edit $1"
+    "commit-msg": "npx --no-install commitlint --edit $1",
+    "pre-push": "npm run check"
   },
   "lint-staged": {
     "*.{ts,vue}": [

@@ -16,6 +16,24 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # ワークフロー定義(.github/workflows)の検証は reviewdog 経由の actionlint に任せる。
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      # reviewdog が検出結果を Check として書き込むために必要。
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: reviewdog/action-actionlint@be0761e4c1bab7cfdfca56cd03d4bb6253e39a4a # v1.72.0
+        with:
+          reporter: github-check
+          # ワークフローに問題があれば CI を失敗させる（ゲートとして使う）。
+          fail_on_error: true
+
   build:
     name: Lint / Test / Build
     runs-on: ubuntu-latest
@@ -34,9 +52,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-
-      - name: Lint workflows (actionlint)
-        run: npm run lint:actions
 
       - name: Format check
         run: npm run format:check
