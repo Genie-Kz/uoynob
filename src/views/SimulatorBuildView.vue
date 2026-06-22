@@ -14,6 +14,7 @@ import { useTraitLink } from '@/composables/useTraitLink';
 import { usePageSeo } from '@/composables/usePageSeo';
 import { useResettableTimeout } from '@/composables/useResettableTimeout';
 import { loadAttributes, loadWeapons } from '@/shared/data/datasets';
+import { logger } from '@/shared/logging/logger';
 import { lineageInfoOf } from '@/constants/monsterTaxonomy';
 import { SKILL_SLOT_COUNT_BY_SIZE } from '@/constants/buildRules';
 import { MONSHOU_LIST } from '@/constants/statsRules';
@@ -138,8 +139,9 @@ async function copyShareUrl(): Promise<void> {
     copiedFeedbackTimeout.start(() => {
       copied.value = false;
     }, 1500);
-  } catch {
-    /* クリップボード不可の環境では何もしない */
+  } catch (error) {
+    /* クリップボード不可の環境では何もしない（コピー失敗時の表示は変えない） */
+    logger.warn('共有URLのクリップボードコピーに失敗しました', error);
   }
 }
 

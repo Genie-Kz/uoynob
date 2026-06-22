@@ -1,5 +1,6 @@
 /** 非同期データ読み込みを reactive な状態として扱う汎用コンポーザブル */
 import { onScopeDispose, ref, shallowRef, type Ref, type ShallowRef } from 'vue';
+import { logger } from '@/shared/logging/logger';
 
 /** 非同期読み込みの状態（データ・ローディング・エラーメッセージ）。 */
 export interface AsyncData<T> {
@@ -34,6 +35,8 @@ export function useAsyncData<T>(loader: () => Promise<T>): AsyncData<T> {
     .catch((error: unknown) => {
       if (disposed) return;
       errorMessage.value = error instanceof Error ? error.message : '読み込みに失敗しました';
+      // 画面にはユーザー向け文言を出すが、原因調査用に例外そのものも記録する。
+      logger.error('非同期データの読み込みに失敗しました', error);
     })
     // 成否に関わらずローディングを終了する
     .finally(() => {

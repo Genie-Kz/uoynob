@@ -4,6 +4,7 @@
  * ルート遷移時の dynamic import が 404 になり、画面が止まることがある。
  */
 import type { Router } from 'vue-router';
+import { logger as appLogger } from '@/shared/logging/logger';
 
 const CHUNK_RELOAD_STORAGE_KEY = 'uoynob:chunk-load-reload-attempted';
 
@@ -46,7 +47,8 @@ function defaultDependencies(): Required<RecoveryDependencies> {
   return {
     storage: window.sessionStorage,
     location: window.location,
-    logger: console,
+    // 既定は共通ロガー経由。テストでは差し替えられるよう注入可能のままにしておく。
+    logger: { warn: (...data) => appLogger.warn(String(data[0] ?? ''), data[1]) },
   };
 }
 

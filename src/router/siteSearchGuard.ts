@@ -8,6 +8,7 @@ import {
   loadSkills,
 } from '@/shared/data/datasets';
 import { searchSite, type SiteSearchHit } from '@/domain/siteSearch';
+import { logger } from '@/shared/logging/logger';
 
 /** 検索ヒットの種類から、対応する詳細ページのルートを作る。 */
 export function routeForSiteSearchHit(hit: SiteSearchHit): RouteLocationRaw {
@@ -41,8 +42,9 @@ export const redirectSingleSiteSearchResult: NavigationGuard = async (to) => {
     const hits = searchSite({ monsters, attributes, skills, abilities }, keyword, readings);
     // ヒットが1件だけなら、その詳細ページへ直行する
     return hits.length === 1 ? routeForSiteSearchHit(hits[0]!) : true;
-  } catch {
-    // 読み込みエラーは検索結果画面のDataStateで表示する。
+  } catch (error) {
+    // 読み込みエラーは検索結果画面のDataStateで表示する。ここでは原因調査用に記録だけ行う。
+    logger.warn('サイト内検索の事前読み込みに失敗しました', error, { keyword });
     return true;
   }
 };
