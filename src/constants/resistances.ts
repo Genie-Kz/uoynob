@@ -80,10 +80,10 @@ export const RESISTANCE_LEVEL: Record<ResistanceValue, number> = {
   反射: 7,
 };
 
-/** 表示テキスト（普通は「-」、弱点は「弱い」と表記する元サイト準拠） */
+/** 表示テキスト（普通は「-」、弱点はデータ名と同じ「弱点」として表記する） */
 export const RESISTANCE_DISPLAY_TEXT: Record<ResistanceValue, string> = {
   普通: '-',
-  弱点: '弱い',
+  弱点: '弱点',
   軽減: '軽減',
   半減: '半減',
   激減: '激減',

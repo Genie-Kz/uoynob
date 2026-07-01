@@ -29,9 +29,9 @@ describe('resistance helpers', () => {
     expect(resistanceValueOfLevel(99)).toBe('反射');
   });
 
-  it('表示テキストは普通が「-」、弱点が「弱い」になる', () => {
+  it('表示テキストは普通が「-」、弱点が「弱点」になる', () => {
     expect(resistanceDisplayText('普通')).toBe('-');
-    expect(resistanceDisplayText('弱点')).toBe('弱い');
+    expect(resistanceDisplayText('弱点')).toBe('弱点');
     expect(resistanceDisplayText('半減')).toBe('半減');
   });
 

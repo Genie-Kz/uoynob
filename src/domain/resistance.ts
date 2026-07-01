@@ -21,7 +21,7 @@ export function resistanceValueOfLevel(level: number): ResistanceValue {
   return RESISTANCE_VALUES_BY_LEVEL[clamped]!;
 }
 
-/** 表示テキスト（普通→「-」、弱点→「弱い」など） */
+/** 表示テキスト（普通→「-」、弱点→「弱点」など） */
 export function resistanceDisplayText(value: ResistanceValue): string {
   return RESISTANCE_DISPLAY_TEXT[value];
 }
